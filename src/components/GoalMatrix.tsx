@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { ProgressBar } from "./ProgressBar";
-import { PixelRocket } from "./PixelRocket";
+import { RocketLaunchSequence } from "./RocketLaunchSequence";
 import { Starfield } from "./Starfield";
 import { TemplateDropdown } from "./TemplateDropdown";
 import { MissionAccomplished } from "./MissionAccomplished";
@@ -216,9 +216,9 @@ export function GoalMatrix() {
             </span>
           </div>
           
-          {/* Rocket above progress bar */}
-          <div className="flex justify-center pb-2">
-            <PixelRocket progress={globalProgress} />
+          {/* Rocket Launch Sequence */}
+          <div className="flex justify-center">
+            <RocketLaunchSequence progress={globalProgress} />
           </div>
           
           <ProgressBar progress={globalProgress} className="h-2" />
