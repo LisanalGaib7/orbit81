@@ -30,7 +30,10 @@ export function Starfield({ progress }: StarfieldProps) {
             width: `${star.size}px`,
             height: `${star.size}px`,
             opacity: star.opacity,
-            animation: `starfall ${star.duration / speedMultiplier}s linear infinite`,
+            animationName: "starfall",
+            animationDuration: `${star.duration / speedMultiplier}s`,
+            animationTimingFunction: "linear",
+            animationIterationCount: "infinite",
             animationDelay: `-${star.delay}s`,
           }}
         />
