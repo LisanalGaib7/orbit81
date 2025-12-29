@@ -45,9 +45,9 @@ export function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground bg-secondary hover:bg-secondary/80 border border-border rounded-lg transition-all"
+        className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground border border-border/50 hover:border-border rounded-lg transition-all bg-transparent hover:bg-secondary/50"
       >
-        <LayoutTemplate className="w-4 h-4" />
+        <LayoutTemplate className="w-3.5 h-3.5" />
         <span>Templates</span>
         <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
@@ -55,7 +55,7 @@ export function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full left-0 mt-2 w-56 bg-popover border border-border rounded-lg shadow-lg z-20 overflow-hidden animate-scale-in">
+          <div className="absolute top-full right-0 mt-2 w-56 bg-popover border border-border rounded-lg shadow-lg z-20 overflow-hidden animate-scale-in">
             <div className="p-1">
               {TEMPLATES.map((template) => (
                 <button

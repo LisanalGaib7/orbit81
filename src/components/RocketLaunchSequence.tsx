@@ -1,7 +1,9 @@
 import { useMemo, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface RocketLaunchSequenceProps {
   progress: number; // 0-100
+  onLaunchStart?: () => void;
 }
 
 type RocketStage = "idle" | "ignition" | "liftoff" | "orbit" | "launching";
@@ -308,64 +310,43 @@ function MissionBadge({ visible }: { visible: boolean }) {
   );
 }
 
-export function RocketLaunchSequence({ progress }: RocketLaunchSequenceProps) {
+export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSequenceProps) {
   const [isLaunching, setIsLaunching] = useState(false);
   const [hasLaunched, setHasLaunched] = useState(false);
+  const [showRocket, setShowRocket] = useState(true);
   
   // Trigger launch animation when reaching 100%
   useEffect(() => {
     if (progress === 100 && !hasLaunched) {
+      // Notify parent that launch is starting
+      onLaunchStart?.();
+      
       // Start violent shake then launch
       setTimeout(() => {
         setIsLaunching(true);
         setHasLaunched(true);
       }, 500);
+      
+      // Hide rocket after it exits screen
+      setTimeout(() => {
+        setShowRocket(false);
+      }, 2000);
     }
-  }, [progress, hasLaunched]);
+  }, [progress, hasLaunched, onLaunchStart]);
 
   // Reset when progress drops from 100
   useEffect(() => {
     if (progress < 100) {
       setIsLaunching(false);
       setHasLaunched(false);
+      setShowRocket(true);
     }
   }, [progress]);
 
   const stage = getStage(progress, isLaunching);
   
-  // Hide rocket after launch animation completes
-  if (isLaunching) {
-    return (
-      <div className="relative w-24 h-32 flex items-end justify-center overflow-visible">
-        <div className="animate-rocket-launch">
-          {/* Launchpad structure */}
-          <Launchpad stage="liftoff" />
-          
-          {/* Intense exhaust during launch */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-16 h-24">
-            <div 
-              className="absolute left-1/2 -translate-x-1/2 bottom-0 rounded-b-full"
-              style={{
-                width: "24px",
-                height: "48px",
-                background: "linear-gradient(to bottom, hsl(60, 100%, 70%), hsl(38, 92%, 50%), hsl(0, 72%, 51%), transparent)",
-                boxShadow: "0 20px 40px hsl(38, 92%, 50% / 0.8)",
-                animation: "fire-flicker 0.05s ease-in-out infinite",
-              }}
-            />
-          </div>
-          
-          {/* Rocket body */}
-          <div className="relative z-10 mb-4 animate-intense-shake">
-            <RocketBody stage="liftoff" progress={100} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // After launch, show empty launchpad
-  if (hasLaunched && progress === 100) {
+  if (!showRocket && progress === 100) {
     return (
       <div className="relative w-24 h-32 flex items-end justify-center">
         {/* Empty launchpad with smoke */}
@@ -393,30 +374,91 @@ export function RocketLaunchSequence({ progress }: RocketLaunchSequenceProps) {
   }
   
   return (
-    <div className="relative w-24 h-32 flex items-end justify-center">
-      {/* Background glow for orbit */}
-      {stage === "orbit" && (
-        <div 
-          className="absolute inset-0 rounded-full opacity-30 animate-pulse"
-          style={{
-            background: "radial-gradient(circle, hsl(200, 100%, 50%), transparent 70%)",
-          }}
-        />
-      )}
-      
-      {/* Mission badge */}
-      <MissionBadge visible={stage === "orbit"} />
-      
-      {/* Launchpad structure */}
-      <Launchpad stage={stage} />
-      
-      {/* Exhaust effects (behind rocket) */}
-      <ExhaustEffects stage={stage} progress={progress} />
-      
-      {/* Rocket body */}
-      <div className={`relative z-10 mb-4 ${progress >= 95 ? "animate-intense-shake" : ""}`}>
-        <RocketBody stage={stage} progress={progress} />
-      </div>
+    <div className="relative w-24 h-32 flex items-end justify-center" style={{ overflow: isLaunching ? 'visible' : 'hidden' }}>
+      <AnimatePresence>
+        {isLaunching ? (
+          <motion.div
+            key="launching-rocket"
+            className="absolute z-[100]"
+            initial={{ y: 0 }}
+            animate={{ y: -1500 }}
+            transition={{ 
+              duration: 1.5, 
+              ease: [0.4, 0, 0.2, 1],
+            }}
+          >
+            {/* Intense exhaust during launch */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-32">
+              <motion.div 
+                className="absolute left-1/2 -translate-x-1/2 bottom-0 rounded-b-full"
+                animate={{ 
+                  scaleY: [1, 1.3, 1, 1.2, 1],
+                  scaleX: [1, 0.9, 1.1, 0.95, 1],
+                }}
+                transition={{ duration: 0.1, repeat: Infinity }}
+                style={{
+                  width: "32px",
+                  height: "80px",
+                  background: "linear-gradient(to bottom, hsl(60, 100%, 85%), hsl(45, 100%, 60%), hsl(38, 92%, 50%), hsl(0, 72%, 51%), transparent)",
+                  boxShadow: "0 30px 60px hsl(38, 92%, 50% / 0.9), 0 0 100px hsl(38, 92%, 50% / 0.5)",
+                  filter: "blur(1px)",
+                }}
+              />
+              {/* Core flame */}
+              <motion.div 
+                className="absolute left-1/2 -translate-x-1/2 bottom-0 rounded-b-full"
+                animate={{ 
+                  scaleY: [1, 1.2, 0.9, 1.1, 1],
+                }}
+                transition={{ duration: 0.08, repeat: Infinity }}
+                style={{
+                  width: "16px",
+                  height: "50px",
+                  background: "linear-gradient(to bottom, white, hsl(60, 100%, 80%), hsl(45, 100%, 60%))",
+                }}
+              />
+            </div>
+            
+            {/* Rocket body with shake */}
+            <motion.div 
+              className="relative z-10"
+              animate={{ 
+                x: [-2, 2, -1, 1, -2, 2, 0],
+                y: [-1, 1, -2, 0, 1, -1, 0],
+              }}
+              transition={{ duration: 0.1, repeat: Infinity }}
+            >
+              <RocketBody stage="liftoff" progress={100} />
+            </motion.div>
+          </motion.div>
+        ) : (
+          <motion.div key="stationary-rocket">
+            {/* Background glow for orbit */}
+            {stage === "orbit" && (
+              <div 
+                className="absolute inset-0 rounded-full opacity-30 animate-pulse"
+                style={{
+                  background: "radial-gradient(circle, hsl(200, 100%, 50%), transparent 70%)",
+                }}
+              />
+            )}
+            
+            {/* Mission badge */}
+            <MissionBadge visible={stage === "orbit"} />
+            
+            {/* Launchpad structure */}
+            <Launchpad stage={stage} />
+            
+            {/* Exhaust effects (behind rocket) */}
+            <ExhaustEffects stage={stage} progress={progress} />
+            
+            {/* Rocket body */}
+            <div className={`relative z-10 mb-4 ${progress >= 95 ? "animate-intense-shake" : ""}`}>
+              <RocketBody stage={stage} progress={progress} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
