@@ -1,7 +1,11 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { ProgressBar } from "./ProgressBar";
+import { PixelRocket } from "./PixelRocket";
+import { Starfield } from "./Starfield";
+import { TemplateDropdown } from "./TemplateDropdown";
+import { MissionAccomplished } from "./MissionAccomplished";
 
 // Default sub-goal labels
 const DEFAULT_SUBGOALS = [
@@ -15,13 +19,36 @@ const DEFAULT_SUBGOALS = [
   "Adventure",
 ];
 
+// localStorage keys
+const STORAGE_KEYS = {
+  actions: "goalMatrix_actions",
+  labels: "goalMatrix_labels",
+};
+
 export function GoalMatrix() {
   // State: 8 sub-goal blocks, each with 8 actions
-  const [actions, setActions] = useState<boolean[][]>(
-    Array(8).fill(null).map(() => Array(8).fill(false))
-  );
+  const [actions, setActions] = useState<boolean[][]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.actions);
+    return saved ? JSON.parse(saved) : Array(8).fill(null).map(() => Array(8).fill(false));
+  });
 
-  const [subGoalLabels] = useState(DEFAULT_SUBGOALS);
+  const [subGoalLabels, setSubGoalLabels] = useState<string[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.labels);
+    return saved ? JSON.parse(saved) : DEFAULT_SUBGOALS;
+  });
+
+  const [showMissionComplete, setShowMissionComplete] = useState(false);
+  const [completedSubGoals, setCompletedSubGoals] = useState<Set<number>>(new Set());
+  const prevCompletedRef = useRef<Set<number>>(new Set());
+
+  // Persist to localStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.actions, JSON.stringify(actions));
+  }, [actions]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.labels, JSON.stringify(subGoalLabels));
+  }, [subGoalLabels]);
 
   // Toggle a specific action
   const toggleAction = useCallback((blockIndex: number, actionIndex: number) => {
@@ -30,6 +57,20 @@ export function GoalMatrix() {
       newActions[blockIndex][actionIndex] = !newActions[blockIndex][actionIndex];
       return newActions;
     });
+  }, []);
+
+  // Update a sub-goal label
+  const updateLabel = useCallback((index: number, newLabel: string) => {
+    setSubGoalLabels(prev => {
+      const newLabels = [...prev];
+      newLabels[index] = newLabel;
+      return newLabels;
+    });
+  }, []);
+
+  // Apply template
+  const applyTemplate = useCallback((labels: string[]) => {
+    setSubGoalLabels(labels);
   }, []);
 
   // Calculate progress for each sub-goal
@@ -46,6 +87,39 @@ export function GoalMatrix() {
     return (totalCompleted / 64) * 100;
   }, [actions]);
 
+  // Track newly completed sub-goals for confetti
+  useEffect(() => {
+    const newCompleted = new Set<number>();
+    subGoalProgress.forEach((progress, idx) => {
+      if (progress === 100) newCompleted.add(idx);
+    });
+
+    // Find newly completed
+    newCompleted.forEach(idx => {
+      if (!prevCompletedRef.current.has(idx)) {
+        setCompletedSubGoals(prev => new Set(prev).add(idx));
+      }
+    });
+
+    prevCompletedRef.current = newCompleted;
+  }, [subGoalProgress]);
+
+  // Clear confetti after animation
+  const clearConfetti = useCallback((idx: number) => {
+    setCompletedSubGoals(prev => {
+      const next = new Set(prev);
+      next.delete(idx);
+      return next;
+    });
+  }, []);
+
+  // Check for mission complete
+  useEffect(() => {
+    if (globalProgress === 100) {
+      setShowMissionComplete(true);
+    }
+  }, [globalProgress]);
+
   const completedCount = actions.flat().filter(Boolean).length;
 
   // Grid positions: 0-7 are sub-goals, 4 is center (core goal)
@@ -53,64 +127,85 @@ export function GoalMatrix() {
   const gridPositions = [0, 1, 2, 3, -1, 4, 5, 6, 7];
 
   return (
-    <div className="flex flex-col items-center gap-6 p-4 sm:p-6 max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-          Goal Matrix <span className="text-primary">Engine</span>
-        </h1>
-        <p className="text-sm text-muted-foreground max-w-md">
-          Break down your core goal into 8 sub-goals, each with 8 actionable steps
-        </p>
-      </div>
-
-      {/* Global Progress */}
-      <div className="w-full max-w-md space-y-2">
-        <div className="flex justify-between items-center text-sm">
-          <span className="text-muted-foreground">Total Progress</span>
-          <span className="font-mono text-primary font-semibold">
-            {completedCount}/64 <span className="text-muted-foreground">({Math.round(globalProgress)}%)</span>
-          </span>
+    <>
+      <Starfield progress={globalProgress} />
+      
+      <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 max-w-3xl mx-auto">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            Goal Matrix <span className="text-primary">Engine</span>
+          </h1>
+          <p className="text-sm text-muted-foreground max-w-md">
+            Break down your core goal into 8 sub-goals, each with 8 actionable steps
+          </p>
         </div>
-        <ProgressBar progress={globalProgress} className="h-2" />
-      </div>
 
-      {/* Matrix Grid */}
-      <div className="goal-grid w-full aspect-square max-w-2xl">
-        {gridPositions.map((subIdx, gridIdx) => (
-          <div key={gridIdx} className="aspect-square">
-            {subIdx === -1 ? (
-              <CoreGoalBlock 
-                subGoalProgress={subGoalProgress}
-                subGoalLabels={subGoalLabels}
-              />
-            ) : (
-              <SubGoalBlock
-                blockIndex={subIdx}
-                actions={actions[subIdx]}
-                onToggle={toggleAction}
-                label={subGoalLabels[subIdx]}
-              />
-            )}
+        {/* Template Button */}
+        <TemplateDropdown onSelect={applyTemplate} />
+
+        {/* Global Progress with Rocket */}
+        <div className="w-full max-w-md space-y-2">
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-muted-foreground">Total Progress</span>
+            <span className="font-mono text-primary font-semibold">
+              {completedCount}/64 <span className="text-muted-foreground">({Math.round(globalProgress)}%)</span>
+            </span>
           </div>
-        ))}
+          
+          {/* Rocket above progress bar */}
+          <div className="flex justify-center pb-2">
+            <PixelRocket progress={globalProgress} />
+          </div>
+          
+          <ProgressBar progress={globalProgress} className="h-2" />
+        </div>
+
+        {/* Matrix Grid */}
+        <div className="goal-grid w-full aspect-square max-w-2xl">
+          {gridPositions.map((subIdx, gridIdx) => (
+            <div key={gridIdx} className="aspect-square">
+              {subIdx === -1 ? (
+                <CoreGoalBlock 
+                  subGoalProgress={subGoalProgress}
+                  subGoalLabels={subGoalLabels}
+                />
+              ) : (
+                <SubGoalBlock
+                  blockIndex={subIdx}
+                  actions={actions[subIdx]}
+                  onToggle={toggleAction}
+                  label={subGoalLabels[subIdx]}
+                  onLabelChange={(newLabel) => updateLabel(subIdx, newLabel)}
+                  showConfetti={completedSubGoals.has(subIdx)}
+                  onConfettiComplete={() => clearConfetti(subIdx)}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Legend */}
+        <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm bg-goal-core border border-border" />
+            <span>Core Goal (Center)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm bg-goal-sub border border-border" />
+            <span>Sub Goals (8 blocks)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="checkbox-goal checked w-3 h-3 !border" />
+            <span>Completed Action</span>
+          </div>
+        </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-goal-core border border-border" />
-          <span>Core Goal (Center)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-goal-sub border border-border" />
-          <span>Sub Goals (8 blocks)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="checkbox-goal checked w-3 h-3 !border" />
-          <span>Completed Action</span>
-        </div>
-      </div>
-    </div>
+      <MissionAccomplished 
+        isOpen={showMissionComplete} 
+        onClose={() => setShowMissionComplete(false)} 
+      />
+    </>
   );
 }
