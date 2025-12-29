@@ -181,9 +181,14 @@ export function GoalMatrix() {
     });
   }, []);
 
-  // Callback when rocket starts launching
-  const handleLaunchStart = useCallback(() => {
+  // Callback when rocket has exited screen - trigger fireworks
+  const handleLaunchComplete = useCallback(() => {
     setShowFireworks(true);
+    
+    // Show modal 0.5s after fireworks start (total 4.5s from 100%)
+    setTimeout(() => {
+      setShowMissionModal(true);
+    }, 500);
   }, []);
 
   // Grand finale launch sequence
@@ -191,11 +196,7 @@ export function GoalMatrix() {
     if (globalProgress === 100 && !missionTriggeredRef.current) {
       missionTriggeredRef.current = true;
       setShowMissionComplete(true);
-      
-      // Show modal after rocket exits screen (1.5s animation + buffer)
-      setTimeout(() => {
-        setShowMissionModal(true);
-      }, 1800);
+      // Note: Fireworks and modal are now triggered by handleLaunchComplete callback
     }
   }, [globalProgress]);
 
@@ -237,7 +238,7 @@ export function GoalMatrix() {
           
           {/* Rocket Launch Sequence */}
           <div className="flex justify-center" style={{ overflow: 'visible', zIndex: 100 }}>
-            <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchStart} />
+            <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} />
           </div>
           
           <ProgressBar progress={globalProgress} className="h-2" />
