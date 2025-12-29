@@ -27,22 +27,61 @@ const STORAGE_KEYS = {
   actionLabels: "goalMatrix_actionLabels",
 };
 
+// Helper to ensure arrays are properly sized
+const ensureArraySize = <T,>(arr: T[] | undefined, size: number, defaultValue: T): T[] => {
+  if (!Array.isArray(arr) || arr.length < size) {
+    return Array(size).fill(defaultValue);
+  }
+  return arr;
+};
+
+const ensure2DArraySize = <T,>(arr: T[][] | undefined, outerSize: number, innerSize: number, defaultValue: T): T[][] => {
+  if (!Array.isArray(arr) || arr.length < outerSize) {
+    return Array(outerSize).fill(null).map(() => Array(innerSize).fill(defaultValue));
+  }
+  return arr.map(inner => ensureArraySize(inner, innerSize, defaultValue));
+};
+
 export function GoalMatrix() {
   // State: 8 sub-goal blocks, each with 8 actions
   const [actions, setActions] = useState<boolean[][]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.actions);
-    return saved ? JSON.parse(saved) : Array(8).fill(null).map(() => Array(8).fill(false));
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.actions);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return ensure2DArraySize(parsed, 8, 8, false);
+      }
+    } catch (e) {
+      console.warn("Failed to parse saved actions, using defaults");
+    }
+    return Array(8).fill(null).map(() => Array(8).fill(false));
   });
 
   const [subGoalLabels, setSubGoalLabels] = useState<string[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.labels);
-    return saved ? JSON.parse(saved) : DEFAULT_SUBGOALS;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.labels);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return ensureArraySize(parsed, 8, "Goal");
+      }
+    } catch (e) {
+      console.warn("Failed to parse saved labels, using defaults");
+    }
+    return [...DEFAULT_SUBGOALS];
   });
 
   // Action item labels: 8 sub-goals × 8 actions
   const [actionLabels, setActionLabels] = useState<string[][]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.actionLabels);
-    return saved ? JSON.parse(saved) : Array(8).fill(null).map(() => Array(8).fill(""));
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.actionLabels);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return ensure2DArraySize(parsed, 8, 8, "");
+      }
+    } catch (e) {
+      console.warn("Failed to parse saved action labels, using defaults");
+    }
+    return Array(8).fill(null).map(() => Array(8).fill(""));
   });
 
   const [showMissionComplete, setShowMissionComplete] = useState(false);
