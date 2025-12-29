@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import { PixelRocketBody } from "./PixelRocketBody";
+import { GroundSmoke, AscendingSmoke } from "./VolumetricSmoke";
 
 interface RocketLaunchSequenceProps {
   progress: number; // 0-100
@@ -21,13 +22,14 @@ function getStage(progress: number, isLaunching: boolean): RocketStage {
 function SteamParticle({ delay, left }: { delay: number; left: number }) {
   return (
     <div
-      className="absolute bottom-0 rounded-full bg-muted-foreground/30"
+      className="absolute bottom-0 rounded-sm bg-muted-foreground/30"
       style={{
         left: `${left}%`,
         width: "4px",
         height: "4px",
         animation: `steam-rise 2s ease-out infinite`,
         animationDelay: `${delay}s`,
+        imageRendering: "pixelated",
       }}
     />
   );
@@ -37,13 +39,14 @@ function SteamParticle({ delay, left }: { delay: number; left: number }) {
 function SmokeParticle({ delay, left, size }: { delay: number; left: number; size: number }) {
   return (
     <div
-      className="absolute bottom-0 rounded-full bg-muted-foreground/40"
+      className="absolute bottom-0 rounded-sm bg-muted-foreground/40"
       style={{
         left: `${left}%`,
         width: `${size}px`,
         height: `${size}px`,
         animation: `smoke-billow 1.5s ease-out infinite`,
         animationDelay: `${delay}s`,
+        imageRendering: "pixelated",
       }}
     />
   );
@@ -53,7 +56,7 @@ function SmokeParticle({ delay, left, size }: { delay: number; left: number; siz
 function FireParticle({ delay, left, intensity }: { delay: number; left: number; intensity: number }) {
   return (
     <div
-      className="absolute rounded-full"
+      className="absolute rounded-sm"
       style={{
         left: `${left}%`,
         bottom: 0,
@@ -62,8 +65,8 @@ function FireParticle({ delay, left, intensity }: { delay: number; left: number;
         background: `linear-gradient(to top, hsl(var(--destructive)), hsl(var(--primary)), hsl(45, 100%, 60%))`,
         animation: `fire-flicker 0.15s ease-in-out infinite`,
         animationDelay: `${delay}s`,
-        filter: `blur(${intensity}px)`,
         opacity: 0.8 + intensity * 0.2,
+        imageRendering: "pixelated",
       }}
     />
   );
@@ -115,23 +118,19 @@ function Launchpad({ stage }: { stage: RocketStage }) {
   );
 }
 
-// Main rocket body
+// Main rocket body (legacy)
 function RocketBody({ stage, progress }: { stage: RocketStage; progress: number }) {
-  // Calculate vertical position based on stage
   const getVerticalOffset = () => {
     if (stage === "idle") return 0;
     if (stage === "ignition") return 4;
     if (stage === "liftoff") {
-      // 51-99% maps to 10-80px
       const liftProgress = (progress - 51) / 48;
       return 10 + liftProgress * 70;
     }
-    return 90; // orbit
+    return 90;
   };
 
   const verticalOffset = getVerticalOffset();
-  
-  // Vibration intensity
   const vibrationClass = 
     stage === "idle" ? "animate-subtle-shake" :
     stage === "ignition" ? "animate-medium-shake" :
@@ -141,11 +140,12 @@ function RocketBody({ stage, progress }: { stage: RocketStage; progress: number 
   return (
     <div 
       className={`relative transition-all duration-1000 ease-out ${vibrationClass}`}
-      style={{ transform: `translateY(-${verticalOffset}px)` }}
+      style={{ 
+        transform: `translateY(-${verticalOffset}px)`,
+        imageRendering: "pixelated",
+      }}
     >
-      {/* Rocket structure */}
       <div className="relative flex flex-col items-center">
-        {/* Nose cone */}
         <div 
           className="w-0 h-0 border-l-[8px] border-r-[8px] border-b-[12px] border-transparent transition-colors duration-500"
           style={{ 
@@ -154,12 +154,9 @@ function RocketBody({ stage, progress }: { stage: RocketStage; progress: number 
               : "hsl(var(--muted-foreground))" 
           }}
         />
-        
-        {/* Body */}
         <div className="w-4 h-7 bg-secondary-foreground rounded-sm relative overflow-hidden">
-          {/* Window */}
           <div 
-            className="absolute top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full transition-all duration-500"
+            className="absolute top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-sm transition-all duration-500"
             style={{
               background: stage === "orbit" 
                 ? "radial-gradient(circle, hsl(200, 100%, 60%), hsl(var(--primary)))"
@@ -169,12 +166,8 @@ function RocketBody({ stage, progress }: { stage: RocketStage; progress: number 
                 : "none",
             }}
           />
-          
-          {/* Body stripe */}
           <div className="absolute bottom-1 left-0 right-0 h-1 bg-primary/30" />
         </div>
-        
-        {/* Fins */}
         <div className="flex justify-center -mt-1.5">
           <div className="w-0 h-0 border-t-[8px] border-r-[5px] border-transparent border-t-muted" />
           <div className="w-4 h-1.5 bg-muted" />
@@ -225,9 +218,11 @@ function ExhaustEffects({ stage, progress }: { stage: RocketStage; progress: num
   return (
     <div 
       className="absolute bottom-6 left-1/2 -translate-x-1/2 w-16 h-20 transition-all duration-1000"
-      style={{ transform: `translateY(-${verticalOffset}px)` }}
+      style={{ 
+        transform: `translateY(-${verticalOffset}px)`,
+        imageRendering: "pixelated",
+      }}
     >
-      {/* Steam puffs (idle stage) */}
       {stage === "idle" && (
         <div className="absolute bottom-0 left-0 right-0 h-12">
           {steamParticles.map((p) => (
@@ -236,7 +231,6 @@ function ExhaustEffects({ stage, progress }: { stage: RocketStage; progress: num
         </div>
       )}
       
-      {/* Smoke (ignition & liftoff) */}
       {(stage === "ignition" || stage === "liftoff") && (
         <div className="absolute bottom-0 left-0 right-0 h-16">
           {smokeParticles.map((p) => (
@@ -245,10 +239,8 @@ function ExhaustEffects({ stage, progress }: { stage: RocketStage; progress: num
         </div>
       )}
       
-      {/* Fire/Flame (ignition, liftoff, orbit) */}
       {flameIntensity > 0 && (
         <div className="absolute bottom-0 left-0 right-0 h-20 flex justify-center">
-          {/* Main flame cone */}
           <div 
             className="relative transition-all duration-300"
             style={{
@@ -256,9 +248,8 @@ function ExhaustEffects({ stage, progress }: { stage: RocketStage; progress: num
               height: `${16 + flameIntensity * 24}px`,
             }}
           >
-            {/* Outer flame */}
             <div 
-              className="absolute inset-0 rounded-b-full transition-all duration-300"
+              className="absolute inset-0 rounded-b-sm transition-all duration-300"
               style={{
                 background: stage === "orbit"
                   ? "linear-gradient(to bottom, hsl(200, 100%, 50%), hsl(200, 100%, 70%), transparent)"
@@ -269,10 +260,8 @@ function ExhaustEffects({ stage, progress }: { stage: RocketStage; progress: num
                 animation: "fire-flicker 0.1s ease-in-out infinite",
               }}
             />
-            
-            {/* Inner bright core */}
             <div 
-              className="absolute left-1/2 -translate-x-1/2 rounded-b-full transition-all duration-300"
+              className="absolute left-1/2 -translate-x-1/2 rounded-b-sm transition-all duration-300"
               style={{
                 top: 0,
                 width: `${6 + flameIntensity * 4}px`,
@@ -284,8 +273,6 @@ function ExhaustEffects({ stage, progress }: { stage: RocketStage; progress: num
               }}
             />
           </div>
-          
-          {/* Fire particles */}
           {stage === "liftoff" && fireParticles.map((p) => (
             <FireParticle key={p.id} delay={p.delay} left={p.left} intensity={flameIntensity} />
           ))}
@@ -300,10 +287,8 @@ function MissionBadge({ visible }: { visible: boolean }) {
   if (!visible) return null;
   
   return (
-    <div 
-      className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap animate-fade-in"
-    >
-      <div className="px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full shadow-lg flex items-center gap-1">
+    <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap animate-fade-in">
+      <div className="px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-sm shadow-lg flex items-center gap-1">
         <span className="animate-pulse">🚀</span>
         <span>ORBIT ACHIEVED</span>
       </div>
@@ -316,6 +301,16 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
   const [showRocket, setShowRocket] = useState(true);
   const [launchPhase, setLaunchPhase] = useState<"idle" | "struggle" | "liftoff" | "ascending" | "exited">("idle");
   const [showFlash, setShowFlash] = useState(false);
+  const rocketY = useMotionValue(0);
+  const [currentRocketY, setCurrentRocketY] = useState(0);
+  
+  // Track rocket Y for smoke trail
+  useEffect(() => {
+    const unsubscribe = rocketY.on("change", (latest) => {
+      setCurrentRocketY(latest);
+    });
+    return () => unsubscribe();
+  }, [rocketY]);
   
   // Trigger ultra-cinematic launch sequence when reaching 100%
   useEffect(() => {
@@ -335,6 +330,11 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
       // Phase 3: Ascending (3s - 6s) - Slow rise then accelerate
       setTimeout(() => {
         setLaunchPhase("ascending");
+        // Animate the rocket Y position
+        animate(rocketY, -2500, {
+          duration: 3.0,
+          ease: [0.85, 0, 0.15, 1],
+        });
       }, 3200);
       
       // Phase 4: Fireworks start at 5.5s (rocket almost gone)
@@ -348,7 +348,7 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
         setLaunchPhase("exited");
       }, 6000);
     }
-  }, [progress, hasLaunched, onLaunchStart]);
+  }, [progress, hasLaunched, onLaunchStart, rocketY]);
 
   // Reset when progress drops from 100
   useEffect(() => {
@@ -357,8 +357,10 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
       setShowRocket(true);
       setLaunchPhase("idle");
       setShowFlash(false);
+      rocketY.set(0);
+      setCurrentRocketY(0);
     }
-  }, [progress]);
+  }, [progress, rocketY]);
 
   const stage = getStage(progress, launchPhase === "ascending");
   
@@ -366,21 +368,20 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
   if (!showRocket && progress === 100) {
     return (
       <div className="relative w-24 h-32 flex items-end justify-center">
-        {/* Empty launchpad with smoke */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24">
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-2 bg-muted rounded-sm" />
-          {/* Residual smoke */}
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-16 h-8 opacity-50">
             {[0, 1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="absolute bottom-0 rounded-full bg-muted-foreground/30"
+                className="absolute bottom-0 rounded-sm bg-muted-foreground/30"
                 style={{
                   left: `${25 + i * 15}%`,
                   width: "8px",
                   height: "8px",
                   animation: `smoke-billow 2s ease-out infinite`,
                   animationDelay: `${i * 0.3}s`,
+                  imageRendering: "pixelated",
                 }}
               />
             ))}
@@ -390,110 +391,119 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
     );
   }
   
-  // Determine shake intensity based on phase
+  // Determine shake intensity based on phase - SUBTLE rumble
   const getShakeClass = () => {
-    if (launchPhase === "struggle") return "animate-heavy-shake";
-    if (launchPhase === "liftoff" || launchPhase === "ascending") return "animate-screen-shake";
+    if (launchPhase === "struggle") return "animate-engine-rumble";
+    if (launchPhase === "liftoff" || launchPhase === "ascending") return "animate-liftoff-shake";
     return "";
   };
 
   return (
-    <div 
-      className={`relative w-24 h-32 flex items-end justify-center ${getShakeClass()}`} 
-      style={{ overflow: launchPhase === "ascending" ? 'visible' : 'hidden' }}
-    >
-      {/* Liftoff Flash */}
-      <AnimatePresence>
-        {showFlash && (
-          <motion.div
-            className="fixed inset-0 z-[200] bg-white pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.8 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.1 }}
-          />
-        )}
-      </AnimatePresence>
+    <>
+      {/* Volumetric smoke effects */}
+      {launchPhase === "struggle" && <GroundSmoke intensity={1} />}
+      {launchPhase === "ascending" && <AscendingSmoke rocketY={currentRocketY} />}
+      
+      <div 
+        className={`relative w-24 h-32 flex items-end justify-center ${getShakeClass()}`} 
+        style={{ 
+          overflow: launchPhase === "ascending" ? 'visible' : 'hidden',
+          imageRendering: "pixelated",
+        }}
+      >
+        {/* Liftoff Flash */}
+        <AnimatePresence>
+          {showFlash && (
+            <motion.div
+              className="fixed inset-0 z-[200] bg-white pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.8 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.1 }}
+            />
+          )}
+        </AnimatePresence>
 
-      <AnimatePresence>
-        {launchPhase === "ascending" ? (
-          <motion.div
-            key="launching-rocket"
-            className="absolute z-[100]"
-            initial={{ y: 0 }}
-            animate={{ y: -2500 }}
-            transition={{ 
-              duration: 3.0, // 3s for the actual ascent (3s-6s)
-              ease: [0.85, 0, 0.15, 1], // Ultra slow start, fast finish
-            }}
-          >
-            {/* Pixel Rocket body with attached exhaust - clean animation */}
-            <motion.div 
-              className="relative z-10"
-              animate={{ 
-                x: [-0.5, 0.5, -0.3, 0.3, 0],
-                y: [-0.3, 0.3, -0.2, 0.2, 0],
-              }}
-              transition={{ duration: 0.04, repeat: Infinity }}
+        <AnimatePresence>
+          {launchPhase === "ascending" ? (
+            <motion.div
+              key="launching-rocket"
+              className="absolute z-[100]"
+              style={{ y: rocketY }}
             >
-              <PixelRocketBody stage="ascending" showExhaust exhaustIntensity={1} />
-            </motion.div>
-          </motion.div>
-        ) : (
-          <motion.div key="stationary-rocket">
-            {/* Background glow for orbit */}
-            {stage === "orbit" && (
-              <div 
-                className="absolute inset-0 rounded-full opacity-30 animate-pulse"
-                style={{
-                  background: "radial-gradient(circle, hsl(200, 100%, 50%), transparent 70%)",
+              {/* Pixel Rocket body with attached exhaust */}
+              <motion.div 
+                className="relative z-10"
+                animate={{ 
+                  x: [-0.5, 0.5, -0.3, 0.3, 0],
+                  y: [-0.3, 0.3, -0.2, 0.2, 0],
                 }}
-              />
-            )}
-            
-            {/* Mission badge */}
-            <MissionBadge visible={stage === "orbit"} />
-            
-            {/* Launchpad structure */}
-            <Launchpad stage={launchPhase === "struggle" || launchPhase === "liftoff" ? "liftoff" : stage} />
-            
-            {/* Struggle/Liftoff phase - pixel rocket with attached exhaust */}
-            {(launchPhase === "struggle" || launchPhase === "liftoff") ? (
-              <div className="relative z-10 mb-4">
-                <motion.div
-                  animate={{ 
-                    x: [-0.5, 0.5, -0.3, 0.3, 0],
-                    y: [-0.3, 0.3, -0.2, 0.2, 0],
+                transition={{ duration: 0.04, repeat: Infinity }}
+                style={{ imageRendering: "pixelated" }}
+              >
+                <PixelRocketBody stage="ascending" showExhaust exhaustIntensity={1} />
+              </motion.div>
+            </motion.div>
+          ) : (
+            <motion.div key="stationary-rocket">
+              {/* Background glow for orbit */}
+              {stage === "orbit" && (
+                <div 
+                  className="absolute inset-0 rounded-sm opacity-30 animate-pulse"
+                  style={{
+                    background: "radial-gradient(circle, hsl(200, 100%, 50%), transparent 70%)",
                   }}
-                  transition={{ duration: 0.03, repeat: Infinity }}
-                >
-                  <PixelRocketBody 
-                    stage="struggle" 
-                    showExhaust 
-                    exhaustIntensity={launchPhase === "liftoff" ? 1 : 0.85} 
-                  />
-                </motion.div>
-              </div>
-            ) : (
-              <>
-                <ExhaustEffects stage={stage} progress={progress} />
-                {/* Regular rocket body */}
-                <div className={`relative z-10 mb-4 ${progress >= 95 ? "animate-subtle-shake" : ""}`}>
-                  <PixelRocketBody 
-                    stage={stage as any} 
-                    showExhaust={stage === "ignition" || stage === "liftoff" || stage === "orbit"} 
-                    exhaustIntensity={
-                      stage === "orbit" ? 0.3 : 
-                      stage === "liftoff" ? 0.7 : 
-                      stage === "ignition" ? 0.5 : 0
-                    }
-                  />
+                />
+              )}
+              
+              {/* Mission badge */}
+              <MissionBadge visible={stage === "orbit"} />
+              
+              {/* Launchpad structure */}
+              <Launchpad stage={launchPhase === "struggle" || launchPhase === "liftoff" ? "liftoff" : stage} />
+              
+              {/* Struggle/Liftoff phase - pixel rocket with attached exhaust */}
+              {(launchPhase === "struggle" || launchPhase === "liftoff") ? (
+                <div className="relative z-10 mb-4">
+                  <motion.div
+                    animate={{ 
+                      x: [-0.8, 0.8, -0.5, 0.5, 0],
+                      y: [-0.4, 0.4, -0.3, 0.3, 0],
+                    }}
+                    transition={{ duration: 0.025, repeat: Infinity }}
+                    style={{ imageRendering: "pixelated" }}
+                  >
+                    <PixelRocketBody 
+                      stage="struggle" 
+                      showExhaust 
+                      exhaustIntensity={launchPhase === "liftoff" ? 1 : 0.85} 
+                    />
+                  </motion.div>
                 </div>
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+              ) : (
+                <>
+                  <ExhaustEffects stage={stage} progress={progress} />
+                  {/* Regular rocket body */}
+                  <div 
+                    className={`relative z-10 mb-4 ${progress >= 95 ? "animate-subtle-shake" : ""}`}
+                    style={{ imageRendering: "pixelated" }}
+                  >
+                    <PixelRocketBody 
+                      stage={stage as any} 
+                      showExhaust={stage === "ignition" || stage === "liftoff" || stage === "orbit"} 
+                      exhaustIntensity={
+                        stage === "orbit" ? 0.3 : 
+                        stage === "liftoff" ? 0.7 : 
+                        stage === "ignition" ? 0.5 : 0
+                      }
+                    />
+                  </div>
+                </>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
   );
 }
