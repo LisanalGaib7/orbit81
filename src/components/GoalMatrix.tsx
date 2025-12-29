@@ -6,6 +6,7 @@ import { RocketLaunchSequence } from "./RocketLaunchSequence";
 import { Starfield } from "./Starfield";
 import { TemplateDropdown } from "./TemplateDropdown";
 import { MissionAccomplished } from "./MissionAccomplished";
+import { DeepSpaceFireworks } from "./DeepSpaceFireworks";
 import { ActionSidebar } from "./ActionSidebar";
 
 // Default sub-goal labels
@@ -85,8 +86,12 @@ export function GoalMatrix() {
   });
 
   const [showMissionComplete, setShowMissionComplete] = useState(false);
+  const [showMissionModal, setShowMissionModal] = useState(false);
+  const [rocketLaunching, setRocketLaunching] = useState(false);
+  const [showFireworks, setShowFireworks] = useState(false);
   const [completedSubGoals, setCompletedSubGoals] = useState<Set<number>>(new Set());
   const prevCompletedRef = useRef<Set<number>>(new Set());
+  const missionTriggeredRef = useRef(false);
 
   // Active block for sidebar
   const [activeBlockIndex, setActiveBlockIndex] = useState<number | null>(null);
@@ -176,10 +181,23 @@ export function GoalMatrix() {
     });
   }, []);
 
-  // Check for mission complete
+  // Grand finale launch sequence
   useEffect(() => {
-    if (globalProgress === 100) {
+    if (globalProgress === 100 && !missionTriggeredRef.current) {
+      missionTriggeredRef.current = true;
       setShowMissionComplete(true);
+      setRocketLaunching(true);
+      
+      // After rocket shakes and launches (1.5s), show fireworks
+      setTimeout(() => {
+        setShowFireworks(true);
+      }, 500);
+      
+      // After rocket exits screen (2s), show modal
+      setTimeout(() => {
+        setRocketLaunching(false);
+        setShowMissionModal(true);
+      }, 2000);
     }
   }, [globalProgress]);
 
@@ -282,9 +300,18 @@ export function GoalMatrix() {
         />
       )}
 
+      {/* Deep Space Fireworks */}
+      <DeepSpaceFireworks active={showFireworks} />
+
       <MissionAccomplished 
         isOpen={showMissionComplete} 
-        onClose={() => setShowMissionComplete(false)} 
+        onClose={() => {
+          setShowMissionComplete(false);
+          setShowMissionModal(false);
+          setShowFireworks(false);
+          missionTriggeredRef.current = false;
+        }}
+        showModal={showMissionModal}
       />
     </>
   );

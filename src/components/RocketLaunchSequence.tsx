@@ -1,12 +1,13 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 
 interface RocketLaunchSequenceProps {
   progress: number; // 0-100
 }
 
-type RocketStage = "idle" | "ignition" | "liftoff" | "orbit";
+type RocketStage = "idle" | "ignition" | "liftoff" | "orbit" | "launching";
 
-function getStage(progress: number): RocketStage {
+function getStage(progress: number, isLaunching: boolean): RocketStage {
+  if (isLaunching) return "launching";
   if (progress <= 20) return "idle";
   if (progress <= 50) return "ignition";
   if (progress < 100) return "liftoff";
@@ -308,7 +309,88 @@ function MissionBadge({ visible }: { visible: boolean }) {
 }
 
 export function RocketLaunchSequence({ progress }: RocketLaunchSequenceProps) {
-  const stage = getStage(progress);
+  const [isLaunching, setIsLaunching] = useState(false);
+  const [hasLaunched, setHasLaunched] = useState(false);
+  
+  // Trigger launch animation when reaching 100%
+  useEffect(() => {
+    if (progress === 100 && !hasLaunched) {
+      // Start violent shake then launch
+      setTimeout(() => {
+        setIsLaunching(true);
+        setHasLaunched(true);
+      }, 500);
+    }
+  }, [progress, hasLaunched]);
+
+  // Reset when progress drops from 100
+  useEffect(() => {
+    if (progress < 100) {
+      setIsLaunching(false);
+      setHasLaunched(false);
+    }
+  }, [progress]);
+
+  const stage = getStage(progress, isLaunching);
+  
+  // Hide rocket after launch animation completes
+  if (isLaunching) {
+    return (
+      <div className="relative w-24 h-32 flex items-end justify-center overflow-visible">
+        <div className="animate-rocket-launch">
+          {/* Launchpad structure */}
+          <Launchpad stage="liftoff" />
+          
+          {/* Intense exhaust during launch */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-16 h-24">
+            <div 
+              className="absolute left-1/2 -translate-x-1/2 bottom-0 rounded-b-full"
+              style={{
+                width: "24px",
+                height: "48px",
+                background: "linear-gradient(to bottom, hsl(60, 100%, 70%), hsl(38, 92%, 50%), hsl(0, 72%, 51%), transparent)",
+                boxShadow: "0 20px 40px hsl(38, 92%, 50% / 0.8)",
+                animation: "fire-flicker 0.05s ease-in-out infinite",
+              }}
+            />
+          </div>
+          
+          {/* Rocket body */}
+          <div className="relative z-10 mb-4 animate-intense-shake">
+            <RocketBody stage="liftoff" progress={100} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // After launch, show empty launchpad
+  if (hasLaunched && progress === 100) {
+    return (
+      <div className="relative w-24 h-32 flex items-end justify-center">
+        {/* Empty launchpad with smoke */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24">
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-2 bg-muted rounded-sm" />
+          {/* Residual smoke */}
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-16 h-8 opacity-50">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="absolute bottom-0 rounded-full bg-muted-foreground/30"
+                style={{
+                  left: `${25 + i * 15}%`,
+                  width: "8px",
+                  height: "8px",
+                  animation: `smoke-billow 2s ease-out infinite`,
+                  animationDelay: `${i * 0.3}s`,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="relative w-24 h-32 flex items-end justify-center">
@@ -332,7 +414,7 @@ export function RocketLaunchSequence({ progress }: RocketLaunchSequenceProps) {
       <ExhaustEffects stage={stage} progress={progress} />
       
       {/* Rocket body */}
-      <div className="relative z-10 mb-4">
+      <div className={`relative z-10 mb-4 ${progress >= 95 ? "animate-intense-shake" : ""}`}>
         <RocketBody stage={stage} progress={progress} />
       </div>
     </div>
