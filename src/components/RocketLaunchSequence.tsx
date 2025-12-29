@@ -1,12 +1,13 @@
 import { useMemo, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PixelRocketBody } from "./PixelRocketBody";
 
 interface RocketLaunchSequenceProps {
   progress: number; // 0-100
   onLaunchStart?: () => void;
 }
 
-type RocketStage = "idle" | "ignition" | "liftoff" | "orbit" | "launching";
+type RocketStage = "idle" | "ignition" | "liftoff" | "orbit" | "launching" | "struggle" | "ascending";
 
 function getStage(progress: number, isLaunching: boolean): RocketStage {
   if (isLaunching) return "launching";
@@ -426,88 +427,16 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
               ease: [0.85, 0, 0.15, 1], // Ultra slow start, fast finish
             }}
           >
-            {/* Massive growing exhaust during ascent */}
-            <motion.div 
-              className="absolute bottom-0 left-1/2 -translate-x-1/2"
-              initial={{ width: 48, height: 120 }}
-              animate={{ width: 64, height: 200 }}
-              transition={{ duration: 2.0, ease: "easeIn" }}
-            >
-              {/* Outer flame glow - intense */}
-              <motion.div 
-                className="absolute left-1/2 -translate-x-1/2 bottom-0 rounded-b-full"
-                animate={{ 
-                  scaleY: [1, 1.5, 1, 1.4, 1.2, 1.6, 1],
-                  scaleX: [1, 0.8, 1.2, 0.85, 1.15, 0.9, 1],
-                }}
-                transition={{ duration: 0.12, repeat: Infinity }}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  background: "linear-gradient(to bottom, hsl(60, 100%, 95%), hsl(50, 100%, 75%), hsl(45, 100%, 60%), hsl(38, 92%, 50%), hsl(20, 90%, 40%), hsl(0, 72%, 35%), transparent)",
-                  boxShadow: "0 80px 150px hsl(38, 92%, 50% / 0.98), 0 0 200px hsl(38, 92%, 50% / 0.8), 0 0 300px hsl(0, 72%, 51% / 0.5)",
-                  filter: "blur(3px)",
-                }}
-              />
-              
-              {/* Core white-hot flame */}
-              <motion.div 
-                className="absolute left-1/2 -translate-x-1/2 bottom-0 rounded-b-full"
-                animate={{ 
-                  scaleY: [1, 1.4, 0.9, 1.3, 1],
-                  opacity: [1, 0.9, 1, 0.85, 1],
-                }}
-                transition={{ duration: 0.05, repeat: Infinity }}
-                style={{
-                  width: "45%",
-                  height: "60%",
-                  background: "linear-gradient(to bottom, white, hsl(60, 100%, 95%), hsl(55, 100%, 80%), hsl(50, 100%, 65%))",
-                }}
-              />
-              
-              {/* Massive smoke plumes */}
-              {[...Array(10)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute bottom-0 rounded-full bg-muted-foreground/60"
-                  initial={{ 
-                    x: 0, 
-                    y: 0, 
-                    scale: 0.8,
-                    opacity: 0.7 
-                  }}
-                  animate={{ 
-                    x: (i % 2 === 0 ? -1 : 1) * (50 + Math.random() * 40),
-                    y: 60 + Math.random() * 50,
-                    scale: 3 + Math.random() * 2,
-                    opacity: 0
-                  }}
-                  transition={{ 
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: i * 0.15,
-                    ease: "easeOut"
-                  }}
-                  style={{
-                    left: "50%",
-                    width: "16px",
-                    height: "16px",
-                  }}
-                />
-              ))}
-            </motion.div>
-            
-            {/* Rocket body with vibration */}
+            {/* Pixel Rocket body with attached exhaust - clean animation */}
             <motion.div 
               className="relative z-10"
               animate={{ 
-                x: [-4, 4, -3, 3, -4, 4, -2, 2, 0],
-                y: [-3, 3, -4, 2, 3, -3, 2, -2, 0],
-                rotate: [-0.8, 0.8, -0.5, 0.5, -0.8, 0.8, 0],
+                x: [-0.5, 0.5, -0.3, 0.3, 0],
+                y: [-0.3, 0.3, -0.2, 0.2, 0],
               }}
-              transition={{ duration: 0.06, repeat: Infinity }}
+              transition={{ duration: 0.04, repeat: Infinity }}
             >
-              <RocketBody stage="liftoff" progress={100} />
+              <PixelRocketBody stage="ascending" showExhaust exhaustIntensity={1} />
             </motion.div>
           </motion.div>
         ) : (
@@ -528,73 +457,40 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
             {/* Launchpad structure */}
             <Launchpad stage={launchPhase === "struggle" || launchPhase === "liftoff" ? "liftoff" : stage} />
             
-            {/* Struggle phase - massive stationary exhaust */}
+            {/* Struggle/Liftoff phase - pixel rocket with attached exhaust */}
             {(launchPhase === "struggle" || launchPhase === "liftoff") ? (
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-20 h-24">
-                {/* Massive turbulent flame during struggle */}
-                <motion.div 
-                  className="absolute left-1/2 -translate-x-1/2 bottom-0 rounded-b-full"
+              <div className="relative z-10 mb-4">
+                <motion.div
                   animate={{ 
-                    scaleY: [1, 1.6, 1.1, 1.5, 1.2, 1.7, 1],
-                    scaleX: [1, 0.75, 1.25, 0.8, 1.2, 0.85, 1],
+                    x: [-0.5, 0.5, -0.3, 0.3, 0],
+                    y: [-0.3, 0.3, -0.2, 0.2, 0],
                   }}
-                  transition={{ duration: 0.1, repeat: Infinity }}
-                  style={{
-                    width: "40px",
-                    height: "100px",
-                    background: "linear-gradient(to bottom, hsl(60, 100%, 90%), hsl(50, 100%, 70%), hsl(45, 100%, 55%), hsl(38, 92%, 50%), hsl(15, 85%, 40%), transparent)",
-                    boxShadow: "0 60px 120px hsl(38, 92%, 50% / 0.95), 0 0 180px hsl(38, 92%, 50% / 0.7)",
-                    filter: "blur(2px)",
-                  }}
-                />
-                
-                {/* Core flame */}
-                <motion.div 
-                  className="absolute left-1/2 -translate-x-1/2 bottom-0 rounded-b-full"
-                  animate={{ 
-                    scaleY: [1, 1.4, 0.85, 1.3, 1],
-                  }}
-                  transition={{ duration: 0.04, repeat: Infinity }}
-                  style={{
-                    width: "20px",
-                    height: "60px",
-                    background: "linear-gradient(to bottom, white, hsl(60, 100%, 90%), hsl(50, 100%, 70%))",
-                  }}
-                />
-                
-                {/* Billowing smoke */}
-                {[...Array(8)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute bottom-0 rounded-full bg-muted-foreground/50"
-                    initial={{ x: 0, y: 0, scale: 0.6, opacity: 0.6 }}
-                    animate={{ 
-                      x: (i % 2 === 0 ? -1 : 1) * (40 + Math.random() * 30),
-                      y: 50 + Math.random() * 40,
-                      scale: 2.5 + Math.random() * 1.5,
-                      opacity: 0
-                    }}
-                    transition={{ 
-                      duration: 1.8,
-                      repeat: Infinity,
-                      delay: i * 0.2,
-                      ease: "easeOut"
-                    }}
-                    style={{ left: "50%", width: "14px", height: "14px" }}
+                  transition={{ duration: 0.03, repeat: Infinity }}
+                >
+                  <PixelRocketBody 
+                    stage="struggle" 
+                    showExhaust 
+                    exhaustIntensity={launchPhase === "liftoff" ? 1 : 0.85} 
                   />
-                ))}
+                </motion.div>
               </div>
             ) : (
-              <ExhaustEffects stage={stage} progress={progress} />
+              <>
+                <ExhaustEffects stage={stage} progress={progress} />
+                {/* Regular rocket body */}
+                <div className={`relative z-10 mb-4 ${progress >= 95 ? "animate-subtle-shake" : ""}`}>
+                  <PixelRocketBody 
+                    stage={stage as any} 
+                    showExhaust={stage === "ignition" || stage === "liftoff" || stage === "orbit"} 
+                    exhaustIntensity={
+                      stage === "orbit" ? 0.3 : 
+                      stage === "liftoff" ? 0.7 : 
+                      stage === "ignition" ? 0.5 : 0
+                    }
+                  />
+                </div>
+              </>
             )}
-            
-            {/* Rocket body with appropriate shake */}
-            <div className={`relative z-10 mb-4 ${
-              launchPhase === "struggle" || launchPhase === "liftoff" ? "animate-heavy-shake" : 
-              progress >= 95 ? "animate-medium-shake" : ""
-            }`}>
-              <RocketBody stage={launchPhase === "struggle" || launchPhase === "liftoff" ? "liftoff" : stage} progress={progress} />
-            </div>
           </motion.div>
         )}
       </AnimatePresence>
