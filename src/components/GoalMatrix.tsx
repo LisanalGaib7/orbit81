@@ -181,23 +181,21 @@ export function GoalMatrix() {
     });
   }, []);
 
+  // Callback when rocket starts launching
+  const handleLaunchStart = useCallback(() => {
+    setShowFireworks(true);
+  }, []);
+
   // Grand finale launch sequence
   useEffect(() => {
     if (globalProgress === 100 && !missionTriggeredRef.current) {
       missionTriggeredRef.current = true;
       setShowMissionComplete(true);
-      setRocketLaunching(true);
       
-      // After rocket shakes and launches (1.5s), show fireworks
+      // Show modal after rocket exits screen (1.5s animation + buffer)
       setTimeout(() => {
-        setShowFireworks(true);
-      }, 500);
-      
-      // After rocket exits screen (2s), show modal
-      setTimeout(() => {
-        setRocketLaunching(false);
         setShowMissionModal(true);
-      }, 2000);
+      }, 1800);
     }
   }, [globalProgress]);
 
@@ -212,18 +210,21 @@ export function GoalMatrix() {
       <Starfield progress={globalProgress} />
       
       <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-            Goal Matrix <span className="text-primary">Engine</span>
-          </h1>
-          <p className="text-sm text-muted-foreground max-w-md">
-            Break down your core goal into 8 sub-goals, each with 8 actionable steps
-          </p>
+        {/* Header with Template Button */}
+        <div className="w-full flex items-start justify-between">
+          <div className="flex-1" />
+          <div className="text-center flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              Goal Matrix <span className="text-primary">Engine</span>
+            </h1>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto mt-2">
+              Break down your core goal into 8 sub-goals, each with 8 actionable steps
+            </p>
+          </div>
+          <div className="flex-1 flex justify-end">
+            <TemplateDropdown onSelect={applyTemplate} />
+          </div>
         </div>
-
-        {/* Template Button */}
-        <TemplateDropdown onSelect={applyTemplate} />
 
         {/* Global Progress with Rocket */}
         <div className="w-full max-w-md space-y-2">
@@ -235,8 +236,8 @@ export function GoalMatrix() {
           </div>
           
           {/* Rocket Launch Sequence */}
-          <div className="flex justify-center">
-            <RocketLaunchSequence progress={globalProgress} />
+          <div className="flex justify-center" style={{ overflow: 'visible', zIndex: 100 }}>
+            <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchStart} />
           </div>
           
           <ProgressBar progress={globalProgress} className="h-2" />
