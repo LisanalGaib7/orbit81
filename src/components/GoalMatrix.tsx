@@ -6,6 +6,7 @@ import { PixelRocket } from "./PixelRocket";
 import { Starfield } from "./Starfield";
 import { TemplateDropdown } from "./TemplateDropdown";
 import { MissionAccomplished } from "./MissionAccomplished";
+import { ActionSidebar } from "./ActionSidebar";
 
 // Default sub-goal labels
 const DEFAULT_SUBGOALS = [
@@ -23,6 +24,7 @@ const DEFAULT_SUBGOALS = [
 const STORAGE_KEYS = {
   actions: "goalMatrix_actions",
   labels: "goalMatrix_labels",
+  actionLabels: "goalMatrix_actionLabels",
 };
 
 export function GoalMatrix() {
@@ -37,9 +39,18 @@ export function GoalMatrix() {
     return saved ? JSON.parse(saved) : DEFAULT_SUBGOALS;
   });
 
+  // Action item labels: 8 sub-goals × 8 actions
+  const [actionLabels, setActionLabels] = useState<string[][]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.actionLabels);
+    return saved ? JSON.parse(saved) : Array(8).fill(null).map(() => Array(8).fill(""));
+  });
+
   const [showMissionComplete, setShowMissionComplete] = useState(false);
   const [completedSubGoals, setCompletedSubGoals] = useState<Set<number>>(new Set());
   const prevCompletedRef = useRef<Set<number>>(new Set());
+
+  // Active block for sidebar
+  const [activeBlockIndex, setActiveBlockIndex] = useState<number | null>(null);
 
   // Persist to localStorage
   useEffect(() => {
@@ -49,6 +60,10 @@ export function GoalMatrix() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.labels, JSON.stringify(subGoalLabels));
   }, [subGoalLabels]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.actionLabels, JSON.stringify(actionLabels));
+  }, [actionLabels]);
 
   // Toggle a specific action
   const toggleAction = useCallback((blockIndex: number, actionIndex: number) => {
@@ -64,6 +79,15 @@ export function GoalMatrix() {
     setSubGoalLabels(prev => {
       const newLabels = [...prev];
       newLabels[index] = newLabel;
+      return newLabels;
+    });
+  }, []);
+
+  // Update an action label
+  const updateActionLabel = useCallback((blockIndex: number, actionIndex: number, label: string) => {
+    setActionLabels(prev => {
+      const newLabels = prev.map(block => [...block]);
+      newLabels[blockIndex][actionIndex] = label;
       return newLabels;
     });
   }, []);
@@ -174,11 +198,15 @@ export function GoalMatrix() {
                 <SubGoalBlock
                   blockIndex={subIdx}
                   actions={actions[subIdx]}
+                  actionLabels={actionLabels[subIdx]}
                   onToggle={toggleAction}
                   label={subGoalLabels[subIdx]}
                   onLabelChange={(newLabel) => updateLabel(subIdx, newLabel)}
                   showConfetti={completedSubGoals.has(subIdx)}
                   onConfettiComplete={() => clearConfetti(subIdx)}
+                  isActive={activeBlockIndex === subIdx}
+                  isDimmed={activeBlockIndex !== null && activeBlockIndex !== subIdx}
+                  onBlockClick={() => setActiveBlockIndex(subIdx)}
                 />
               )}
             </div>
@@ -201,6 +229,20 @@ export function GoalMatrix() {
           </div>
         </div>
       </div>
+
+      {/* Action Sidebar */}
+      {activeBlockIndex !== null && (
+        <ActionSidebar
+          isOpen={activeBlockIndex !== null}
+          onClose={() => setActiveBlockIndex(null)}
+          blockIndex={activeBlockIndex}
+          label={subGoalLabels[activeBlockIndex]}
+          actions={actions[activeBlockIndex]}
+          actionLabels={actionLabels[activeBlockIndex]}
+          onToggle={toggleAction}
+          onActionLabelChange={updateActionLabel}
+        />
+      )}
 
       <MissionAccomplished 
         isOpen={showMissionComplete} 
