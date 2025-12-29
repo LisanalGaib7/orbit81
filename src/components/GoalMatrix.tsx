@@ -181,14 +181,14 @@ export function GoalMatrix() {
     });
   }, []);
 
-  // Callback when rocket has exited screen - trigger fireworks
+  // Callback when rocket is about to exit - trigger fireworks at 5.5s
   const handleLaunchComplete = useCallback(() => {
     setShowFireworks(true);
     
-    // Show modal 0.5s after fireworks start (total 4.5s from 100%)
+    // Show modal 1.0s after fireworks start (at 6.5s total)
     setTimeout(() => {
       setShowMissionModal(true);
-    }, 500);
+    }, 1000);
   }, []);
 
   // Grand finale launch sequence
