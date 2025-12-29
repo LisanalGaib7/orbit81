@@ -314,23 +314,27 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
   const [isLaunching, setIsLaunching] = useState(false);
   const [hasLaunched, setHasLaunched] = useState(false);
   const [showRocket, setShowRocket] = useState(true);
+  const [launchPhase, setLaunchPhase] = useState<"idle" | "igniting" | "ascending" | "exited">("idle");
   
   // Trigger launch animation when reaching 100%
   useEffect(() => {
     if (progress === 100 && !hasLaunched) {
-      // Notify parent that launch is starting
-      onLaunchStart?.();
+      // Phase 1: Pre-ignition rumble
+      setLaunchPhase("igniting");
       
-      // Start violent shake then launch
+      // Phase 2: Begin slow ascent after 0.5s
       setTimeout(() => {
         setIsLaunching(true);
         setHasLaunched(true);
+        setLaunchPhase("ascending");
       }, 500);
       
-      // Hide rocket after it exits screen
+      // Phase 3: Rocket exits screen after 3.5s launch + 0.5s ignition
       setTimeout(() => {
         setShowRocket(false);
-      }, 2000);
+        setLaunchPhase("exited");
+        onLaunchStart?.(); // Trigger fireworks only after rocket is gone
+      }, 4000);
     }
   }, [progress, hasLaunched, onLaunchStart]);
 
@@ -340,6 +344,7 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
       setIsLaunching(false);
       setHasLaunched(false);
       setShowRocket(true);
+      setLaunchPhase("idle");
     }
   }, [progress]);
 
@@ -373,60 +378,108 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
     );
   }
   
+  // Screen shake during launch
+  const screenShakeClass = launchPhase === "igniting" || launchPhase === "ascending" 
+    ? "animate-screen-shake" 
+    : "";
+
   return (
-    <div className="relative w-24 h-32 flex items-end justify-center" style={{ overflow: isLaunching ? 'visible' : 'hidden' }}>
+    <div 
+      className={`relative w-24 h-32 flex items-end justify-center ${screenShakeClass}`} 
+      style={{ overflow: isLaunching ? 'visible' : 'hidden' }}
+    >
       <AnimatePresence>
         {isLaunching ? (
           <motion.div
             key="launching-rocket"
             className="absolute z-[100]"
             initial={{ y: 0 }}
-            animate={{ y: -1500 }}
+            animate={{ y: -2000 }}
             transition={{ 
-              duration: 1.5, 
-              ease: [0.4, 0, 0.2, 1],
+              duration: 3.5, 
+              ease: [0.16, 0.04, 0.8, 0.98], // Custom exponential ease-in curve
             }}
           >
-            {/* Intense exhaust during launch */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-32">
+            {/* Massive exhaust during launch - grows over time */}
+            <motion.div 
+              className="absolute bottom-0 left-1/2 -translate-x-1/2"
+              initial={{ width: 32, height: 80 }}
+              animate={{ width: 48, height: 140 }}
+              transition={{ duration: 2.5, ease: "easeIn" }}
+            >
+              {/* Outer flame glow */}
               <motion.div 
                 className="absolute left-1/2 -translate-x-1/2 bottom-0 rounded-b-full"
                 animate={{ 
-                  scaleY: [1, 1.3, 1, 1.2, 1],
-                  scaleX: [1, 0.9, 1.1, 0.95, 1],
+                  scaleY: [1, 1.4, 1, 1.3, 1.1, 1.5, 1],
+                  scaleX: [1, 0.85, 1.15, 0.9, 1.1, 0.95, 1],
                 }}
-                transition={{ duration: 0.1, repeat: Infinity }}
+                transition={{ duration: 0.15, repeat: Infinity }}
                 style={{
-                  width: "32px",
-                  height: "80px",
-                  background: "linear-gradient(to bottom, hsl(60, 100%, 85%), hsl(45, 100%, 60%), hsl(38, 92%, 50%), hsl(0, 72%, 51%), transparent)",
-                  boxShadow: "0 30px 60px hsl(38, 92%, 50% / 0.9), 0 0 100px hsl(38, 92%, 50% / 0.5)",
-                  filter: "blur(1px)",
+                  width: "100%",
+                  height: "100%",
+                  background: "linear-gradient(to bottom, hsl(60, 100%, 90%), hsl(45, 100%, 65%), hsl(38, 92%, 50%), hsl(20, 90%, 45%), hsl(0, 72%, 40%), transparent)",
+                  boxShadow: "0 50px 100px hsl(38, 92%, 50% / 0.95), 0 0 150px hsl(38, 92%, 50% / 0.7), 0 0 200px hsl(0, 72%, 51% / 0.4)",
+                  filter: "blur(2px)",
                 }}
               />
-              {/* Core flame */}
+              
+              {/* Core white-hot flame */}
               <motion.div 
                 className="absolute left-1/2 -translate-x-1/2 bottom-0 rounded-b-full"
                 animate={{ 
-                  scaleY: [1, 1.2, 0.9, 1.1, 1],
+                  scaleY: [1, 1.3, 0.9, 1.2, 1],
+                  opacity: [1, 0.95, 1, 0.9, 1],
                 }}
-                transition={{ duration: 0.08, repeat: Infinity }}
+                transition={{ duration: 0.06, repeat: Infinity }}
                 style={{
-                  width: "16px",
-                  height: "50px",
-                  background: "linear-gradient(to bottom, white, hsl(60, 100%, 80%), hsl(45, 100%, 60%))",
+                  width: "50%",
+                  height: "65%",
+                  background: "linear-gradient(to bottom, white, hsl(60, 100%, 90%), hsl(50, 100%, 70%), hsl(45, 100%, 55%))",
                 }}
               />
-            </div>
+              
+              {/* Smoke particles billowing outward */}
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute bottom-0 rounded-full bg-muted-foreground/50"
+                  initial={{ 
+                    x: 0, 
+                    y: 0, 
+                    scale: 0.5,
+                    opacity: 0.6 
+                  }}
+                  animate={{ 
+                    x: (i % 2 === 0 ? -1 : 1) * (30 + Math.random() * 20),
+                    y: 40 + Math.random() * 30,
+                    scale: 2 + Math.random(),
+                    opacity: 0
+                  }}
+                  transition={{ 
+                    duration: 1.5,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                    ease: "easeOut"
+                  }}
+                  style={{
+                    left: "50%",
+                    width: "12px",
+                    height: "12px",
+                  }}
+                />
+              ))}
+            </motion.div>
             
-            {/* Rocket body with shake */}
+            {/* Rocket body with intense vibration */}
             <motion.div 
               className="relative z-10"
               animate={{ 
-                x: [-2, 2, -1, 1, -2, 2, 0],
-                y: [-1, 1, -2, 0, 1, -1, 0],
+                x: [-3, 3, -2, 2, -3, 3, -1, 1, 0],
+                y: [-2, 2, -3, 1, 2, -2, 1, -1, 0],
+                rotate: [-0.5, 0.5, -0.3, 0.3, -0.5, 0.5, 0],
               }}
-              transition={{ duration: 0.1, repeat: Infinity }}
+              transition={{ duration: 0.08, repeat: Infinity }}
             >
               <RocketBody stage="liftoff" progress={100} />
             </motion.div>
@@ -452,8 +505,11 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
             {/* Exhaust effects (behind rocket) */}
             <ExhaustEffects stage={stage} progress={progress} />
             
-            {/* Rocket body */}
-            <div className={`relative z-10 mb-4 ${progress >= 95 ? "animate-intense-shake" : ""}`}>
+            {/* Rocket body - intense shake when at 100% pre-launch */}
+            <div className={`relative z-10 mb-4 ${
+              launchPhase === "igniting" ? "animate-intense-shake" : 
+              progress >= 95 ? "animate-medium-shake" : ""
+            }`}>
               <RocketBody stage={stage} progress={progress} />
             </div>
           </motion.div>
