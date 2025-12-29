@@ -47,10 +47,11 @@ export function ActionSidebar({
   const completedCount = actions.filter(Boolean).length;
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()} modal={false}>
       <SheetContent
         side={isMobile ? "bottom" : "right"}
-        className={isMobile ? "h-[85vh] rounded-t-2xl" : "w-[380px] sm:w-[420px]"}
+        className={isMobile ? "h-[85vh] rounded-t-2xl" : "w-[380px] sm:w-[420px] border-l border-border/50 shadow-2xl"}
+        hideOverlay
       >
         <SheetHeader className="pb-4 border-b border-border">
           <SheetTitle className="flex items-center gap-2">

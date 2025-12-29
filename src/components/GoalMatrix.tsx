@@ -244,7 +244,6 @@ export function GoalMatrix() {
                   showConfetti={completedSubGoals.has(subIdx)}
                   onConfettiComplete={() => clearConfetti(subIdx)}
                   isActive={activeBlockIndex === subIdx}
-                  isDimmed={activeBlockIndex !== null && activeBlockIndex !== subIdx}
                   onBlockClick={() => setActiveBlockIndex(subIdx)}
                 />
               )}

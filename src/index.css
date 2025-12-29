@@ -35,6 +35,9 @@
     --ring: 38 92% 50%;
 
     --radius: 0.5rem;
+    
+    /* RGB values for glow effects */
+    --primary-rgb: 234 179 8;
 
     /* Custom tokens for the goal matrix */
     --progress-bg: 220 15% 12%;
