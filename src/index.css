@@ -361,20 +361,39 @@
   animation: screen-shake 0.2s ease-in-out infinite;
 }
 
-/* Heavy shake for struggle phase - SUBTLE engine rumble */
-@keyframes heavy-shake {
+/* Engine rumble - subtle high-frequency vibration */
+@keyframes engine-rumble {
   0%, 100% { transform: translate(0, 0); }
-  12.5% { transform: translate(-0.5px, 0.3px); }
-  25% { transform: translate(0.4px, -0.2px); }
-  37.5% { transform: translate(-0.3px, 0.4px); }
-  50% { transform: translate(0.5px, -0.3px); }
-  62.5% { transform: translate(-0.4px, 0.2px); }
-  75% { transform: translate(0.3px, -0.4px); }
-  87.5% { transform: translate(-0.5px, 0.3px); }
+  10% { transform: translate(-0.3px, 0.2px); }
+  20% { transform: translate(0.2px, -0.1px); }
+  30% { transform: translate(-0.2px, 0.3px); }
+  40% { transform: translate(0.3px, -0.2px); }
+  50% { transform: translate(-0.1px, 0.1px); }
+  60% { transform: translate(0.2px, -0.2px); }
+  70% { transform: translate(-0.3px, 0.1px); }
+  80% { transform: translate(0.1px, -0.3px); }
+  90% { transform: translate(-0.2px, 0.2px); }
 }
 
+.animate-engine-rumble {
+  animation: engine-rumble 0.03s linear infinite;
+}
+
+/* Liftoff shake - slightly more intense but still controlled */
+@keyframes liftoff-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, 0.5px); }
+  50% { transform: translate(0.5px, -0.5px); }
+  75% { transform: translate(-0.5px, 0.5px); }
+}
+
+.animate-liftoff-shake {
+  animation: liftoff-shake 0.08s ease-in-out infinite;
+}
+
+/* Legacy heavy shake (keeping for backwards compat) */
 .animate-heavy-shake {
-  animation: heavy-shake 0.05s ease-in-out infinite;
+  animation: engine-rumble 0.03s linear infinite;
 }
 
 /* Grand finale animations */
