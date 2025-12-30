@@ -38,12 +38,13 @@ export function GroundSmoke({ intensity = 1 }: { intensity?: number }) {
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute rounded-sm"
+          className="absolute"
           style={{
             left: `${p.x}%`,
             bottom: `${p.y}px`,
             width: `${p.size}px`,
             height: `${p.size}px`,
+            borderRadius: "50%",
             backgroundColor: `hsl(var(--muted-foreground) / ${p.opacity})`,
             transform: `rotate(${p.rotation}deg)`,
           }}
@@ -72,12 +73,13 @@ export function GroundSmoke({ intensity = 1 }: { intensity?: number }) {
       {Array.from({ length: 30 }, (_, i) => (
         <motion.div
           key={`base-${i}`}
-          className="absolute rounded-sm"
+          className="absolute"
           style={{
             left: `${40 + Math.random() * 20}%`,
             bottom: 0,
             width: `${12 + Math.random() * 8}px`,
             height: `${12 + Math.random() * 8}px`,
+            borderRadius: "50%",
             backgroundColor: `hsl(var(--muted-foreground) / 0.5)`,
           }}
           animate={{
@@ -157,13 +159,13 @@ export function AscendingSmoke({ rocketY }: { rocketY: number }) {
         return (
           <motion.div
             key={p.id}
-            className="absolute rounded-sm"
+            className="absolute"
             style={{
-              // Position from bottom of screen (where launchpad is)
               left: `calc(50% + ${p.offsetX + sidewaysDrift}px)`,
               bottom: `calc(80px + ${worldY - downwardDrift}px)`,
               width: `${p.size * expansion}px`,
               height: `${p.size * expansion}px`,
+              borderRadius: "50%",
               backgroundColor: `hsl(var(--muted-foreground) / ${fadeOpacity})`,
               transform: 'translateX(-50%)',
             }}
@@ -180,12 +182,13 @@ export function AscendingSmoke({ rocketY }: { rocketY: number }) {
         return (
           <motion.div
             key={`fresh-${i}`}
-            className="absolute rounded-sm"
+            className="absolute"
             style={{
               left: `calc(50% + ${Math.cos(angle) * radius}px)`,
               bottom: `calc(80px + ${rocketTravel + Math.sin(angle) * radius * 0.5}px)`,
               width: '8px',
               height: '8px',
+              borderRadius: "50%",
               backgroundColor: `hsl(var(--muted-foreground) / 0.6)`,
               transform: 'translateX(-50%)',
             }}
@@ -209,12 +212,13 @@ export function AscendingSmoke({ rocketY }: { rocketY: number }) {
         {Array.from({ length: 50 }, (_, i) => (
           <motion.div
             key={`ground-persist-${i}`}
-            className="absolute rounded-sm"
+            className="absolute"
             style={{
               left: `${20 + Math.random() * 60}%`,
               bottom: `${Math.random() * 40}px`,
               width: `${14 + Math.random() * 12}px`,
               height: `${14 + Math.random() * 12}px`,
+              borderRadius: "50%",
               backgroundColor: `hsl(var(--muted-foreground) / ${0.25 + Math.random() * 0.25})`,
             }}
             animate={{
