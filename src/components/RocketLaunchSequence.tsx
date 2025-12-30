@@ -317,25 +317,33 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
     if (progress === 100 && !hasLaunched) {
       setHasLaunched(true);
       
-      // Phase 1: Struggle (0s - 3s) - Engines building thrust, no movement
+      // Phase 1: Immediate Ignition (0s) - Instant feedback with slight lift
       setLaunchPhase("struggle");
+      setShowFlash(true);
+      setTimeout(() => setShowFlash(false), 150);
       
-      // Phase 2: Liftoff flash at 3.0s
+      // Immediate slight lift (5-10px) to confirm ignition
+      animate(rocketY, -8, {
+        duration: 0.8,
+        ease: "easeOut",
+      });
+      
+      // Phase 2: Main liftoff at 1.5s (shortened from 3s)
       setTimeout(() => {
         setShowFlash(true);
         setTimeout(() => setShowFlash(false), 200);
         setLaunchPhase("liftoff");
-      }, 3000);
+      }, 1500);
       
-      // Phase 3: Ascending (3s - 6s) - Slow rise then accelerate
+      // Phase 3: Ascending (1.7s - 6s) - Visible movement then accelerate
       setTimeout(() => {
         setLaunchPhase("ascending");
-        // Animate the rocket Y position
+        // Animate rocket with adjusted curve - starts faster but keeps epic scale
         animate(rocketY, -2500, {
-          duration: 3.0,
-          ease: [0.85, 0, 0.15, 1],
+          duration: 4.3,
+          ease: [0.45, 0, 0.15, 1], // Starts faster, still accelerates
         });
-      }, 3200);
+      }, 1700);
       
       // Phase 4: Fireworks start at 5.5s (rocket almost gone)
       setTimeout(() => {
