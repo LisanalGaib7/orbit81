@@ -1,23 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-
-interface SmokeParticleData {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  delay: number;
-  direction: number; // -1 for left, 1 for right
-  speed: number;
-  opacity: number;
-  rotation: number;
-}
 
 // Ground smoke - billows outward horizontally during warmup
 export function GroundSmoke({ intensity = 1 }: { intensity?: number }) {
   const particles = useMemo(() => {
     const count = Math.floor(80 * intensity);
-    return Array.from({ length: count }, (_, i): SmokeParticleData => ({
+    return Array.from({ length: count }, (_, i) => ({
       id: i,
       x: 50 + (Math.random() - 0.5) * 20,
       y: Math.random() * 15,
@@ -25,7 +13,7 @@ export function GroundSmoke({ intensity = 1 }: { intensity?: number }) {
       delay: Math.random() * 0.8,
       direction: Math.random() > 0.5 ? 1 : -1,
       speed: 0.5 + Math.random() * 1.5,
-      opacity: 0.3 + Math.random() * 0.4,
+      opacity: 0.4 + Math.random() * 0.4,
       rotation: Math.random() * 360,
     }));
   }, [intensity]);
@@ -97,35 +85,71 @@ export function GroundSmoke({ intensity = 1 }: { intensity?: number }) {
   );
 }
 
-interface TrailParticle {
+interface SmokeParticle {
   id: number;
+  spawnTime: number;
+  spawnY: number; // World Y position where particle was spawned
   offsetX: number;
+  vx: number; // Horizontal velocity for spreading
+  vy: number; // Initial downward velocity
   size: number;
   opacity: number;
-  direction: number;
-  speed: number;
-  spawnY: number;
 }
 
 // Ascending smoke trail - spawns from rocket engine position
 export function AscendingSmoke({ rocketY }: { rocketY: number }) {
-  // Generate continuous stream of smoke particles from engine
-  const engineParticles = useMemo(() => {
-    // Particles spawn at intervals based on rocket travel distance
-    const particleCount = 100;
-    return Array.from({ length: particleCount }, (_, i): TrailParticle => ({
-      id: i,
-      offsetX: (Math.random() - 0.5) * 40, // Random spread from center
-      size: 12 + Math.random() * 16,
-      opacity: 0.5 + Math.random() * 0.3,
-      direction: Math.random() > 0.5 ? 1 : -1,
-      speed: 0.3 + Math.random() * 0.7,
-      spawnY: (i / particleCount), // Normalized spawn position along trail
-    }));
+  const [particles, setParticles] = useState<SmokeParticle[]>([]);
+  const particleIdRef = useRef(0);
+  const lastSpawnYRef = useRef(0);
+  
+  // Spawn particles as rocket moves
+  useEffect(() => {
+    const rocketTravel = Math.abs(rocketY);
+    const spawnInterval = 8; // Spawn every 8 pixels of travel
+    
+    // Calculate how many particles to spawn based on distance traveled
+    while (lastSpawnYRef.current < rocketTravel) {
+      const spawnCount = 3 + Math.floor(Math.random() * 3); // 3-5 particles per spawn
+      
+      for (let i = 0; i < spawnCount; i++) {
+        const newParticle: SmokeParticle = {
+          id: particleIdRef.current++,
+          spawnTime: Date.now(),
+          spawnY: lastSpawnYRef.current,
+          offsetX: (Math.random() - 0.5) * 30, // Initial spread
+          vx: (Math.random() - 0.5) * 4, // Horizontal velocity: -2 to +2
+          vy: 1 + Math.random() * 2, // Initial downward thrust: 1 to 3
+          size: 10 + Math.random() * 14,
+          opacity: 0.4 + Math.random() * 0.4, // 0.4 to 0.8 range
+        };
+        
+        setParticles(prev => [...prev, newParticle]);
+      }
+      
+      lastSpawnYRef.current += spawnInterval;
+    }
+  }, [rocketY]);
+  
+  // Clean up old particles
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      const now = Date.now();
+      setParticles(prev => prev.filter(p => now - p.spawnTime < 4000));
+    }, 500);
+    return () => clearInterval(cleanup);
+  }, []);
+  
+  // Reset on unmount or when rocket resets
+  useEffect(() => {
+    return () => {
+      lastSpawnYRef.current = 0;
+      particleIdRef.current = 0;
+    };
   }, []);
 
   const rocketTravel = Math.abs(rocketY);
-  
+  const engineWorldY = rocketTravel; // Engine is at this Y position in world space
+
   return (
     <div 
       className="fixed inset-0 overflow-hidden pointer-events-none"
@@ -134,70 +158,68 @@ export function AscendingSmoke({ rocketY }: { rocketY: number }) {
         zIndex: 50,
       }}
     >
-      {/* Smoke trail from engine - particles spawned at engine position */}
-      {engineParticles.map((p) => {
-        // Each particle spawns when rocket passes its spawn point
-        const spawnDistance = p.spawnY * rocketTravel;
-        const particleAge = (rocketTravel - spawnDistance) / (rocketTravel || 1);
+      {/* Trail particles - each stays at its spawn position with physics */}
+      {particles.map((p) => {
+        const age = (Date.now() - p.spawnTime) / 1000; // Age in seconds
+        const ageNormalized = Math.min(age / 4, 1); // 0 to 1 over 4 seconds
         
-        // Only show if rocket has passed this spawn point
-        if (particleAge < 0 || particleAge > 1) return null;
+        // Physics: position over time
+        const horizontalDrift = p.offsetX + p.vx * age * 30; // Spread outward
+        const verticalDrift = p.vy * age * 15 - age * age * 8; // Down then slow rise
         
-        // Particles stay at their spawn position (world space)
-        const worldY = spawnDistance;
+        // Size expansion: grows 2.5x over lifetime
+        const scale = 1 + ageNormalized * 2.5;
         
-        // Expansion and fade based on age
-        const expansion = 1 + particleAge * 2.5;
-        const fadeOpacity = Math.max(0, p.opacity * (1 - particleAge * 0.8));
+        // Opacity fade
+        const fadeOpacity = p.opacity * Math.max(0, 1 - ageNormalized * 0.9);
         
-        // Downward initial velocity then drift
-        const downwardDrift = particleAge * 15;
-        const sidewaysDrift = p.direction * particleAge * (30 + p.speed * 40);
+        if (fadeOpacity < 0.05) return null;
         
         return (
           <motion.div
             key={p.id}
             className="absolute rounded-sm"
             style={{
-              // Position from bottom of screen (where launchpad is)
-              left: `calc(50% + ${p.offsetX + sidewaysDrift}px)`,
-              bottom: `calc(80px + ${worldY - downwardDrift}px)`,
-              width: `${p.size * expansion}px`,
-              height: `${p.size * expansion}px`,
+              // Position: spawn point + drift
+              left: `calc(50% + ${horizontalDrift}px)`,
+              bottom: `calc(80px + ${p.spawnY - verticalDrift}px)`,
+              width: `${p.size * scale}px`,
+              height: `${p.size * scale}px`,
               backgroundColor: `hsl(var(--muted-foreground) / ${fadeOpacity})`,
               transform: 'translateX(-50%)',
             }}
-            initial={false}
           />
         );
       })}
       
-      {/* Fresh smoke at current engine position */}
-      {Array.from({ length: 20 }, (_, i) => {
-        const angle = (i / 20) * Math.PI * 2;
-        const radius = 5 + Math.random() * 15;
+      {/* Fresh smoke burst at current engine position */}
+      {Array.from({ length: 24 }, (_, i) => {
+        const angle = (i / 24) * Math.PI * 2;
+        const baseRadius = 5 + (i % 3) * 8;
+        const randomOffset = Math.random() * 10;
         
         return (
           <motion.div
             key={`fresh-${i}`}
             className="absolute rounded-sm"
             style={{
-              left: `calc(50% + ${Math.cos(angle) * radius}px)`,
-              bottom: `calc(80px + ${rocketTravel + Math.sin(angle) * radius * 0.5}px)`,
-              width: '8px',
-              height: '8px',
-              backgroundColor: `hsl(var(--muted-foreground) / 0.6)`,
+              left: `calc(50% + ${Math.cos(angle) * baseRadius}px)`,
+              bottom: `calc(80px + ${engineWorldY}px)`,
+              width: `${6 + (i % 4) * 2}px`,
+              height: `${6 + (i % 4) * 2}px`,
+              backgroundColor: `hsl(var(--muted-foreground) / ${0.5 + (i % 3) * 0.15})`,
               transform: 'translateX(-50%)',
             }}
             animate={{
-              scale: [1, 1.5, 2],
+              x: [0, Math.cos(angle) * (20 + randomOffset)], // Spread outward
+              y: [0, 15 + Math.random() * 25], // Push downward
+              scale: [1, 1.8, 2.5],
               opacity: [0.6, 0.4, 0],
-              y: [0, 20 + Math.random() * 30], // Downward push from engine
             }}
             transition={{
-              duration: 0.8,
+              duration: 0.6 + (i % 5) * 0.1,
               repeat: Infinity,
-              delay: i * 0.04,
+              delay: i * 0.025,
               ease: "easeOut",
             }}
           />
@@ -218,9 +240,9 @@ export function AscendingSmoke({ rocketY }: { rocketY: number }) {
               backgroundColor: `hsl(var(--muted-foreground) / ${0.25 + Math.random() * 0.25})`,
             }}
             animate={{
-              x: [(Math.random() > 0.5 ? 1 : -1) * Math.random() * 60, (Math.random() > 0.5 ? 1 : -1) * Math.random() * 100],
+              x: [(Math.random() > 0.5 ? 1 : -1) * Math.random() * 80, (Math.random() > 0.5 ? 1 : -1) * Math.random() * 140],
               y: [0, -(20 + Math.random() * 40)],
-              scale: [1, 1.5, 2],
+              scale: [1, 1.5, 2.2],
               opacity: [0.4, 0.3, 0],
             }}
             transition={{
