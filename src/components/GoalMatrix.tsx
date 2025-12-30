@@ -2,13 +2,13 @@ import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { ProgressBar } from "./ProgressBar";
+import { ProgressMilestones } from "./ProgressMilestones";
 import { RocketLaunchSequence } from "./RocketLaunchSequence";
 import { Starfield } from "./Starfield";
 import { TemplateDropdown } from "./TemplateDropdown";
 import { MissionAccomplished } from "./MissionAccomplished";
 import { DeepSpaceFireworks } from "./DeepSpaceFireworks";
 import { ActionSidebar } from "./ActionSidebar";
-
 // Default sub-goal labels
 const DEFAULT_SUBGOALS = [
   "Health",
@@ -228,20 +228,25 @@ export function GoalMatrix() {
         </div>
 
         {/* Global Progress with Rocket */}
-        <div className="w-full max-w-md space-y-2">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Total Progress</span>
+        <div className="w-full max-w-md space-y-1">
+          {/* Header: Label left, Stats right - ABOVE progress bar */}
+          <div className="flex justify-between items-center text-sm mb-2">
+            <span className="text-muted-foreground font-medium">Total Progress</span>
             <span className="font-mono text-primary font-semibold">
               {completedCount}/64 <span className="text-muted-foreground">({Math.round(globalProgress)}%)</span>
             </span>
           </div>
           
+          {/* Progress Bar */}
+          <ProgressBar progress={globalProgress} className="h-2.5" />
+          
+          {/* Milestone Markers BELOW the bar */}
+          <ProgressMilestones progress={globalProgress} />
+          
           {/* Rocket Launch Sequence */}
-          <div className="flex justify-center" style={{ overflow: 'visible', zIndex: 100 }}>
+          <div className="flex justify-center pt-2" style={{ overflow: 'visible', zIndex: 100 }}>
             <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} />
           </div>
-          
-          <ProgressBar progress={globalProgress} className="h-2" />
         </div>
 
         {/* Matrix Grid */}
