@@ -227,28 +227,6 @@ export function GoalMatrix() {
           </div>
         </div>
 
-        {/* Global Progress with Rocket */}
-        <div className="w-full max-w-md space-y-1">
-          {/* Header: Label left, Stats right - ABOVE progress bar */}
-          <div className="flex justify-between items-center text-sm mb-2">
-            <span className="text-muted-foreground font-medium">Total Progress</span>
-            <span className="font-mono text-primary font-semibold">
-              {completedCount}/64 <span className="text-muted-foreground">({Math.round(globalProgress)}%)</span>
-            </span>
-          </div>
-          
-          {/* Progress Bar */}
-          <ProgressBar progress={globalProgress} className="h-2.5" />
-          
-          {/* Milestone Markers BELOW the bar */}
-          <ProgressMilestones progress={globalProgress} />
-          
-          {/* Rocket Launch Sequence */}
-          <div className="flex justify-center pt-2" style={{ overflow: 'visible', zIndex: 100 }}>
-            <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} />
-          </div>
-        </div>
-
         {/* Matrix Grid */}
         <div className="goal-grid w-full aspect-square max-w-2xl">
           {gridPositions.map((subIdx, gridIdx) => (
@@ -275,6 +253,29 @@ export function GoalMatrix() {
             </div>
           ))}
         </div>
+
+        {/* Rocket Launch Sequence - BELOW the matrix */}
+        <div className="flex justify-center py-4" style={{ overflow: 'visible', zIndex: 100 }}>
+          <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} />
+        </div>
+
+        {/* Progress Section - BELOW the rocket */}
+        <div className="w-full max-w-md space-y-1">
+          {/* Header: Label left, Stats right - ABOVE progress bar */}
+          <div className="flex justify-between items-center text-sm mb-2">
+            <span className="text-muted-foreground font-medium">Total Progress</span>
+            <span className="font-mono text-primary font-semibold">
+              {completedCount}/64 <span className="text-muted-foreground">({Math.round(globalProgress)}%)</span>
+            </span>
+          </div>
+          
+          {/* Progress Bar */}
+          <ProgressBar progress={globalProgress} className="h-2.5" />
+          
+          {/* Milestone Markers BELOW the bar */}
+          <ProgressMilestones progress={globalProgress} />
+        </div>
+
 
         {/* Legend */}
         <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
