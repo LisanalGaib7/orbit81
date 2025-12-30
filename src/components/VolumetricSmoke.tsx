@@ -97,25 +97,35 @@ export function GroundSmoke({ intensity = 1 }: { intensity?: number }) {
   );
 }
 
-// Ascending smoke trail - thick widening column
+interface TrailParticle {
+  id: number;
+  offsetX: number;
+  size: number;
+  opacity: number;
+  direction: number;
+  speed: number;
+  spawnY: number;
+}
+
+// Ascending smoke trail - spawns from rocket engine position
 export function AscendingSmoke({ rocketY }: { rocketY: number }) {
-  // Generate smoke particles that stay in place
-  const trailParticles = useMemo(() => {
-    // Create particles at intervals along the trail
-    const particleCount = 60;
-    return Array.from({ length: particleCount }, (_, i): SmokeParticleData => ({
+  // Generate continuous stream of smoke particles from engine
+  const engineParticles = useMemo(() => {
+    // Particles spawn at intervals based on rocket travel distance
+    const particleCount = 100;
+    return Array.from({ length: particleCount }, (_, i): TrailParticle => ({
       id: i,
-      x: 50 + (Math.random() - 0.5) * 15,
-      y: (i / particleCount) * 100, // Distributed along trail
-      size: 10 + Math.random() * 14,
-      delay: i * 0.03,
+      offsetX: (Math.random() - 0.5) * 40, // Random spread from center
+      size: 12 + Math.random() * 16,
+      opacity: 0.5 + Math.random() * 0.3,
       direction: Math.random() > 0.5 ? 1 : -1,
-      speed: Math.random(),
-      opacity: 0.4 + Math.random() * 0.3,
-      rotation: Math.random() * 360,
+      speed: 0.3 + Math.random() * 0.7,
+      spawnY: (i / particleCount), // Normalized spawn position along trail
     }));
   }, []);
 
+  const rocketTravel = Math.abs(rocketY);
+  
   return (
     <div 
       className="fixed inset-0 overflow-hidden pointer-events-none"
@@ -124,48 +134,77 @@ export function AscendingSmoke({ rocketY }: { rocketY: number }) {
         zIndex: 50,
       }}
     >
-      {/* Main smoke column */}
-      <div 
-        className="absolute left-1/2 -translate-x-1/2 w-[300px]"
-        style={{
-          bottom: 0,
-          height: `${Math.min(Math.abs(rocketY) + 100, window.innerHeight)}px`,
-        }}
-      >
-        {trailParticles.map((p) => {
-          const yPos = (p.y / 100) * Math.abs(rocketY);
-          const age = yPos / Math.abs(rocketY || 1); // 0 = new, 1 = old
-          const expansion = 1 + age * 2; // Particles expand as they age
-          const fadeOpacity = Math.max(0, p.opacity * (1 - age * 0.7));
-          
-          if (yPos > Math.abs(rocketY)) return null;
-          
-          return (
-            <motion.div
-              key={p.id}
-              className="absolute rounded-sm"
-              style={{
-                left: `${p.x}%`,
-                bottom: `${yPos}px`,
-                width: `${p.size * expansion}px`,
-                height: `${p.size * expansion}px`,
-                backgroundColor: `hsl(var(--muted-foreground) / ${fadeOpacity})`,
-              }}
-              animate={{
-                x: [0, p.direction * (5 + age * 20)],
-                scale: [1, 1 + age * 0.5],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeOut",
-              }}
-            />
-          );
-        })}
-      </div>
+      {/* Smoke trail from engine - particles spawned at engine position */}
+      {engineParticles.map((p) => {
+        // Each particle spawns when rocket passes its spawn point
+        const spawnDistance = p.spawnY * rocketTravel;
+        const particleAge = (rocketTravel - spawnDistance) / (rocketTravel || 1);
+        
+        // Only show if rocket has passed this spawn point
+        if (particleAge < 0 || particleAge > 1) return null;
+        
+        // Particles stay at their spawn position (world space)
+        const worldY = spawnDistance;
+        
+        // Expansion and fade based on age
+        const expansion = 1 + particleAge * 2.5;
+        const fadeOpacity = Math.max(0, p.opacity * (1 - particleAge * 0.8));
+        
+        // Downward initial velocity then drift
+        const downwardDrift = particleAge * 15;
+        const sidewaysDrift = p.direction * particleAge * (30 + p.speed * 40);
+        
+        return (
+          <motion.div
+            key={p.id}
+            className="absolute rounded-sm"
+            style={{
+              // Position from bottom of screen (where launchpad is)
+              left: `calc(50% + ${p.offsetX + sidewaysDrift}px)`,
+              bottom: `calc(80px + ${worldY - downwardDrift}px)`,
+              width: `${p.size * expansion}px`,
+              height: `${p.size * expansion}px`,
+              backgroundColor: `hsl(var(--muted-foreground) / ${fadeOpacity})`,
+              transform: 'translateX(-50%)',
+            }}
+            initial={false}
+          />
+        );
+      })}
       
-      {/* Ground smoke base that persists */}
+      {/* Fresh smoke at current engine position */}
+      {Array.from({ length: 20 }, (_, i) => {
+        const angle = (i / 20) * Math.PI * 2;
+        const radius = 5 + Math.random() * 15;
+        
+        return (
+          <motion.div
+            key={`fresh-${i}`}
+            className="absolute rounded-sm"
+            style={{
+              left: `calc(50% + ${Math.cos(angle) * radius}px)`,
+              bottom: `calc(80px + ${rocketTravel + Math.sin(angle) * radius * 0.5}px)`,
+              width: '8px',
+              height: '8px',
+              backgroundColor: `hsl(var(--muted-foreground) / 0.6)`,
+              transform: 'translateX(-50%)',
+            }}
+            animate={{
+              scale: [1, 1.5, 2],
+              opacity: [0.6, 0.4, 0],
+              y: [0, 20 + Math.random() * 30], // Downward push from engine
+            }}
+            transition={{
+              duration: 0.8,
+              repeat: Infinity,
+              delay: i * 0.04,
+              ease: "easeOut",
+            }}
+          />
+        );
+      })}
+      
+      {/* Ground smoke base that persists and billows */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[150px]">
         {Array.from({ length: 50 }, (_, i) => (
           <motion.div
