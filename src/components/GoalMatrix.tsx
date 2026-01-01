@@ -214,18 +214,24 @@ export function GoalMatrix() {
       <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 max-w-3xl mx-auto">
         {/* SECTION 1: Header */}
         <div className="w-full flex items-start justify-between">
-          <div className="flex-1" />
+          {/* Mission Manual - Top Left */}
+          <div className="flex-1 flex justify-start">
+            <MissionManual />
+          </div>
+          
+          {/* Title - Center */}
           <div className="text-center flex-1">
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight neon-glow-title">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-wide pixel-title-3d">
               <span className="text-primary">Orbit</span>{" "}
               <span className="text-foreground">81</span>
             </h1>
-            <p className="font-pixel text-[8px] sm:text-[10px] text-muted-foreground max-w-md mx-auto mt-3 leading-relaxed">
+            <p className="font-pixel text-[7px] sm:text-[8px] text-muted-foreground max-w-md mx-auto mt-3 leading-relaxed" style={{ imageRendering: 'pixelated' }}>
               Writing the greatest chapter yet
             </p>
           </div>
-          <div className="flex-1 flex justify-end gap-2">
-            <MissionManual />
+          
+          {/* Templates - Top Right */}
+          <div className="flex-1 flex justify-end">
             <TemplateDropdown onSelect={applyTemplate} />
           </div>
         </div>
@@ -240,15 +246,17 @@ export function GoalMatrix() {
           {/* Progress Section - Directly BELOW the rocket */}
           <div className="w-full max-w-md space-y-2">
             {/* Header: Label left, Stats right - ABOVE progress bar */}
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground font-medium">Total Progress</span>
-              <span className="font-mono text-primary font-semibold">
-                {completedCount}/64 <span className="text-muted-foreground">({Math.round(globalProgress)}%)</span>
+            <div className="flex justify-between items-center">
+              <span className="font-pixel text-[8px] text-muted-foreground" style={{ imageRendering: 'pixelated' }}>
+                Total Progress
+              </span>
+              <span className="pixel-gold-stat text-xl">
+                {completedCount}/64 ({Math.round(globalProgress)}%)
               </span>
             </div>
             
-            {/* Progress Bar */}
-            <ProgressBar progress={globalProgress} className="h-3" />
+            {/* Progress Bar - 3D Glass Tube */}
+            <ProgressBar progress={globalProgress} />
             
             {/* Milestone Markers BELOW the bar */}
             <ProgressMilestones progress={globalProgress} />

@@ -45,23 +45,33 @@ export function TemplateDropdown({ onSelect }: TemplateDropdownProps) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground border border-border/50 hover:border-border rounded-lg transition-all bg-transparent hover:bg-secondary/50"
+        className={`pixel-button flex items-center gap-2 font-pixel text-[8px] sm:text-[10px] text-muted-foreground hover:text-foreground ${isOpen ? 'pressed' : ''}`}
+        style={{ imageRendering: 'pixelated' }}
       >
-        <LayoutTemplate className="w-3.5 h-3.5" />
+        <LayoutTemplate className="w-3.5 h-3.5" style={{ imageRendering: 'pixelated' }} />
         <span>Templates</span>
-        <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown 
+          className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`} 
+          style={{ imageRendering: 'pixelated' }}
+        />
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full right-0 mt-2 w-56 bg-popover border border-border rounded-lg shadow-lg z-20 overflow-hidden animate-scale-in">
+          <div 
+            className="absolute top-full right-0 mt-2 w-56 bg-popover border-2 border-border z-20 overflow-hidden animate-scale-in"
+            style={{ 
+              imageRendering: 'pixelated',
+              boxShadow: 'inset -2px -2px 0 hsl(220 15% 8%), inset 2px 2px 0 hsl(220 15% 20%), 4px 4px 0 hsl(0 0% 0% / 0.3)'
+            }}
+          >
             <div className="p-1">
               {TEMPLATES.map((template) => (
                 <button
                   key={template.name}
                   onClick={() => handleSelect(template)}
-                  className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+                  className="w-full text-left px-3 py-2 font-pixel-mono text-lg text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
                   {template.name}
                 </button>
