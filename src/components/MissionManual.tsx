@@ -1,14 +1,36 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function MissionManual() {
   const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  // Close popover when clicking outside
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        popoverRef.current && 
+        !popoverRef.current.contains(e.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
 
   return (
-    <>
+    <div className="relative">
       {/* Trigger Button - Pixel style with custom "?" icon */}
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className={`pixel-button flex items-center justify-center gap-1.5 font-pixel text-[10px] sm:text-[12px] text-muted-foreground hover:text-foreground ${isOpen ? 'pressed' : ''}`}
         style={{ imageRendering: 'pixelated', minWidth: '36px', minHeight: '36px' }}
@@ -36,75 +58,59 @@ export function MissionManual() {
         </svg>
       </button>
 
-      {/* Modal Overlay + Content - Fixed position, high z-index */}
+      {/* Popover Content - Anchored below button */}
       <AnimatePresence>
         {isOpen && (
-          <>
-            {/* Backdrop - Dims background and blocks interaction */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/60 z-[1000]"
-              onClick={() => setIsOpen(false)}
-              style={{ imageRendering: 'pixelated' }}
-            />
+          <motion.div
+            ref={popoverRef}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="absolute left-0 top-full mt-2 z-[1000] w-[85vw] max-w-sm rounded-lg border-2 border-border bg-card/95 backdrop-blur-sm p-4 shadow-2xl"
+            style={{ 
+              imageRendering: 'pixelated',
+              boxShadow: 'inset -2px -2px 0 hsl(220 15% 8%), inset 2px 2px 0 hsl(220 15% 22%), 4px 4px 0 hsl(0 0% 0% / 0.5)'
+            }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-pixel text-[11px] text-primary">Mission Manual</h3>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-muted-foreground hover:text-foreground transition-colors pixel-button p-1"
+                aria-label="Close Mission Manual"
+              >
+                <X className="w-3.5 h-3.5" style={{ imageRendering: 'pixelated' }} />
+              </button>
+            </div>
             
-            {/* Modal Content - Centered, fixed position */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[1001] w-[90vw] max-w-md rounded-lg border-2 border-border bg-card p-5 shadow-2xl"
-              style={{ 
-                imageRendering: 'pixelated',
-                boxShadow: 'inset -3px -3px 0 hsl(220 15% 8%), inset 3px 3px 0 hsl(220 15% 22%), 6px 6px 0 hsl(0 0% 0% / 0.4)'
-              }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-pixel text-[12px] text-primary">Mission Manual</h3>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="text-muted-foreground hover:text-foreground transition-colors pixel-button p-1.5"
-                  aria-label="Close Mission Manual"
-                >
-                  <X className="w-4 h-4" style={{ imageRendering: 'pixelated' }} />
-                </button>
+            <div className="space-y-3 text-xs text-muted-foreground font-pixel-mono">
+              <div>
+                <h4 className="font-pixel text-[8px] text-foreground mb-1">The 81-Square Method</h4>
+                <p className="text-[11px] leading-relaxed">
+                  Break down your core goal into 8 sub-goals, each with 8 actionable steps.
+                </p>
               </div>
               
-              <div className="space-y-4 text-sm text-muted-foreground font-pixel-mono">
-                <div>
-                  <h4 className="font-pixel text-[9px] text-foreground mb-1.5">The 81-Square Method</h4>
-                  <p className="text-base leading-relaxed">
-                    Break down your core goal into 8 sub-goals, each with 8 actionable steps. 
-                    That's 64 actions orbiting your central mission.
-                  </p>
-                </div>
-                
-                <div>
-                  <h4 className="font-pixel text-[9px] text-foreground mb-1.5">How to Use</h4>
-                  <ul className="list-disc list-inside space-y-1 text-base">
-                    <li>Click any sub-goal block to expand and edit actions</li>
-                    <li>Double-click labels to rename goals</li>
-                    <li>Check off completed actions to fuel your rocket</li>
-                    <li>Use templates to jumpstart your journey</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h4 className="font-pixel text-[9px] text-foreground mb-1.5">Launch Sequence</h4>
-                  <p className="text-base leading-relaxed">
-                    Watch your rocket power up as you complete actions. 
-                    At 100%, witness the grand liftoff celebration!
-                  </p>
-                </div>
+              <div>
+                <h4 className="font-pixel text-[8px] text-foreground mb-1">How to Use</h4>
+                <ul className="list-disc list-inside space-y-0.5 text-[11px]">
+                  <li>Click any sub-goal block to expand</li>
+                  <li>Double-click labels to rename</li>
+                  <li>Check off actions to fuel your rocket</li>
+                </ul>
               </div>
-            </motion.div>
-          </>
+              
+              <div>
+                <h4 className="font-pixel text-[8px] text-foreground mb-1">Launch Sequence</h4>
+                <p className="text-[11px] leading-relaxed">
+                  At 100%, witness the grand liftoff!
+                </p>
+              </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }
