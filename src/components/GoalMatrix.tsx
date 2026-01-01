@@ -230,17 +230,17 @@ export function GoalMatrix() {
           </div>
         </div>
 
-        {/* SECTION 2: Mission Control - Rocket + Progress Bar */}
-        <div className="w-full flex flex-col items-center gap-4" style={{ zIndex: 100 }}>
-          {/* Rocket Launch Sequence */}
+        {/* SECTION 2: Mission Control - Rocket-Assembly + Progress Bar BELOW */}
+        <div className="w-full flex flex-col items-center gap-6" style={{ zIndex: 100 }}>
+          {/* Rocket Launch Sequence (Rocket-Assembly) */}
           <div className="relative" style={{ minHeight: '140px' }}>
             <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} />
           </div>
 
-          {/* Progress Section - BELOW the rocket */}
-          <div className="w-full max-w-md space-y-1">
+          {/* Progress Section - Directly BELOW the rocket */}
+          <div className="w-full max-w-md space-y-2">
             {/* Header: Label left, Stats right - ABOVE progress bar */}
-            <div className="flex justify-between items-center text-sm mb-2">
+            <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground font-medium">Total Progress</span>
               <span className="font-mono text-primary font-semibold">
                 {completedCount}/64 <span className="text-muted-foreground">({Math.round(globalProgress)}%)</span>
@@ -248,7 +248,7 @@ export function GoalMatrix() {
             </div>
             
             {/* Progress Bar */}
-            <ProgressBar progress={globalProgress} className="h-2.5" />
+            <ProgressBar progress={globalProgress} className="h-3" />
             
             {/* Milestone Markers BELOW the bar */}
             <ProgressMilestones progress={globalProgress} />
