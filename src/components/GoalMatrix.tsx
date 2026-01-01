@@ -6,6 +6,7 @@ import { ProgressMilestones } from "./ProgressMilestones";
 import { RocketLaunchSequence } from "./RocketLaunchSequence";
 import { Starfield } from "./Starfield";
 import { TemplateDropdown } from "./TemplateDropdown";
+import { MissionManual } from "./MissionManual";
 import { MissionAccomplished } from "./MissionAccomplished";
 import { DeepSpaceFireworks } from "./DeepSpaceFireworks";
 import { ActionSidebar } from "./ActionSidebar";
@@ -215,14 +216,16 @@ export function GoalMatrix() {
         <div className="w-full flex items-start justify-between">
           <div className="flex-1" />
           <div className="text-center flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-              Goal Matrix <span className="text-primary">Engine</span>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight neon-glow-title">
+              <span className="text-primary">Orbit</span>{" "}
+              <span className="text-foreground">81</span>
             </h1>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto mt-2">
-              Break down your core goal into 8 sub-goals, each with 8 actionable steps
+            <p className="font-pixel text-[8px] sm:text-[10px] text-muted-foreground max-w-md mx-auto mt-3 leading-relaxed">
+              Writing the greatest chapter yet
             </p>
           </div>
-          <div className="flex-1 flex justify-end">
+          <div className="flex-1 flex justify-end gap-2">
+            <MissionManual />
             <TemplateDropdown onSelect={applyTemplate} />
           </div>
         </div>
