@@ -33,9 +33,10 @@ function getPreLaunchStage(progress: number): PreLaunchStage {
 function SteamParticle({ delay, left }: { delay: number; left: number }) {
   return (
     <div
-      className="absolute bottom-0 bg-muted-foreground/30"
+      className="absolute bg-muted-foreground/30"
       style={{
         left: `${left}%`,
+        bottom: 0,
         width: "6px",
         height: "6px",
         borderRadius: "50%",
@@ -51,9 +52,10 @@ function SteamParticle({ delay, left }: { delay: number; left: number }) {
 function SmokeParticle({ delay, left, size }: { delay: number; left: number; size: number }) {
   return (
     <div
-      className="absolute bottom-0 bg-muted-foreground/40"
+      className="absolute bg-muted-foreground/40"
       style={{
         left: `${left}%`,
+        bottom: 0,
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: "50%",
@@ -96,7 +98,6 @@ function SparkParticle({ delay, left }: { delay: number; left: number }) {
 
 // Launchpad component with gantry arms
 function Launchpad({ stage, isLaunching }: { stage: PreLaunchStage; isLaunching: boolean }) {
-  // Gantry arm opening based on stage
   const getArmOpening = () => {
     if (isLaunching) return 30;
     switch (stage) {
@@ -112,11 +113,10 @@ function Launchpad({ stage, isLaunching }: { stage: PreLaunchStage; isLaunching:
   
   const armOpening = getArmOpening();
   
-  // Hide launchpad after rocket exits
   if (isLaunching) return null;
   
   return (
-    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 transition-all duration-1000">
+    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 transition-all duration-1000" style={{ zIndex: 1 }}>
       {/* Platform base */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-2 bg-muted rounded-sm" />
       
@@ -129,7 +129,6 @@ function Launchpad({ stage, isLaunching }: { stage: PreLaunchStage; isLaunching:
           transformOrigin: 'bottom center',
         }}
       >
-        {/* Support arm */}
         <div 
           className="absolute top-2 right-0 w-6 h-0.5 bg-muted-foreground/50 transition-transform duration-700 origin-left"
           style={{ transform: `rotate(${armOpening * 2}deg)` }}
@@ -145,7 +144,6 @@ function Launchpad({ stage, isLaunching }: { stage: PreLaunchStage; isLaunching:
           transformOrigin: 'bottom center',
         }}
       >
-        {/* Support arm */}
         <div 
           className="absolute top-2 left-0 w-6 h-0.5 bg-muted-foreground/50 transition-transform duration-700 origin-right"
           style={{ transform: `rotate(-${armOpening * 2}deg)` }}
@@ -155,7 +153,7 @@ function Launchpad({ stage, isLaunching }: { stage: PreLaunchStage; isLaunching:
   );
 }
 
-// Pre-launch exhaust effects
+// Pre-launch exhaust effects - positioned relative to Rocket-Assembly
 function PreLaunchEffects({ stage }: { stage: PreLaunchStage }) {
   const steamParticles = useMemo(() => 
     Array.from({ length: 8 }, (_, i) => ({
@@ -182,16 +180,17 @@ function PreLaunchEffects({ stage }: { stage: PreLaunchStage }) {
   const showSteam = stage === "venting";
   const showSmoke = stage === "pre-ignition" || stage === "high-tension";
   const showSparks = stage === "engine-test";
-  
-  // Smoke intensity based on stage
   const smokeIntensity = stage === "high-tension" ? 2 : 1;
 
   return (
     <div 
-      className="absolute bottom-6 left-1/2 -translate-x-1/2 w-20 h-20"
-      style={{ imageRendering: "pixelated" }}
+      className="absolute left-1/2 -translate-x-1/2 w-20 h-20 pointer-events-none"
+      style={{ 
+        bottom: '-16px', // Position below rocket nozzle
+        imageRendering: "pixelated",
+        zIndex: 0,
+      }}
     >
-      {/* Steam during venting phase */}
       {showSteam && (
         <div className="absolute bottom-0 left-0 right-0 h-12">
           {steamParticles.map((p) => (
@@ -200,7 +199,6 @@ function PreLaunchEffects({ stage }: { stage: PreLaunchStage }) {
         </div>
       )}
       
-      {/* Smoke during pre-ignition and high-tension */}
       {showSmoke && (
         <div className="absolute bottom-0 left-0 right-0 h-16">
           {smokeParticles.map((p) => (
@@ -214,7 +212,6 @@ function PreLaunchEffects({ stage }: { stage: PreLaunchStage }) {
         </div>
       )}
       
-      {/* Sparks during engine test */}
       {showSparks && (
         <div className="absolute bottom-0 left-0 right-0 h-12 flex justify-center">
           {sparkParticles.map((p) => (
@@ -233,6 +230,7 @@ function FuelSequenceGlow({ active }: { active: boolean }) {
   return (
     <motion.div 
       className="absolute inset-0 pointer-events-none"
+      style={{ zIndex: 3 }}
       initial={{ opacity: 0 }}
       animate={{ opacity: [0.2, 0.5, 0.2] }}
       transition={{ duration: 2, repeat: Infinity }}
@@ -254,7 +252,8 @@ function HighTensionFlicker({ active }: { active: boolean }) {
   
   return (
     <motion.div
-      className="absolute bottom-2 left-1/2 -translate-x-1/2"
+      className="absolute left-1/2 -translate-x-1/2"
+      style={{ bottom: '-8px', zIndex: 1 }}
       animate={{
         opacity: [0.4, 1, 0.6, 1, 0.3, 0.9],
         scale: [0.8, 1.2, 0.9, 1.1, 0.85, 1],
@@ -273,6 +272,42 @@ function HighTensionFlicker({ active }: { active: boolean }) {
   );
 }
 
+// Countdown display component
+function CountdownDisplay({ phase }: { phase: LaunchPhase }) {
+  const [count, setCount] = useState(3);
+  
+  useEffect(() => {
+    if (phase === "ignition") {
+      setCount(3);
+      const interval = setInterval(() => {
+        setCount((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [phase]);
+  
+  if (phase !== "ignition" || count === 0) return null;
+  
+  return (
+    <div 
+      className="absolute left-[-40px] top-1/2 -translate-y-1/2 font-mono text-3xl font-bold text-primary"
+      style={{ 
+        imageRendering: "pixelated",
+        textShadow: "0 0 10px hsl(var(--primary) / 0.5)",
+        zIndex: 10,
+      }}
+    >
+      {count}
+    </div>
+  );
+}
+
 export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSequenceProps) {
   const [hasLaunched, setHasLaunched] = useState(false);
   const [showRocket, setShowRocket] = useState(true);
@@ -281,7 +316,6 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
   const rocketY = useMotionValue(0);
   const [currentRocketY, setCurrentRocketY] = useState(0);
   
-  // Track rocket Y for smoke trail
   useEffect(() => {
     const unsubscribe = rocketY.on("change", (latest) => {
       setCurrentRocketY(latest);
@@ -289,10 +323,8 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
     return () => unsubscribe();
   }, [rocketY]);
   
-  // Get pre-launch stage (only relevant when progress < 100)
   const preLaunchStage = getPreLaunchStage(progress);
   
-  // Determine vibration class based on pre-launch stage
   const getVibrationClass = () => {
     if (progress === 100) return "";
     switch (preLaunchStage) {
@@ -311,30 +343,25 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
     }
   };
   
-  // Trigger cinematic launch sequence when reaching 100%
   useEffect(() => {
     if (progress === 100 && !hasLaunched) {
       setHasLaunched(true);
       
-      // Phase 1: Immediate Ignition Flash (0s)
       setLaunchPhase("ignition");
       setShowFlash(true);
       setTimeout(() => setShowFlash(false), 150);
       
-      // Immediate slight lift (5-10px) to confirm ignition
       animate(rocketY, -8, {
         duration: 0.8,
         ease: "easeOut",
       });
       
-      // Phase 2: Main liftoff at 1.5s
       setTimeout(() => {
         setShowFlash(true);
         setTimeout(() => setShowFlash(false), 200);
         setLaunchPhase("liftoff");
       }, 1500);
       
-      // Phase 3: Ascending (1.7s - 6s)
       setTimeout(() => {
         setLaunchPhase("ascending");
         animate(rocketY, -2500, {
@@ -343,12 +370,10 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
         });
       }, 1700);
       
-      // Phase 4: Fireworks start at 5.5s
       setTimeout(() => {
         onLaunchStart?.();
       }, 5500);
       
-      // Phase 5: Rocket fully exits at 6.0s
       setTimeout(() => {
         setShowRocket(false);
         setLaunchPhase("exited");
@@ -356,7 +381,6 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
     }
   }, [progress, hasLaunched, onLaunchStart, rocketY]);
 
-  // Reset when progress drops from 100
   useEffect(() => {
     if (progress < 100) {
       setHasLaunched(false);
@@ -398,7 +422,6 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
     );
   }
   
-  // Determine shake class during launch phases
   const getLaunchShakeClass = () => {
     if (launchPhase === "ignition") return "animate-engine-rumble";
     if (launchPhase === "liftoff" || launchPhase === "ascending") return "animate-liftoff-shake";
@@ -407,75 +430,94 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
 
   return (
     <>
+      {/* Flash effect */}
+      <AnimatePresence>
+        {showFlash && (
+          <motion.div
+            className="fixed inset-0 z-[200] bg-white pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.8 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Volumetric smoke effects during launch */}
       {launchPhase === "ignition" && <GroundSmoke intensity={1} />}
       {launchPhase === "ascending" && <AscendingSmoke rocketY={currentRocketY} />}
       
+      {/* Main container with shake */}
       <div 
-        className={`relative w-24 h-32 flex items-end justify-center ${isLaunching ? getLaunchShakeClass() : getVibrationClass()}`}
+        className={`relative flex items-end justify-center ${isLaunching ? getLaunchShakeClass() : getVibrationClass()}`}
         style={{ 
-          overflow: launchPhase === "ascending" ? 'visible' : 'hidden',
+          width: '96px',
+          height: '140px',
           imageRendering: "pixelated",
         }}
       >
-        {/* Liftoff Flash */}
-        <AnimatePresence>
-          {showFlash && (
-            <motion.div
-              className="fixed inset-0 z-[200] bg-white pointer-events-none"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.8 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.1 }}
-            />
-          )}
-        </AnimatePresence>
-
+        {/* ROCKET-ASSEMBLY: Contains rocket + flame + effects, moves as one unit */}
         <AnimatePresence>
           {launchPhase === "ascending" ? (
-            // LAUNCH: Rocket flying upward with attached exhaust
             <motion.div
-              key="launching-rocket"
-              className="absolute z-[100]"
-              style={{ y: rocketY }}
+              key="rocket-assembly-ascending"
+              className="absolute"
+              style={{ 
+                y: rocketY,
+                bottom: '16px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 10,
+              }}
             >
-              <motion.div 
-                className="relative z-10"
-                animate={{ 
-                  x: [-0.5, 0.5, -0.3, 0.3, 0],
-                  y: [-0.3, 0.3, -0.2, 0.2, 0],
-                }}
-                transition={{ duration: 0.04, repeat: Infinity }}
-                style={{ imageRendering: "pixelated" }}
-              >
-                <PixelRocketBody stage="ascending" showExhaust exhaustIntensity={1} />
-              </motion.div>
+              {/* Rocket Assembly wrapper */}
+              <div className="relative" style={{ imageRendering: "pixelated" }}>
+                {/* Rocket Body - z-index 2 */}
+                <motion.div 
+                  className="relative"
+                  style={{ zIndex: 2 }}
+                  animate={{ 
+                    x: [-0.5, 0.5, -0.3, 0.3, 0],
+                    y: [-0.3, 0.3, -0.2, 0.2, 0],
+                  }}
+                  transition={{ duration: 0.04, repeat: Infinity }}
+                >
+                  <PixelRocketBody stage="ascending" showExhaust exhaustIntensity={1} />
+                </motion.div>
+              </div>
             </motion.div>
           ) : (
-            // PRE-LAUNCH: Rocket stationary on launchpad
-            <motion.div key="stationary-rocket">
-              {/* Blue energy glow for fuel sequence (31-45%) */}
-              <FuelSequenceGlow active={preLaunchStage === "fuel-sequence" && !isLaunching} />
-              
-              {/* Launchpad structure with gantry */}
+            <motion.div
+              key="rocket-assembly-grounded"
+              className="absolute"
+              style={{ 
+                y: rocketY,
+                bottom: '16px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+              }}
+            >
+              {/* Launchpad structure - positioned below assembly */}
               <Launchpad stage={preLaunchStage} isLaunching={isLaunching} />
               
-              {/* Pre-launch effects (steam, smoke, sparks) */}
-              {!isLaunching && <PreLaunchEffects stage={preLaunchStage} />}
-              
-              {/* High tension flickering engine (81-99%) */}
-              <HighTensionFlicker active={preLaunchStage === "high-tension" && !isLaunching} />
-              
-              {/* During ignition/liftoff phases - pixel rocket with intense exhaust */}
-              {(launchPhase === "ignition" || launchPhase === "liftoff") ? (
-                <div className="relative z-10 mb-4">
+              {/* Rocket Assembly wrapper - position: relative */}
+              <div className="relative" style={{ imageRendering: "pixelated" }}>
+                {/* Countdown display - positioned left of rocket */}
+                <CountdownDisplay phase={launchPhase} />
+                
+                {/* Blue energy glow for fuel sequence */}
+                <FuelSequenceGlow active={preLaunchStage === "fuel-sequence" && !isLaunching} />
+                
+                {/* Rocket Body - z-index 2 */}
+                {(launchPhase === "ignition" || launchPhase === "liftoff") ? (
                   <motion.div
+                    className="relative"
+                    style={{ zIndex: 2 }}
                     animate={{ 
                       x: [-0.8, 0.8, -0.5, 0.5, 0],
                       y: [-0.4, 0.4, -0.3, 0.3, 0],
                     }}
                     transition={{ duration: 0.025, repeat: Infinity }}
-                    style={{ imageRendering: "pixelated" }}
                   >
                     <PixelRocketBody 
                       stage="struggle" 
@@ -483,23 +525,25 @@ export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSe
                       exhaustIntensity={launchPhase === "liftoff" ? 1 : 0.85} 
                     />
                   </motion.div>
-                </div>
-              ) : (
-                // Static pre-launch rocket with minimal effects
-                <div 
-                  className="relative z-10 mb-4"
-                  style={{ imageRendering: "pixelated" }}
-                >
-                  <PixelRocketBody 
-                    stage="idle" 
-                    showExhaust={preLaunchStage === "engine-test" || preLaunchStage === "pre-ignition"}
-                    exhaustIntensity={
-                      preLaunchStage === "pre-ignition" ? 0.3 :
-                      preLaunchStage === "engine-test" ? 0.15 : 0
-                    }
-                  />
-                </div>
-              )}
+                ) : (
+                  <div className="relative" style={{ zIndex: 2 }}>
+                    <PixelRocketBody 
+                      stage="idle" 
+                      showExhaust={preLaunchStage === "engine-test" || preLaunchStage === "pre-ignition"}
+                      exhaustIntensity={
+                        preLaunchStage === "pre-ignition" ? 0.3 :
+                        preLaunchStage === "engine-test" ? 0.15 : 0
+                      }
+                    />
+                  </div>
+                )}
+                
+                {/* Pre-launch effects (steam, smoke, sparks) - positioned below rocket */}
+                {!isLaunching && <PreLaunchEffects stage={preLaunchStage} />}
+                
+                {/* High tension flickering engine - positioned at nozzle */}
+                <HighTensionFlicker active={preLaunchStage === "high-tension" && !isLaunching} />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

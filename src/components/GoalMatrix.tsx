@@ -211,7 +211,7 @@ export function GoalMatrix() {
       <Starfield progress={globalProgress} />
       
       <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 max-w-3xl mx-auto">
-        {/* Header with Template Button */}
+        {/* SECTION 1: Header */}
         <div className="w-full flex items-start justify-between">
           <div className="flex-1" />
           <div className="text-center flex-1">
@@ -227,8 +227,33 @@ export function GoalMatrix() {
           </div>
         </div>
 
-        {/* Matrix Grid */}
-        <div className="goal-grid w-full aspect-square max-w-2xl">
+        {/* SECTION 2: Mission Control - Rocket + Progress Bar */}
+        <div className="w-full flex flex-col items-center gap-4" style={{ zIndex: 100 }}>
+          {/* Rocket Launch Sequence */}
+          <div className="relative" style={{ minHeight: '140px' }}>
+            <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} />
+          </div>
+
+          {/* Progress Section - BELOW the rocket */}
+          <div className="w-full max-w-md space-y-1">
+            {/* Header: Label left, Stats right - ABOVE progress bar */}
+            <div className="flex justify-between items-center text-sm mb-2">
+              <span className="text-muted-foreground font-medium">Total Progress</span>
+              <span className="font-mono text-primary font-semibold">
+                {completedCount}/64 <span className="text-muted-foreground">({Math.round(globalProgress)}%)</span>
+              </span>
+            </div>
+            
+            {/* Progress Bar */}
+            <ProgressBar progress={globalProgress} className="h-2.5" />
+            
+            {/* Milestone Markers BELOW the bar */}
+            <ProgressMilestones progress={globalProgress} />
+          </div>
+        </div>
+
+        {/* SECTION 3: Matrix Grid */}
+        <div className="goal-grid w-full aspect-square max-w-2xl" style={{ zIndex: 50 }}>
           {gridPositions.map((subIdx, gridIdx) => (
             <div key={gridIdx} className="aspect-square">
               {subIdx === -1 ? (
@@ -254,30 +279,7 @@ export function GoalMatrix() {
           ))}
         </div>
 
-        {/* Rocket Launch Sequence - BELOW the matrix */}
-        <div className="flex justify-center py-4" style={{ overflow: 'visible', zIndex: 100 }}>
-          <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} />
-        </div>
-
-        {/* Progress Section - BELOW the rocket */}
-        <div className="w-full max-w-md space-y-1">
-          {/* Header: Label left, Stats right - ABOVE progress bar */}
-          <div className="flex justify-between items-center text-sm mb-2">
-            <span className="text-muted-foreground font-medium">Total Progress</span>
-            <span className="font-mono text-primary font-semibold">
-              {completedCount}/64 <span className="text-muted-foreground">({Math.round(globalProgress)}%)</span>
-            </span>
-          </div>
-          
-          {/* Progress Bar */}
-          <ProgressBar progress={globalProgress} className="h-2.5" />
-          
-          {/* Milestone Markers BELOW the bar */}
-          <ProgressMilestones progress={globalProgress} />
-        </div>
-
-
-        {/* Legend */}
+        {/* SECTION 4: Legend */}
         <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-sm bg-goal-core border border-border" />
