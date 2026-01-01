@@ -178,28 +178,42 @@
     text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
   }
 
-  /* 8-Bit 3D Pixel Title */
+  /* 8-Bit 3D Pixel Title - Heavy blocky with 2px stroke and 3D shadow */
   .pixel-title-3d {
-    font-family: 'Silkscreen', 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', cursive;
     text-shadow: 
-      1px 1px 0 hsl(220 20% 5%),
+      /* 2px dark stroke */
+      -2px -2px 0 hsl(220 20% 5%),
+      2px -2px 0 hsl(220 20% 5%),
+      -2px 2px 0 hsl(220 20% 5%),
       2px 2px 0 hsl(220 20% 5%),
-      3px 3px 0 hsl(220 15% 10%),
-      4px 4px 8px hsl(0 0% 0% / 0.5);
+      -2px 0 0 hsl(220 20% 5%),
+      2px 0 0 hsl(220 20% 5%),
+      0 -2px 0 hsl(220 20% 5%),
+      0 2px 0 hsl(220 20% 5%),
+      /* 3D bottom shadow effect */
+      3px 3px 0 hsl(220 15% 8%),
+      4px 4px 0 hsl(220 15% 6%),
+      5px 5px 0 hsl(220 15% 4%),
+      6px 6px 12px hsl(0 0% 0% / 0.6);
     image-rendering: pixelated;
+    letter-spacing: 2px;
   }
 
-  /* Gold stat numbers */
+  /* Gold stat numbers - High-resolution pixel font */
   .pixel-gold-stat {
     font-family: 'VT323', monospace;
     color: hsl(45 100% 50%);
     text-shadow: 
-      1px 1px 0 hsl(35 100% 30%),
-      0 0 10px hsl(45 100% 50% / 0.5);
+      1px 1px 0 hsl(35 100% 25%),
+      2px 2px 0 hsl(25 100% 20%),
+      0 0 12px hsl(45 100% 50% / 0.6),
+      0 0 20px hsl(45 100% 50% / 0.3);
     image-rendering: pixelated;
+    font-weight: bold;
   }
 
-  /* Stepped pixel border button */
+  /* Stepped pixel border button with physical press animation */
   .pixel-button {
     position: relative;
     background: hsl(var(--secondary));
@@ -207,23 +221,30 @@
     padding: 8px 16px;
     image-rendering: pixelated;
     box-shadow:
-      inset -2px -2px 0 hsl(220 15% 8%),
-      inset 2px 2px 0 hsl(220 15% 25%),
-      2px 2px 0 hsl(0 0% 0% / 0.3);
-    transition: all 0.1s ease;
+      /* Stepped pixel border effect */
+      inset -3px -3px 0 hsl(220 15% 6%),
+      inset 3px 3px 0 hsl(220 15% 28%),
+      3px 3px 0 hsl(0 0% 0% / 0.4),
+      1px 1px 0 hsl(220 15% 10%);
+    transition: all 0.05s ease;
   }
 
   .pixel-button:hover {
     background: hsl(var(--muted));
+    box-shadow:
+      inset -3px -3px 0 hsl(220 15% 8%),
+      inset 3px 3px 0 hsl(220 15% 32%),
+      3px 3px 0 hsl(0 0% 0% / 0.4),
+      1px 1px 0 hsl(220 15% 10%);
   }
 
   .pixel-button:active,
   .pixel-button.pressed {
     box-shadow:
-      inset 2px 2px 0 hsl(220 15% 8%),
-      inset -2px -2px 0 hsl(220 15% 25%),
-      1px 1px 0 hsl(0 0% 0% / 0.3);
-    transform: translate(1px, 1px);
+      inset 3px 3px 0 hsl(220 15% 6%),
+      inset -3px -3px 0 hsl(220 15% 22%),
+      1px 1px 0 hsl(0 0% 0% / 0.2);
+    transform: translate(2px, 2px);
   }
 
   /* 3D Glass Tube Progress Bar */
@@ -274,33 +295,38 @@
     border-radius: 9999px;
   }
 
-  /* Milestone markers */
-  .milestone-marker {
-    image-rendering: pixelated;
-  }
-
-  .milestone-marker.active {
-    color: hsl(45 100% 50%);
-    text-shadow: 0 0 8px hsl(45 100% 50% / 0.7);
-  }
-
-  .milestone-marker.inactive {
-    color: hsl(220 10% 40%);
-    opacity: 0.6;
-  }
-
-  .milestone-dot {
-    image-rendering: pixelated;
-  }
-
-  .milestone-dot.active {
+  /* Milestone markers - Active state: Bright Gold with outer glow */
+  .milestone-dot-active {
     background: hsl(45 100% 50%);
-    box-shadow: 0 0 8px hsl(45 100% 50% / 0.7);
+    box-shadow: 
+      0 0 8px hsl(45 100% 50% / 0.8),
+      0 0 16px hsl(45 100% 50% / 0.5),
+      0 0 24px hsl(45 100% 50% / 0.3);
+    image-rendering: pixelated;
   }
 
-  .milestone-dot.inactive {
-    background: hsl(220 10% 30%);
+  /* Milestone markers - Inactive state: Muted Dark Gray */
+  .milestone-dot-inactive {
+    background: hsl(220 10% 25%);
+    opacity: 0.4;
+    image-rendering: pixelated;
+  }
+
+  /* Milestone labels - Active: Bright Gold with glow */
+  .milestone-label-active {
+    color: hsl(45 100% 50%);
+    text-shadow: 
+      0 0 6px hsl(45 100% 50% / 0.7),
+      0 0 12px hsl(45 100% 50% / 0.4);
+    image-rendering: pixelated;
+    font-weight: bold;
+  }
+
+  /* Milestone labels - Inactive: Muted Dark Gray */
+  .milestone-label-inactive {
+    color: hsl(220 10% 35%);
     opacity: 0.5;
+    image-rendering: pixelated;
   }
 }
 

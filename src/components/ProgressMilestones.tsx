@@ -10,32 +10,32 @@ const MILESTONES = [15, 30, 45, 60, 80, 100];
 
 export function ProgressMilestones({ progress, className }: ProgressMilestonesProps) {
   return (
-    <div className={cn("relative w-full h-8 mt-3", className)}>
+    <div className={cn("relative w-full h-10 mt-2", className)}>
       {/* Milestone markers */}
       {MILESTONES.map((milestone) => {
         const isActive = progress >= milestone;
         return (
           <div
             key={milestone}
-            className="absolute -translate-x-1/2 flex flex-col items-center gap-1"
+            className="absolute -translate-x-1/2 flex flex-col items-center gap-0.5"
             style={{ left: `${milestone}%` }}
           >
-            {/* Tick mark / Dot */}
+            {/* Tick mark / Diamond Dot */}
             <div
               className={cn(
-                "w-2.5 h-2.5 milestone-dot transition-all duration-500",
-                isActive ? "active" : "inactive"
+                "w-3 h-3 transition-all duration-500",
+                isActive ? "milestone-dot-active" : "milestone-dot-inactive"
               )}
               style={{ 
                 imageRendering: "pixelated",
-                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)" // Diamond shape for pixel look
+                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
               }}
             />
             {/* Percentage Label */}
             <span
               className={cn(
-                "font-pixel-mono text-sm milestone-marker transition-colors duration-500",
-                isActive ? "active" : "inactive"
+                "font-pixel-mono text-base transition-all duration-500",
+                isActive ? "milestone-label-active" : "milestone-label-inactive"
               )}
               style={{ imageRendering: "pixelated" }}
             >
