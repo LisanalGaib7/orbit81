@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
 @layer base {
   :root {
     --background: 220 20% 7%;
@@ -50,6 +48,10 @@
     --subgoal-bg: 220 16% 11%;
     --tile-hover: 220 15% 14%;
 
+    /* Neon glow tokens */
+    --neon-gold: 38 100% 55%;
+    --neon-orange: 25 100% 50%;
+
     --sidebar-background: 220 18% 10%;
     --sidebar-foreground: 45 20% 95%;
     --sidebar-primary: 38 92% 50%;
@@ -80,6 +82,10 @@
     --border: 220 15% 20%;
     --input: 220 15% 20%;
     --ring: 38 92% 50%;
+    
+    /* Neon glow tokens */
+    --neon-gold: 38 100% 55%;
+    --neon-orange: 25 100% 50%;
   }
 }
 
@@ -89,12 +95,16 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Space Grotesk', sans-serif;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
   }
 
   .font-mono {
     font-family: 'JetBrains Mono', monospace;
+  }
+
+  .font-pixel {
+    font-family: 'Press Start 2P', cursive;
   }
 }
 
@@ -157,6 +167,14 @@
 
   .glow-text {
     text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+  }
+
+  .neon-glow-title {
+    text-shadow: 
+      0 0 10px hsl(var(--neon-gold) / 0.8),
+      0 0 20px hsl(var(--neon-gold) / 0.6),
+      0 0 40px hsl(var(--neon-orange) / 0.4),
+      0 0 60px hsl(var(--neon-orange) / 0.2);
   }
 }
 
