@@ -23,18 +23,19 @@ export function ProgressMilestones({ progress, className }: ProgressMilestonesPr
             {/* Tick mark / Dot */}
             <div
               className={cn(
-                "w-2.5 h-2.5 rounded-full transition-all duration-500 border-2",
-                isActive
-                  ? "bg-primary border-primary shadow-[0_0_10px_hsl(var(--primary)/0.7)]"
-                  : "bg-transparent border-muted-foreground/40"
+                "w-2.5 h-2.5 milestone-dot transition-all duration-500",
+                isActive ? "active" : "inactive"
               )}
-              style={{ imageRendering: "pixelated" }}
+              style={{ 
+                imageRendering: "pixelated",
+                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)" // Diamond shape for pixel look
+              }}
             />
             {/* Percentage Label */}
             <span
               className={cn(
-                "text-[9px] font-pixel transition-colors duration-500",
-                isActive ? "text-primary" : "text-muted-foreground/40"
+                "font-pixel-mono text-sm milestone-marker transition-colors duration-500",
+                isActive ? "active" : "inactive"
               )}
               style={{ imageRendering: "pixelated" }}
             >
