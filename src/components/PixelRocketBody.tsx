@@ -19,10 +19,16 @@ export function PixelRocketBody({
   const exhaustWidth = 6 + exhaustIntensity * 6;
   
   return (
+    // Rocket-Assembly: Single parent container for strict alignment
     <div 
-      className="relative flex flex-col items-center"
-      style={{ imageRendering: "pixelated" }}
+      className="relative"
+      style={{ 
+        imageRendering: "pixelated",
+        // Fixed dimensions matching rocket structure
+      }}
     >
+      {/* Rocket Image - static relative element (z-index: 2) */}
+      <div className="relative z-[2]">
       {/* Pixel Rocket Structure */}
       <div className="relative">
         {/* Nose cone - 3 rows of pixels */}
@@ -124,7 +130,7 @@ export function PixelRocketBody({
             <div className="w-1 h-1 bg-muted" />
             <div className="w-1 h-1 bg-muted" />
           </div>
-          {/* Fin row 2 - nozzle */}
+        {/* Fin row 2 - nozzle */}
           <div className="flex">
             <div className="w-1 h-1 bg-muted" />
             <div className="w-1 h-1 bg-muted" />
@@ -136,10 +142,20 @@ export function PixelRocketBody({
           </div>
         </div>
       </div>
+      </div>
       
-      {/* Pixel Exhaust Fire - attached directly to rocket bottom */}
+      {/* Flame/Exhaust Container - absolute positioned, z-index: 1, pinned to bottom */}
       {showExhaust && (
-        <div className="flex flex-col items-center -mt-px" style={{ imageRendering: "pixelated" }}>
+        <div 
+          className="absolute z-[1] flex flex-col items-center"
+          style={{ 
+            imageRendering: "pixelated",
+            bottom: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            marginBottom: "-2px" // Tuck perfectly under nozzle
+          }}
+        >
           <motion.div
             className="flex flex-col items-center"
             animate={{ 

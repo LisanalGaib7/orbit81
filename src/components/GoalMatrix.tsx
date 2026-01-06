@@ -236,7 +236,6 @@ export function GoalMatrix() {
               <TypewriterText 
                 text="Writing the greatest chapter yet" 
                 typingSpeed={60}
-                cursorBlinkSpeed={500}
               />
             </p>
           </div>
@@ -261,7 +260,7 @@ export function GoalMatrix() {
               <span className="font-pixel text-[8px] text-muted-foreground" style={{ imageRendering: 'pixelated' }}>
                 Total Progress
               </span>
-              <span className="pixel-gold-stat text-xl">
+              <span className="pixel-gold-stat-outlined text-xl">
                 {completedCount}/64 ({Math.round(globalProgress)}%)
               </span>
             </div>
