@@ -213,6 +213,26 @@
     font-weight: bold;
   }
 
+  /* Gold stat numbers with dark pixel outline for starry background contrast */
+  .pixel-gold-stat-outlined {
+    font-family: 'VT323', monospace;
+    color: hsl(45 100% 50%);
+    text-shadow: 
+      /* 1px black outline on all sides */
+      1px 1px 0 #000000,
+      -1px -1px 0 #000000,
+      1px -1px 0 #000000,
+      -1px 1px 0 #000000,
+      0px 1px 0 #000000,
+      0px -1px 0 #000000,
+      1px 0px 0 #000000,
+      -1px 0px 0 #000000,
+      /* Subtle gold outer glow */
+      0 0 8px hsl(45 100% 50% / 0.4);
+    image-rendering: pixelated;
+    font-weight: bold;
+  }
+
   /* Stepped pixel border button with physical press animation */
   .pixel-button {
     position: relative;
@@ -331,6 +351,16 @@
 }
 
 @layer utilities {
+  /* Retro terminal cursor fade - smoother CRT-style breathing animation */
+  .cursor-fade {
+    animation: cursorFade 0.8s ease-in-out infinite;
+  }
+
+  @keyframes cursorFade {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
   .animate-pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
   }
