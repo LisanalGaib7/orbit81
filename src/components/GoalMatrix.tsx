@@ -226,8 +226,7 @@ export function GoalMatrix() {
               className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide pixel-title-3d whitespace-nowrap"
               style={{ imageRendering: 'pixelated' }}
             >
-              <span className="text-primary">Orbit</span>{" "}
-              <span className="text-foreground">81</span>
+              Orbit 81
             </h1>
             <p 
               className="font-pixel text-[6px] sm:text-[7px] text-muted-foreground mt-2 whitespace-nowrap" 

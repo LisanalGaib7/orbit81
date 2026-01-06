@@ -178,24 +178,22 @@
     text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
   }
 
-  /* 8-Bit 3D Pixel Title - Heavy blocky with 2px stroke and 3D shadow */
+  /* 8-Bit 3D Pixel Title - Gold bar chiseled bevel effect */
   .pixel-title-3d {
     font-family: 'Press Start 2P', cursive;
+    color: hsl(45 100% 50%); /* Gold base */
     text-shadow: 
-      /* 2px dark stroke */
-      -2px -2px 0 hsl(220 20% 5%),
-      2px -2px 0 hsl(220 20% 5%),
-      -2px 2px 0 hsl(220 20% 5%),
-      2px 2px 0 hsl(220 20% 5%),
-      -2px 0 0 hsl(220 20% 5%),
-      2px 0 0 hsl(220 20% 5%),
-      0 -2px 0 hsl(220 20% 5%),
-      0 2px 0 hsl(220 20% 5%),
-      /* 3D bottom shadow effect */
-      3px 3px 0 hsl(220 15% 8%),
-      4px 4px 0 hsl(220 15% 6%),
-      5px 5px 0 hsl(220 15% 4%),
-      6px 6px 12px hsl(0 0% 0% / 0.6);
+      /* Top-left highlight (light bevel) */
+      -1px -1px 0 hsl(45 100% 85%),
+      -2px -2px 0 hsl(45 100% 75%),
+      /* Bottom-right shadow (dark bevel) */
+      1px 1px 0 hsl(30 100% 25%),
+      2px 2px 0 hsl(25 80% 20%),
+      /* Deep 3D drop shadow */
+      3px 3px 0 hsl(0 0% 0% / 0.5),
+      4px 4px 0 hsl(0 0% 0% / 0.4),
+      5px 5px 0 hsl(0 0% 0% / 0.3),
+      6px 6px 8px hsl(0 0% 0% / 0.6);
     image-rendering: pixelated;
     letter-spacing: 2px;
   }
