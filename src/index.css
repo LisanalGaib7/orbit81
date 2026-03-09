@@ -96,12 +96,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Silkscreen', 'Press Start 2P', cursive;
+    font-family: 'Inter', system-ui, sans-serif;
+    --font-header: 'Silkscreen', 'Press Start 2P', cursive;
+    --font-data: 'JetBrains Mono', 'VT323', monospace;
+    --font-body: 'Inter', system-ui, sans-serif;
   }
 
   .font-mono {
-    font-family: 'VT323', monospace;
-    font-size: 1.25em;
+    font-family: var(--font-data);
   }
 
   .font-pixel {
@@ -109,11 +111,25 @@
   }
 
   .font-pixel-display {
-    font-family: 'Silkscreen', 'Press Start 2P', cursive;
+    font-family: var(--font-header);
   }
 
   .font-pixel-mono {
-    font-family: 'VT323', monospace;
+    font-family: var(--font-data);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .font-header {
+    font-family: var(--font-header);
+    text-shadow: 1px 1px 0px #000000;
+  }
+
+  .font-data {
+    font-family: var(--font-data);
+    text-shadow: 1px 1px 0px #000000;
   }
 }
 

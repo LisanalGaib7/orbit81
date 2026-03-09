@@ -1,7 +1,7 @@
 import { GoalCheckbox } from "./GoalCheckbox";
 import { EditableLabel } from "./EditableLabel";
 import { PixelConfetti } from "./PixelConfetti";
-import { generateActionId, getPrefix } from "@/lib/goalIds";
+import { generateActionId } from "@/lib/goalIds";
 import {
   Tooltip,
   TooltipContent,
@@ -84,13 +84,14 @@ export function SubGoalBlock({
           {actionPositions.map((actionIdx, gridIdx) => (
             <div
               key={gridIdx}
-              className="tile-cell aspect-square flex items-center justify-center overflow-hidden"
+              className="tile-cell aspect-square flex items-center justify-center overflow-visible"
             >
               {actionIdx === -1 ? (
                 <EditableLabel
                   value={label || "Goal"}
                   onChange={onLabelChange}
                   className="text-[10px] sm:text-xs font-medium leading-tight px-0.5 w-full"
+                  style={{ fontFamily: 'var(--font-header)' }}
                 />
               ) : (
                 <Tooltip>
@@ -99,16 +100,17 @@ export function SubGoalBlock({
                       className="relative w-full h-full flex flex-col items-center justify-center gap-0.5 cursor-pointer hover:bg-primary/10 rounded transition-colors"
                       onClick={(e) => handleActionSlotClick(actionIdx, e)}
                     >
-                      {/* ID Code - monospaced terminal style */}
+                      {/* ID Code - data font */}
                       <span 
-                        className={`font-mono text-[7px] sm:text-[9px] font-bold tracking-tight leading-none ${
+                        className={`text-[7px] sm:text-[9px] font-bold tracking-tight leading-none ${
                           safeActions[actionIdx] 
                             ? "text-primary/50 line-through" 
-                            : "text-[#FFD700]"
+                            : ""
                         }`}
                         style={{ 
+                          fontFamily: 'var(--font-data)',
                           textShadow: '1px 1px 0px #000000',
-                          imageRendering: 'auto' as any 
+                          color: safeActions[actionIdx] ? undefined : '#FFD700',
                         }}
                       >
                         {generateActionId(label, actionIdx)}
@@ -124,10 +126,11 @@ export function SubGoalBlock({
                   </TooltipTrigger>
                   <TooltipContent 
                     side="top" 
-                    className="max-w-[200px] text-xs font-mono"
+                    className="max-w-[200px] text-xs"
                     sideOffset={5}
+                    style={{ fontFamily: 'var(--font-body)' }}
                   >
-                    <span className="text-[#FFD700] font-bold">[{generateActionId(label, actionIdx)}]</span>{" "}
+                    <span style={{ fontFamily: 'var(--font-data)', color: '#FFD700' }} className="font-bold">[{generateActionId(label, actionIdx)}]</span>{" "}
                     {safeActionLabels[actionIdx] || "Click to define action"}
                   </TooltipContent>
                 </Tooltip>
