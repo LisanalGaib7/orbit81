@@ -97,6 +97,13 @@ export function GoalMatrix() {
 
   // Active block for sidebar
   const [activeBlockIndex, setActiveBlockIndex] = useState<number | null>(null);
+  const [focusActionIndex, setFocusActionIndex] = useState<number | null>(null);
+
+  // Handle clicking a specific action slot in the grid
+  const handleActionSlotClick = useCallback((blockIndex: number, actionIndex: number) => {
+    setActiveBlockIndex(blockIndex);
+    setFocusActionIndex(actionIndex);
+  }, []);
 
   // Persist to localStorage
   useEffect(() => {
