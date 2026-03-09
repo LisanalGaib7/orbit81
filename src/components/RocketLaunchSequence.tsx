@@ -709,6 +709,11 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                 
                 {/* High tension flickering engine - positioned at nozzle */}
                 <HighTensionFlicker active={preLaunchStage === "high-tension" && !isLaunching} />
+                
+                {/* Checkbox ignition burst effects */}
+                <AnimatePresence>
+                  {burstActive && <CheckIgnitionBurst active={burstActive} />}
+                </AnimatePresence>
               </div>
             </motion.div>
           )}
