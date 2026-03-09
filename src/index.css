@@ -737,3 +737,29 @@
   scrollbar-width: thin;
   scrollbar-color: hsl(38, 92%, 50%) hsl(220, 20%, 7%, 0.8);
 }
+
+/* No-scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile: hide scrollbars on body and drawers */
+@media (max-width: 767px) {
+  body::-webkit-scrollbar,
+  [data-radix-scroll-area-viewport]::-webkit-scrollbar,
+  [role="dialog"]::-webkit-scrollbar,
+  [role="dialog"] *::-webkit-scrollbar {
+    display: none;
+  }
+  body,
+  [data-radix-scroll-area-viewport],
+  [role="dialog"],
+  [role="dialog"] * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
