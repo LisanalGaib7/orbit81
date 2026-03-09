@@ -421,6 +421,22 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
   const [showFlash, setShowFlash] = useState(false);
   const rocketY = useMotionValue(0);
   const [currentRocketY, setCurrentRocketY] = useState(0);
+  const [burstActive, setBurstActive] = useState(false);
+  const [burstShake, setBurstShake] = useState(false);
+  const prevBurstRef = useRef(ignitionBurst);
+  
+  // Trigger burst animation when ignitionBurst increments
+  useEffect(() => {
+    if (ignitionBurst > 0 && ignitionBurst !== prevBurstRef.current && progress < 100) {
+      prevBurstRef.current = ignitionBurst;
+      setBurstActive(true);
+      setBurstShake(true);
+      // Phase D: Shake lasts 500ms
+      setTimeout(() => setBurstShake(false), 500);
+      // Full burst lasts 800ms
+      setTimeout(() => setBurstActive(false), 800);
+    }
+  }, [ignitionBurst, progress]);
   
   useEffect(() => {
     const unsubscribe = rocketY.on("change", (latest) => {
