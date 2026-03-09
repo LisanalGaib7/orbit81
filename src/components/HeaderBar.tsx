@@ -196,24 +196,7 @@ export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
   };
 
   return (
-    <div className="w-full flex items-center justify-between gap-2">
-      {/* Spacer for centering */}
-      <div className="flex-1" />
-
-      {/* Centered Logo */}
-      <div className="text-center flex-shrink-0">
-        <h1 
-          className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide pixel-title-3d whitespace-nowrap"
-          style={{ imageRendering: 'pixelated' }}
-        >
-          <span className="text-primary">Orbit</span>{" "}
-          <span className="text-foreground">81</span>
-        </h1>
-      </div>
-
-      {/* Utility icons - top right */}
-      <div className="flex-1 flex justify-end">
-        <div className="relative flex items-center gap-1 sm:gap-1.5">
+    <div className="relative flex items-center gap-4 sm:gap-5">
           <UtilityIcon
             icon={BookOpen}
             label="Manual"
@@ -235,8 +218,6 @@ export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
 
           <ManualPanel isOpen={manualOpen} onClose={() => setManualOpen(false)} />
           <TemplatePanel isOpen={templateOpen} onClose={() => setTemplateOpen(false)} onSelect={onApplyTemplate} />
-        </div>
-      </div>
     </div>
   );
 }

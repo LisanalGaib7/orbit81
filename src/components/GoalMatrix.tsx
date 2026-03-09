@@ -238,17 +238,30 @@ export function GoalMatrix() {
       <Starfield progress={globalProgress} />
       
       <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 max-w-3xl mx-auto">
-        {/* SECTION 1: Header */}
-        <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} />
-        <p 
-          className="font-pixel text-[6px] sm:text-[7px] text-muted-foreground -mt-4 whitespace-nowrap" 
-          style={{ imageRendering: 'pixelated' }}
-        >
-          <TypewriterText 
-            text="Writing the greatest chapter yet" 
-            typingSpeed={60}
-          />
-        </p>
+        {/* Utility icons - absolute top-right corner */}
+        <div className="fixed top-4 right-4 sm:top-8 sm:right-8 z-[200]">
+          <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} />
+        </div>
+
+        {/* SECTION 1: Centered Logo */}
+        <div className="text-center pt-2">
+          <h1 
+            className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide pixel-title-3d whitespace-nowrap"
+            style={{ imageRendering: 'pixelated' }}
+          >
+            <span className="text-primary">Orbit</span>{" "}
+            <span className="text-foreground">81</span>
+          </h1>
+          <p 
+            className="font-pixel text-[6px] sm:text-[7px] text-muted-foreground mt-2 whitespace-nowrap" 
+            style={{ imageRendering: 'pixelated' }}
+          >
+            <TypewriterText 
+              text="Writing the greatest chapter yet" 
+              typingSpeed={60}
+            />
+          </p>
+        </div>
 
         {/* SECTION 2: Mission Control - Rocket-Assembly + Progress Bar BELOW */}
         <div className="w-full flex flex-col items-center gap-6" style={{ zIndex: 100 }}>
