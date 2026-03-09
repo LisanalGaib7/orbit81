@@ -263,7 +263,7 @@ export function GoalMatrix() {
         <div className="w-full flex flex-col items-center gap-6" style={{ zIndex: 100 }}>
           {/* Rocket Launch Sequence (Rocket-Assembly) */}
           <div className="relative" style={{ minHeight: '140px' }}>
-            <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} />
+            <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} ignitionBurst={ignitionBurst} />
           </div>
 
           {/* Progress Section - Directly BELOW the rocket */}
