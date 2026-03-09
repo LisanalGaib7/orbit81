@@ -94,6 +94,7 @@ export function GoalMatrix() {
   const [completedSubGoals, setCompletedSubGoals] = useState<Set<number>>(new Set());
   const prevCompletedRef = useRef<Set<number>>(new Set());
   const missionTriggeredRef = useRef(false);
+  const [ignitionBurst, setIgnitionBurst] = useState(0);
 
   // Active block for sidebar
   const [activeBlockIndex, setActiveBlockIndex] = useState<number | null>(null);
