@@ -5,13 +5,12 @@ import { ProgressBar } from "./ProgressBar";
 import { ProgressMilestones } from "./ProgressMilestones";
 import { RocketLaunchSequence } from "./RocketLaunchSequence";
 import { Starfield } from "./Starfield";
-import { TemplateDropdown } from "./TemplateDropdown";
-import { MissionManual } from "./MissionManual";
 import { MissionAccomplished } from "./MissionAccomplished";
 import { DeepSpaceFireworks } from "./DeepSpaceFireworks";
 import { ActionSidebar } from "./ActionSidebar";
 import { TypewriterText } from "./TypewriterText";
 import { MobileCategoryTabs } from "./MobileCategoryTabs";
+import { HeaderBar } from "./HeaderBar";
 import { useIsMobile } from "@/hooks/use-mobile";
 // Default sub-goal labels
 const DEFAULT_SUBGOALS = [
