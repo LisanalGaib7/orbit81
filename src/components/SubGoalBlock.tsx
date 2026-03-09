@@ -87,12 +87,13 @@ export function SubGoalBlock({
               className="tile-cell aspect-square flex items-center justify-center overflow-visible"
             >
               {actionIdx === -1 ? (
+              <div style={{ fontFamily: 'var(--font-header)' }}>
                 <EditableLabel
                   value={label || "Goal"}
                   onChange={onLabelChange}
                   className="text-[10px] sm:text-xs font-medium leading-tight px-0.5 w-full"
-                  style={{ fontFamily: 'var(--font-header)' }}
                 />
+              </div>
               ) : (
                 <Tooltip>
                   <TooltipTrigger asChild>
