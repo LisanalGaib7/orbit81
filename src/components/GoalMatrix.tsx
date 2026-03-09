@@ -290,32 +290,48 @@ export function GoalMatrix() {
         </div>
 
         {/* SECTION 3: Matrix Grid */}
-        <div className="goal-grid w-full aspect-square max-w-2xl" style={{ zIndex: 50 }}>
-          {gridPositions.map((subIdx, gridIdx) => (
-            <div key={gridIdx} className="aspect-square">
-              {subIdx === -1 ? (
-                <CoreGoalBlock 
-                  subGoalProgress={subGoalProgress}
-                  subGoalLabels={subGoalLabels}
-                />
-              ) : (
-                <SubGoalBlock
-                  blockIndex={subIdx}
-                  actions={actions[subIdx]}
-                  actionLabels={actionLabels[subIdx]}
-                  onToggle={toggleAction}
-                  label={subGoalLabels[subIdx]}
-                  onLabelChange={(newLabel) => updateLabel(subIdx, newLabel)}
-                  showConfetti={completedSubGoals.has(subIdx)}
-                  onConfettiComplete={() => clearConfetti(subIdx)}
-                  isActive={activeBlockIndex === subIdx}
-                  onBlockClick={() => { setActiveBlockIndex(subIdx); setFocusActionIndex(null); }}
-                  onActionClick={handleActionSlotClick}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+        {isMobile ? (
+          <MobileCategoryTabs
+            actions={actions}
+            actionLabels={actionLabels}
+            subGoalLabels={subGoalLabels}
+            subGoalProgress={subGoalProgress}
+            onToggle={toggleAction}
+            onLabelChange={updateLabel}
+            completedSubGoals={completedSubGoals}
+            onConfettiComplete={clearConfetti}
+            activeBlockIndex={activeBlockIndex}
+            onBlockClick={(idx) => { setActiveBlockIndex(idx); setFocusActionIndex(null); }}
+            onActionClick={handleActionSlotClick}
+          />
+        ) : (
+          <div className="goal-grid w-full aspect-square max-w-2xl" style={{ zIndex: 50 }}>
+            {gridPositions.map((subIdx, gridIdx) => (
+              <div key={gridIdx} className="aspect-square">
+                {subIdx === -1 ? (
+                  <CoreGoalBlock 
+                    subGoalProgress={subGoalProgress}
+                    subGoalLabels={subGoalLabels}
+                  />
+                ) : (
+                  <SubGoalBlock
+                    blockIndex={subIdx}
+                    actions={actions[subIdx]}
+                    actionLabels={actionLabels[subIdx]}
+                    onToggle={toggleAction}
+                    label={subGoalLabels[subIdx]}
+                    onLabelChange={(newLabel) => updateLabel(subIdx, newLabel)}
+                    showConfetti={completedSubGoals.has(subIdx)}
+                    onConfettiComplete={() => clearConfetti(subIdx)}
+                    isActive={activeBlockIndex === subIdx}
+                    onBlockClick={() => { setActiveBlockIndex(subIdx); setFocusActionIndex(null); }}
+                    onActionClick={handleActionSlotClick}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* SECTION 4: Legend */}
         <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
