@@ -63,7 +63,7 @@ const ActionItem = memo(function ActionItem({
 
   return (
     <div
-      className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+      className={`flex items-center gap-3 p-3 pr-4 rounded-lg transition-all ${
         isHighlighted
           ? "ring-2 ring-[#FFD700] shadow-[0_0_12px_rgba(255,215,0,0.3)] bg-primary/15 border border-[#FFD700]/50"
           : isChecked
@@ -71,18 +71,20 @@ const ActionItem = memo(function ActionItem({
             : "bg-secondary/50 border border-border hover:border-muted-foreground/30"
       }`}
     >
-      {/* ID badge - monospaced */}
+      {/* ID badge - monospaced data font */}
       <span
-        className={`flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold tracking-tight ${
-          isChecked
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-[#FFD700]"
-        }`}
-        style={{ textShadow: '1px 1px 0px #000000' }}
+        className="flex-shrink-0 min-w-[52px] px-1.5 py-0.5 rounded text-[11px] font-data text-center font-bold tracking-tight"
+        style={{ 
+          fontFamily: 'var(--font-data)',
+          textShadow: '1px 1px 0px #000000',
+          color: isChecked ? 'hsl(var(--primary-foreground))' : '#FFD700',
+          background: isChecked ? 'hsl(var(--primary))' : 'hsl(var(--muted))',
+        }}
       >
         {actionId}
       </span>
 
+      {/* Input field - body font for readability */}
       <input
         ref={inputRef}
         type="text"
@@ -91,17 +93,21 @@ const ActionItem = memo(function ActionItem({
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         placeholder={`Action ${idx + 1}...`}
-        className={`flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50 ${
+        className={`flex-1 min-w-0 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50 ${
           isChecked ? "line-through text-muted-foreground" : "text-foreground"
         }`}
+        style={{ fontFamily: 'var(--font-body)' }}
         maxLength={50}
       />
 
-      <GoalCheckbox
-        checked={isChecked}
-        onChange={() => onToggle(blockIndex, idx)}
-        label={localValue || `Action ${idx + 1}`}
-      />
+      {/* Checkbox - fixed min-width to prevent cutoff */}
+      <div className="flex-shrink-0" style={{ minWidth: '24px' }}>
+        <GoalCheckbox
+          checked={isChecked}
+          onChange={() => onToggle(blockIndex, idx)}
+          label={localValue || `Action ${idx + 1}`}
+        />
+      </div>
     </div>
   );
 });
@@ -146,26 +152,36 @@ export function ActionSidebar({
         hideOverlay
       >
         <SheetHeader className="pb-4 border-b border-border">
-          <SheetTitle className="flex items-center gap-2 font-mono">
+          <SheetTitle className="flex items-center gap-2">
             <span 
-              className="text-[#FFD700] font-bold"
-              style={{ textShadow: '1px 1px 0px #000000' }}
+              className="font-bold text-base"
+              style={{ 
+                fontFamily: 'var(--font-data)',
+                textShadow: '1px 1px 0px #000000',
+                color: '#FFD700',
+              }}
             >
               [{prefix}]
             </span>
-            <span className="text-primary font-bold uppercase tracking-wider text-sm">
+            <span 
+              className="font-bold uppercase tracking-wider text-sm text-primary"
+              style={{ fontFamily: 'var(--font-header)' }}
+            >
               {label}
             </span>
-            <span className="text-muted-foreground font-normal text-xs">
+            <span 
+              className="text-muted-foreground font-normal text-xs"
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
               ({completedCount}/8)
             </span>
           </SheetTitle>
-          <SheetDescription className="font-mono text-xs">
+          <SheetDescription style={{ fontFamily: 'var(--font-data)' }} className="text-xs">
             Mission Control — {prefix}-01 to {prefix}-08
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-4 space-y-3 overflow-y-auto max-h-[calc(100%-100px)] pr-2">
+        <div className="mt-4 space-y-3 overflow-y-auto pb-16 pr-1" style={{ maxHeight: 'calc(100% - 100px)' }}>
           {Array.from({ length: 8 }, (_, idx) => (
             <ActionItem
               key={`${blockIndex}-${idx}`}
@@ -182,10 +198,10 @@ export function ActionSidebar({
           ))}
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background to-transparent">
-          <div className="flex justify-between items-center text-xs text-muted-foreground font-mono">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background/95 to-transparent">
+          <div className="flex justify-between items-center text-xs text-muted-foreground" style={{ fontFamily: 'var(--font-data)' }}>
             <span>Progress: {Math.round((completedCount / 8) * 100)}%</span>
-            <span className="text-[#FFD700]">{completedCount}/8</span>
+            <span style={{ color: '#FFD700' }}>{completedCount}/8</span>
           </div>
         </div>
       </SheetContent>
