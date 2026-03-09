@@ -218,6 +218,7 @@ export function GoalMatrix() {
   }, [globalProgress]);
 
   const completedCount = actions.flat().filter(Boolean).length;
+  const isMobile = useIsMobile();
 
   // Grid positions: 0-7 are sub-goals, 4 is center (core goal)
   // Layout: [0][1][2] / [3][C][4] / [5][6][7]
