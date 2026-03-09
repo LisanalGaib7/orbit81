@@ -123,7 +123,12 @@ export function GoalMatrix() {
   const toggleAction = useCallback((blockIndex: number, actionIndex: number) => {
     setActions(prev => {
       const newActions = prev.map(block => [...block]);
-      newActions[blockIndex][actionIndex] = !newActions[blockIndex][actionIndex];
+      const wasChecked = newActions[blockIndex][actionIndex];
+      newActions[blockIndex][actionIndex] = !wasChecked;
+      // Trigger ignition burst only when checking (not unchecking)
+      if (!wasChecked) {
+        setIgnitionBurst(c => c + 1);
+      }
       return newActions;
     });
   }, []);
