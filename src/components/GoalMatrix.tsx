@@ -11,6 +11,8 @@ import { MissionAccomplished } from "./MissionAccomplished";
 import { DeepSpaceFireworks } from "./DeepSpaceFireworks";
 import { ActionSidebar } from "./ActionSidebar";
 import { TypewriterText } from "./TypewriterText";
+import { MobileCategoryTabs } from "./MobileCategoryTabs";
+import { useIsMobile } from "@/hooks/use-mobile";
 // Default sub-goal labels
 const DEFAULT_SUBGOALS = [
   "Health",
@@ -216,6 +218,7 @@ export function GoalMatrix() {
   }, [globalProgress]);
 
   const completedCount = actions.flat().filter(Boolean).length;
+  const isMobile = useIsMobile();
 
   // Grid positions: 0-7 are sub-goals, 4 is center (core goal)
   // Layout: [0][1][2] / [3][C][4] / [5][6][7]
@@ -287,32 +290,48 @@ export function GoalMatrix() {
         </div>
 
         {/* SECTION 3: Matrix Grid */}
-        <div className="goal-grid w-full aspect-square max-w-2xl" style={{ zIndex: 50 }}>
-          {gridPositions.map((subIdx, gridIdx) => (
-            <div key={gridIdx} className="aspect-square">
-              {subIdx === -1 ? (
-                <CoreGoalBlock 
-                  subGoalProgress={subGoalProgress}
-                  subGoalLabels={subGoalLabels}
-                />
-              ) : (
-                <SubGoalBlock
-                  blockIndex={subIdx}
-                  actions={actions[subIdx]}
-                  actionLabels={actionLabels[subIdx]}
-                  onToggle={toggleAction}
-                  label={subGoalLabels[subIdx]}
-                  onLabelChange={(newLabel) => updateLabel(subIdx, newLabel)}
-                  showConfetti={completedSubGoals.has(subIdx)}
-                  onConfettiComplete={() => clearConfetti(subIdx)}
-                  isActive={activeBlockIndex === subIdx}
-                  onBlockClick={() => { setActiveBlockIndex(subIdx); setFocusActionIndex(null); }}
-                  onActionClick={handleActionSlotClick}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+        {isMobile ? (
+          <MobileCategoryTabs
+            actions={actions}
+            actionLabels={actionLabels}
+            subGoalLabels={subGoalLabels}
+            subGoalProgress={subGoalProgress}
+            onToggle={toggleAction}
+            onLabelChange={updateLabel}
+            completedSubGoals={completedSubGoals}
+            onConfettiComplete={clearConfetti}
+            activeBlockIndex={activeBlockIndex}
+            onBlockClick={(idx) => { setActiveBlockIndex(idx); setFocusActionIndex(null); }}
+            onActionClick={handleActionSlotClick}
+          />
+        ) : (
+          <div className="goal-grid w-full aspect-square max-w-2xl" style={{ zIndex: 50 }}>
+            {gridPositions.map((subIdx, gridIdx) => (
+              <div key={gridIdx} className="aspect-square">
+                {subIdx === -1 ? (
+                  <CoreGoalBlock 
+                    subGoalProgress={subGoalProgress}
+                    subGoalLabels={subGoalLabels}
+                  />
+                ) : (
+                  <SubGoalBlock
+                    blockIndex={subIdx}
+                    actions={actions[subIdx]}
+                    actionLabels={actionLabels[subIdx]}
+                    onToggle={toggleAction}
+                    label={subGoalLabels[subIdx]}
+                    onLabelChange={(newLabel) => updateLabel(subIdx, newLabel)}
+                    showConfetti={completedSubGoals.has(subIdx)}
+                    onConfettiComplete={() => clearConfetti(subIdx)}
+                    isActive={activeBlockIndex === subIdx}
+                    onBlockClick={() => { setActiveBlockIndex(subIdx); setFocusActionIndex(null); }}
+                    onActionClick={handleActionSlotClick}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* SECTION 4: Legend */}
         <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
