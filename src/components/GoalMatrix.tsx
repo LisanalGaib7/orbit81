@@ -238,37 +238,16 @@ export function GoalMatrix() {
       
       <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 max-w-3xl mx-auto">
         {/* SECTION 1: Header */}
-        <div className="w-full flex items-start justify-between gap-2">
-          {/* Mission Manual - Top Left */}
-          <div className="flex-shrink-0">
-            <MissionManual />
-          </div>
-          
-          {/* Title - Center */}
-          <div className="text-center flex-1 min-w-0">
-            <h1 
-              className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide pixel-title-3d whitespace-nowrap"
-              style={{ imageRendering: 'pixelated' }}
-            >
-              <span className="text-primary">Orbit</span>{" "}
-              <span className="text-foreground">81</span>
-            </h1>
-            <p 
-              className="font-pixel text-[6px] sm:text-[7px] text-muted-foreground mt-2 whitespace-nowrap" 
-              style={{ imageRendering: 'pixelated' }}
-            >
-              <TypewriterText 
-                text="Writing the greatest chapter yet" 
-                typingSpeed={60}
-              />
-            </p>
-          </div>
-          
-          {/* Templates - Top Right */}
-          <div className="flex-shrink-0">
-            <TemplateDropdown onSelect={applyTemplate} />
-          </div>
-        </div>
+        <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} />
+        <p 
+          className="font-pixel text-[6px] sm:text-[7px] text-muted-foreground -mt-4 whitespace-nowrap" 
+          style={{ imageRendering: 'pixelated' }}
+        >
+          <TypewriterText 
+            text="Writing the greatest chapter yet" 
+            typingSpeed={60}
+          />
+        </p>
 
         {/* SECTION 2: Mission Control - Rocket-Assembly + Progress Bar BELOW */}
         <div className="w-full flex flex-col items-center gap-6" style={{ zIndex: 100 }}>
