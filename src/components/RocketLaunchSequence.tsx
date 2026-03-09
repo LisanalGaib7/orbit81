@@ -672,6 +672,25 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                       exhaustIntensity={launchPhase === "liftoff" ? 1 : 0.85} 
                     />
                   </motion.div>
+                ) : burstShake ? (
+                  <motion.div
+                    className="relative"
+                    style={{ zIndex: 2 }}
+                    animate={{ 
+                      x: [-1, 1, -0.6, 0.6, 0],
+                      y: [-0.5, 0.5, -0.3, 0.3, 0],
+                    }}
+                    transition={{ duration: 0.05, repeat: Infinity }}
+                  >
+                    <PixelRocketBody 
+                      stage="idle" 
+                      showExhaust={preLaunchStage === "engine-test" || preLaunchStage === "power-up"}
+                      exhaustIntensity={
+                        preLaunchStage === "power-up" ? 0.3 :
+                        preLaunchStage === "engine-test" ? 0.15 : 0
+                      }
+                    />
+                  </motion.div>
                 ) : (
                   <div className="relative" style={{ zIndex: 2 }}>
                     <PixelRocketBody 
