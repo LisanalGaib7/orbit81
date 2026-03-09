@@ -1,7 +1,7 @@
 import { GoalCheckbox } from "./GoalCheckbox";
 import { EditableLabel } from "./EditableLabel";
 import { PixelConfetti } from "./PixelConfetti";
-import { Plus } from "lucide-react";
+import { generateActionId, getPrefix } from "@/lib/goalIds";
 import {
   Tooltip,
   TooltipContent,
@@ -20,17 +20,11 @@ interface SubGoalBlockProps {
   onConfettiComplete?: () => void;
   isActive?: boolean;
   onBlockClick?: () => void;
+  onActionClick?: (blockIndex: number, actionIndex: number) => void;
 }
 
-// Default arrays for fallback
 const DEFAULT_ACTIONS = Array(8).fill(false);
 const DEFAULT_ACTION_LABELS = Array(8).fill("");
-
-// Truncate to 7 characters with ellipsis
-const truncateText = (text: string, maxLength: number = 7): string => {
-  if (!text) return "";
-  return text.length > maxLength ? text.slice(0, maxLength) + "…" : text;
-};
 
 export function SubGoalBlock({ 
   blockIndex, 
@@ -43,16 +37,13 @@ export function SubGoalBlock({
   onConfettiComplete,
   isActive = false,
   onBlockClick,
+  onActionClick,
 }: SubGoalBlockProps) {
-  // Create a 3x3 grid where center is the label
-  const actionPositions = [0, 1, 2, 3, -1, 4, 5, 6, 7]; // -1 is center (label)
-
-  // Ensure arrays are valid with defensive fallbacks
+  const actionPositions = [0, 1, 2, 3, -1, 4, 5, 6, 7];
   const safeActions = actions ?? DEFAULT_ACTIONS;
   const safeActionLabels = actionLabels ?? DEFAULT_ACTION_LABELS;
 
   const handleBlockClick = (e: React.MouseEvent) => {
-    // Don't trigger if clicking on checkbox or editable label
     const target = e.target as HTMLElement;
     if (
       target.closest('.checkbox-goal') || 
@@ -64,7 +55,11 @@ export function SubGoalBlock({
     onBlockClick?.();
   };
 
-  // Fallback UI if data is completely missing
+  const handleActionSlotClick = (actionIdx: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onActionClick?.(blockIndex, actionIdx);
+  };
+
   if (!Array.isArray(safeActions) || safeActions.length < 8) {
     return (
       <div className="goal-block goal-block-sub p-2 flex items-center justify-center">
@@ -98,38 +93,44 @@ export function SubGoalBlock({
                   className="text-[10px] sm:text-xs font-medium leading-tight px-0.5 w-full"
                 />
               ) : (
-                <div className="relative w-full h-full flex flex-col items-center justify-center gap-0.5">
-                  {/* Action label keyword with tooltip */}
-                  {safeActionLabels[actionIdx] ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span 
-                          className={`text-[7px] sm:text-[8px] text-center leading-tight px-0.5 cursor-default ${
-                            safeActions[actionIdx] ? "text-primary line-through opacity-60" : "text-muted-foreground"
-                          }`}
-                        >
-                          {truncateText(safeActionLabels[actionIdx])}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent 
-                        side="top" 
-                        className="max-w-[200px] text-xs"
-                        sideOffset={5}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div 
+                      className="relative w-full h-full flex flex-col items-center justify-center gap-0.5 cursor-pointer hover:bg-primary/10 rounded transition-colors"
+                      onClick={(e) => handleActionSlotClick(actionIdx, e)}
+                    >
+                      {/* ID Code - monospaced terminal style */}
+                      <span 
+                        className={`font-mono text-[7px] sm:text-[9px] font-bold tracking-tight leading-none ${
+                          safeActions[actionIdx] 
+                            ? "text-primary/50 line-through" 
+                            : "text-[#FFD700]"
+                        }`}
+                        style={{ 
+                          textShadow: '1px 1px 0px #000000',
+                          imageRendering: 'auto' as any 
+                        }}
                       >
-                        {safeActionLabels[actionIdx]}
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <Plus className="w-2.5 h-2.5 text-muted-foreground/40" />
-                  )}
-                  
-                  <GoalCheckbox
-                    checked={Boolean(safeActions[actionIdx])}
-                    onChange={() => onToggle(blockIndex, actionIdx)}
-                    label={safeActionLabels[actionIdx] || `Action ${actionIdx + 1} for ${label}`}
-                    size="sm"
-                  />
-                </div>
+                        {generateActionId(label, actionIdx)}
+                      </span>
+                      
+                      <GoalCheckbox
+                        checked={Boolean(safeActions[actionIdx])}
+                        onChange={() => onToggle(blockIndex, actionIdx)}
+                        label={safeActionLabels[actionIdx] || `Action ${actionIdx + 1} for ${label}`}
+                        size="sm"
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent 
+                    side="top" 
+                    className="max-w-[200px] text-xs font-mono"
+                    sideOffset={5}
+                  >
+                    <span className="text-[#FFD700] font-bold">[{generateActionId(label, actionIdx)}]</span>{" "}
+                    {safeActionLabels[actionIdx] || "Click to define action"}
+                  </TooltipContent>
+                </Tooltip>
               )}
             </div>
           ))}

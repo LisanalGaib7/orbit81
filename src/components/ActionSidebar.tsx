@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback, memo } from "react";
 import { GoalCheckbox } from "./GoalCheckbox";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { generateActionId, getPrefix } from "@/lib/goalIds";
 import {
   Sheet,
   SheetContent,
@@ -18,42 +19,42 @@ interface ActionSidebarProps {
   actionLabels: string[];
   onToggle: (blockIndex: number, actionIndex: number) => void;
   onActionLabelChange: (blockIndex: number, actionIndex: number, label: string) => void;
+  focusActionIndex?: number | null;
 }
 
-// Memoized action item to prevent unnecessary re-renders
 const ActionItem = memo(function ActionItem({
   idx,
   blockIndex,
   isChecked,
   initialLabel,
+  actionId,
   onToggle,
   onLabelSync,
   inputRef,
+  isHighlighted,
 }: {
   idx: number;
   blockIndex: number;
   isChecked: boolean;
   initialLabel: string;
+  actionId: string;
   onToggle: (blockIndex: number, actionIndex: number) => void;
   onLabelSync: (blockIndex: number, actionIndex: number, label: string) => void;
   inputRef: (el: HTMLInputElement | null) => void;
+  isHighlighted: boolean;
 }) {
-  // Local state for immediate input responsiveness
   const [localValue, setLocalValue] = useState(initialLabel);
 
-  // Sync local state when prop changes (e.g., switching blocks)
   useEffect(() => {
     setLocalValue(initialLabel);
   }, [initialLabel]);
 
-  // Sync to global state on blur
   const handleBlur = useCallback(() => {
     if (localValue !== initialLabel) {
       onLabelSync(blockIndex, idx, localValue);
     }
   }, [localValue, initialLabel, blockIndex, idx, onLabelSync]);
 
-  // Handle Enter key to move to next input or blur
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.currentTarget.blur();
@@ -63,23 +64,25 @@ const ActionItem = memo(function ActionItem({
   return (
     <div
       className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
-        isChecked
-          ? "bg-primary/10 border border-primary/30"
-          : "bg-secondary/50 border border-border hover:border-muted-foreground/30"
+        isHighlighted
+          ? "ring-2 ring-[#FFD700] shadow-[0_0_12px_rgba(255,215,0,0.3)] bg-primary/15 border border-[#FFD700]/50"
+          : isChecked
+            ? "bg-primary/10 border border-primary/30"
+            : "bg-secondary/50 border border-border hover:border-muted-foreground/30"
       }`}
     >
-      {/* Number badge */}
+      {/* ID badge - monospaced */}
       <span
-        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-mono ${
+        className={`flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold tracking-tight ${
           isChecked
             ? "bg-primary text-primary-foreground"
-            : "bg-muted text-muted-foreground"
+            : "bg-muted text-[#FFD700]"
         }`}
+        style={{ textShadow: '1px 1px 0px #000000' }}
       >
-        {idx + 1}
+        {actionId}
       </span>
 
-      {/* Input field with local state */}
       <input
         ref={inputRef}
         type="text"
@@ -94,7 +97,6 @@ const ActionItem = memo(function ActionItem({
         maxLength={50}
       />
 
-      {/* Checkbox */}
       <GoalCheckbox
         checked={isChecked}
         onChange={() => onToggle(blockIndex, idx)}
@@ -113,24 +115,25 @@ export function ActionSidebar({
   actionLabels,
   onToggle,
   onActionLabelChange,
+  focusActionIndex = null,
 }: ActionSidebarProps) {
   const isMobile = useIsMobile();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const prefix = getPrefix(label);
 
-  // Focus first empty input when opening
   useEffect(() => {
     if (isOpen) {
-      const firstEmptyIdx = actionLabels.findIndex((l) => !l);
-      const targetIdx = firstEmptyIdx >= 0 ? firstEmptyIdx : 0;
+      const targetIdx = focusActionIndex ?? actionLabels.findIndex((l) => !l);
+      const idx = targetIdx >= 0 ? targetIdx : 0;
       setTimeout(() => {
-        inputRefs.current[targetIdx]?.focus();
-      }, 100);
+        inputRefs.current[idx]?.focus();
+        inputRefs.current[idx]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
     }
-  }, [isOpen, blockIndex]); // Only re-run when sidebar opens or block changes
+  }, [isOpen, blockIndex, focusActionIndex]);
 
   const completedCount = actions.filter(Boolean).length;
 
-  // Stable callback ref setter
   const setInputRef = useCallback((idx: number) => (el: HTMLInputElement | null) => {
     inputRefs.current[idx] = el;
   }, []);
@@ -143,14 +146,22 @@ export function ActionSidebar({
         hideOverlay
       >
         <SheetHeader className="pb-4 border-b border-border">
-          <SheetTitle className="flex items-center gap-2">
-            <span className="text-primary font-bold">{label}</span>
-            <span className="text-muted-foreground font-normal text-sm">
-              ({completedCount}/8 complete)
+          <SheetTitle className="flex items-center gap-2 font-mono">
+            <span 
+              className="text-[#FFD700] font-bold"
+              style={{ textShadow: '1px 1px 0px #000000' }}
+            >
+              [{prefix}]
+            </span>
+            <span className="text-primary font-bold uppercase tracking-wider text-sm">
+              {label}
+            </span>
+            <span className="text-muted-foreground font-normal text-xs">
+              ({completedCount}/8)
             </span>
           </SheetTitle>
-          <SheetDescription>
-            Define your 8 action items for this sub-goal
+          <SheetDescription className="font-mono text-xs">
+            Mission Control — {prefix}-01 to {prefix}-08
           </SheetDescription>
         </SheetHeader>
 
@@ -162,18 +173,19 @@ export function ActionSidebar({
               blockIndex={blockIndex}
               isChecked={actions[idx] ?? false}
               initialLabel={actionLabels[idx] ?? ""}
+              actionId={generateActionId(label, idx)}
               onToggle={onToggle}
               onLabelSync={onActionLabelChange}
               inputRef={setInputRef(idx)}
+              isHighlighted={focusActionIndex === idx}
             />
           ))}
         </div>
 
-        {/* Quick stats footer */}
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background to-transparent">
-          <div className="flex justify-between items-center text-xs text-muted-foreground">
+          <div className="flex justify-between items-center text-xs text-muted-foreground font-mono">
             <span>Progress: {Math.round((completedCount / 8) * 100)}%</span>
-            <span className="font-mono text-primary">{completedCount}/8</span>
+            <span className="text-[#FFD700]">{completedCount}/8</span>
           </div>
         </div>
       </SheetContent>

@@ -329,13 +329,14 @@ export function GoalMatrix() {
       {activeBlockIndex !== null && (
         <ActionSidebar
           isOpen={activeBlockIndex !== null}
-          onClose={() => setActiveBlockIndex(null)}
+          onClose={() => { setActiveBlockIndex(null); setFocusActionIndex(null); }}
           blockIndex={activeBlockIndex}
           label={subGoalLabels[activeBlockIndex]}
           actions={actions[activeBlockIndex]}
           actionLabels={actionLabels[activeBlockIndex]}
           onToggle={toggleAction}
           onActionLabelChange={updateActionLabel}
+          focusActionIndex={focusActionIndex}
         />
       )}
 
