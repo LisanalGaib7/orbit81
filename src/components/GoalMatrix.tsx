@@ -1,3 +1,4 @@
+// GoalMatrix - Main application component
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
