@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, animate } from "framer-motion";
 import { PixelRocketBody } from "./PixelRocketBody";
 import { GroundSmoke, AscendingSmoke } from "./VolumetricSmoke";
