@@ -319,7 +319,102 @@ function CountdownDisplay({ phase }: { phase: LaunchPhase }) {
   );
 }
 
-export function RocketLaunchSequence({ progress, onLaunchStart }: RocketLaunchSequenceProps) {
+// Checkbox ignition burst - sparks, flame, smoke, shake triggered on task completion
+function CheckIgnitionBurst({ active }: { active: boolean }) {
+  if (!active) return null;
+  
+  return (
+    <>
+      {/* Phase A: Sparks - orange/yellow particles from nozzle */}
+      <div 
+        className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
+        style={{ bottom: '-8px', zIndex: 5, imageRendering: 'pixelated' }}
+      >
+        {Array.from({ length: 10 }, (_, i) => (
+          <motion.div
+            key={`spark-${i}`}
+            className="absolute"
+            style={{
+              width: '3px',
+              height: '3px',
+              borderRadius: '50%',
+              background: i % 2 === 0 
+                ? 'hsl(30, 100%, 55%)' 
+                : 'hsl(45, 100%, 65%)',
+            }}
+            initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+            animate={{ 
+              x: (Math.random() - 0.5) * 40,
+              y: [0, 8 + Math.random() * 16],
+              opacity: [1, 0.8, 0],
+              scale: [1, 0.6, 0.2],
+            }}
+            transition={{
+              duration: 0.4 + Math.random() * 0.3,
+              delay: Math.random() * 0.15,
+              ease: 'easeOut',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Phase B: Ignition pulse - brief bright flame */}
+      <motion.div
+        className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
+        style={{ bottom: '-10px', zIndex: 4, imageRendering: 'pixelated' }}
+        initial={{ opacity: 0, scale: 0.3 }}
+        animate={{ 
+          opacity: [0, 1, 0.8, 0],
+          scale: [0.3, 1.2, 1, 0.5],
+        }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
+        <div 
+          style={{
+            width: '14px',
+            height: '20px',
+            borderRadius: '50% 50% 40% 40%',
+            background: 'linear-gradient(to bottom, hsl(45, 100%, 70%), hsl(30, 100%, 55%), hsl(15, 90%, 45%))',
+            boxShadow: '0 4px 12px hsl(30, 100%, 50% / 0.6)',
+          }}
+        />
+      </motion.div>
+
+      {/* Phase C: Smoke puff */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
+        style={{ bottom: '-6px', zIndex: 3, imageRendering: 'pixelated' }}
+      >
+        {Array.from({ length: 8 }, (_, i) => (
+          <motion.div
+            key={`smoke-${i}`}
+            className="absolute"
+            style={{
+              width: `${6 + Math.random() * 6}px`,
+              height: `${6 + Math.random() * 6}px`,
+              borderRadius: '50%',
+              backgroundColor: `hsl(var(--muted-foreground) / 0.35)`,
+            }}
+            initial={{ x: 0, y: 0, opacity: 0, scale: 0.5 }}
+            animate={{
+              x: (Math.random() - 0.5) * 50,
+              y: [0, 5 + Math.random() * 15],
+              opacity: [0, 0.4, 0.2, 0],
+              scale: [0.5, 1.3, 1.8],
+            }}
+            transition={{
+              duration: 0.8 + Math.random() * 0.4,
+              delay: 0.15 + Math.random() * 0.2,
+              ease: 'easeOut',
+            }}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
+export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 0 }: RocketLaunchSequenceProps) {
   const [hasLaunched, setHasLaunched] = useState(false);
   const [showRocket, setShowRocket] = useState(true);
   const [launchPhase, setLaunchPhase] = useState<LaunchPhase>("idle");
