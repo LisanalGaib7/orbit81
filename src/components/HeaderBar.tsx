@@ -218,8 +218,6 @@ export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
 
           <ManualPanel isOpen={manualOpen} onClose={() => setManualOpen(false)} />
           <TemplatePanel isOpen={templateOpen} onClose={() => setTemplateOpen(false)} onSelect={onApplyTemplate} />
-        </div>
-      </div>
     </div>
   );
 }
