@@ -11,6 +11,8 @@ import { MissionAccomplished } from "./MissionAccomplished";
 import { DeepSpaceFireworks } from "./DeepSpaceFireworks";
 import { ActionSidebar } from "./ActionSidebar";
 import { TypewriterText } from "./TypewriterText";
+import { MobileCategoryTabs } from "./MobileCategoryTabs";
+import { useIsMobile } from "@/hooks/use-mobile";
 // Default sub-goal labels
 const DEFAULT_SUBGOALS = [
   "Health",
