@@ -6,6 +6,7 @@ import { GroundSmoke, AscendingSmoke } from "./VolumetricSmoke";
 interface RocketLaunchSequenceProps {
   progress: number; // 0-100
   onLaunchStart?: () => void;
+  ignitionBurst?: number; // increments when a checkbox is checked
 }
 
 // 7-Stage Pre-launch states (0-99%) - rocket stays grounded
