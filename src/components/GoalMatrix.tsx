@@ -157,6 +157,15 @@ export function GoalMatrix() {
     setSubGoalLabels(labels);
   }, []);
 
+  // Reset session
+  const resetSession = useCallback(() => {
+    setActions(Array(8).fill(null).map(() => Array(8).fill(false)));
+    setSubGoalLabels([...DEFAULT_SUBGOALS]);
+    setActionLabels(Array(8).fill(null).map(() => Array(8).fill("")));
+    setActiveBlockIndex(null);
+    setFocusActionIndex(null);
+  }, []);
+
   // Calculate progress for each sub-goal
   const subGoalProgress = useMemo(() => {
     return actions.map(block => {
