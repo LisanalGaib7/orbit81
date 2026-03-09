@@ -94,6 +94,7 @@ export function GoalMatrix() {
   const [completedSubGoals, setCompletedSubGoals] = useState<Set<number>>(new Set());
   const prevCompletedRef = useRef<Set<number>>(new Set());
   const missionTriggeredRef = useRef(false);
+  const [ignitionBurst, setIgnitionBurst] = useState(0);
 
   // Active block for sidebar
   const [activeBlockIndex, setActiveBlockIndex] = useState<number | null>(null);
@@ -122,7 +123,12 @@ export function GoalMatrix() {
   const toggleAction = useCallback((blockIndex: number, actionIndex: number) => {
     setActions(prev => {
       const newActions = prev.map(block => [...block]);
-      newActions[blockIndex][actionIndex] = !newActions[blockIndex][actionIndex];
+      const wasChecked = newActions[blockIndex][actionIndex];
+      newActions[blockIndex][actionIndex] = !wasChecked;
+      // Trigger ignition burst only when checking (not unchecking)
+      if (!wasChecked) {
+        setIgnitionBurst(c => c + 1);
+      }
       return newActions;
     });
   }, []);
@@ -257,7 +263,7 @@ export function GoalMatrix() {
         <div className="w-full flex flex-col items-center gap-6" style={{ zIndex: 100 }}>
           {/* Rocket Launch Sequence (Rocket-Assembly) */}
           <div className="relative" style={{ minHeight: '140px' }}>
-            <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} />
+            <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} ignitionBurst={ignitionBurst} />
           </div>
 
           {/* Progress Section - Directly BELOW the rocket */}
