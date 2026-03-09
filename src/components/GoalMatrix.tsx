@@ -300,7 +300,8 @@ export function GoalMatrix() {
                   showConfetti={completedSubGoals.has(subIdx)}
                   onConfettiComplete={() => clearConfetti(subIdx)}
                   isActive={activeBlockIndex === subIdx}
-                  onBlockClick={() => setActiveBlockIndex(subIdx)}
+                  onBlockClick={() => { setActiveBlockIndex(subIdx); setFocusActionIndex(null); }}
+                  onActionClick={handleActionSlotClick}
                 />
               )}
             </div>
