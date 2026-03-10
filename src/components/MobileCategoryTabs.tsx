@@ -71,7 +71,7 @@ export function MobileCategoryTabs({
               style={{ 
                 fontFamily: 'var(--font-data)',
                 textShadow: '1px 1px 0px #000000',
-                color: isActive ? '#FFD700' : 'hsl(var(--muted-foreground))',
+                color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
               }}
             >
               <span>{tab.prefix}</span>
