@@ -1,56 +1,59 @@
 /**
- * HeaderBar — HUD utility cluster (Manual, Templates, Reset).
+ * HeaderBar — "Command Settings" HUD hub.
  *
- * WHY: Renders via portal to document.body so it stays viewport-fixed
- * regardless of scroll/transform contexts in the main content tree.
- * All template data is sourced from constants/missionData.ts.
+ * WHY: Consolidates Manual / Templates / Reset behind a single Cog icon
+ * to keep the top-right corner clean. Renders via portal to document.body
+ * so it stays viewport-fixed regardless of scroll/transform contexts.
  */
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { BookOpen, Wrench, Power, X } from "lucide-react";
+import { Settings, BookOpen, Wrench, Power, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { TEMPLATES, type Template } from "@/constants/missionData";
+import { TEMPLATES } from "@/constants/missionData";
 
-// ─── Icon Button ─────────────────────────────────────────────────
+// ─── Sub-icon button ─────────────────────────────────────────────
 
-function UtilityIcon({
+function SubIcon({
   icon: Icon,
   label,
   onClick,
   isActive = false,
+  index,
 }: {
   icon: React.ElementType;
   label: string;
   onClick: () => void;
   isActive?: boolean;
+  index: number;
 }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <motion.button
           onClick={onClick}
-          className="relative p-2 rounded-md text-primary transition-colors hover:drop-shadow-[0_0_6px_hsl(var(--primary)/0.7)]"
+          className="relative p-2.5 rounded-lg text-primary transition-colors hover:bg-primary/10"
           style={{
             filter: isActive ? "drop-shadow(0 0 6px hsl(var(--primary) / 0.7))" : undefined,
           }}
+          initial={{ opacity: 0, y: -8, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -8, scale: 0.8 }}
+          transition={{ duration: 0.15, delay: index * 0.05 }}
           aria-label={label}
         >
-          <Icon className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
+          <Icon className="w-4 h-4" strokeWidth={1.5} />
         </motion.button>
       </TooltipTrigger>
       <TooltipContent
-        side="bottom"
+        side="left"
         className="text-[10px] font-bold border-primary/30 text-primary"
-        style={{
-          fontFamily: "var(--font-data)",
-          textShadow: "1px 1px 0px #000000",
-        }}
+        style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0px #000000" }}
       >
         {label}
       </TooltipContent>
@@ -77,15 +80,11 @@ function ManualPanel({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
       {isOpen && (
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
+          initial={{ opacity: 0, x: 8 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 8 }}
           transition={{ duration: 0.15 }}
-          className="absolute right-0 top-full mt-2 z-[1000] w-[85vw] max-w-sm rounded-lg border-2 border-border bg-card/95 backdrop-blur-sm p-4 shadow-2xl"
-          style={{
-            boxShadow:
-              "inset -2px -2px 0 hsl(220 15% 8%), inset 2px 2px 0 hsl(220 15% 22%), 4px 4px 0 hsl(0 0% 0% / 0.5)",
-          }}
+          className="absolute right-full top-0 mr-3 z-[1000] w-[85vw] max-w-sm rounded-lg bg-background/80 backdrop-blur-md p-4 shadow-2xl"
         >
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-bold text-primary" style={{ fontFamily: "var(--font-header)" }}>
@@ -154,15 +153,11 @@ function TemplatePanel({
       {isOpen && (
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
+          initial={{ opacity: 0, x: 8 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 8 }}
           transition={{ duration: 0.15 }}
-          className="absolute right-0 top-full mt-2 z-[1000] w-56 rounded-lg border-2 border-border bg-card/95 backdrop-blur-sm shadow-2xl overflow-hidden"
-          style={{
-            boxShadow:
-              "inset -2px -2px 0 hsl(220 15% 8%), inset 2px 2px 0 hsl(220 15% 20%), 4px 4px 0 hsl(0 0% 0% / 0.3)",
-          }}
+          className="absolute right-full top-0 mr-3 z-[1000] w-56 rounded-lg bg-background/80 backdrop-blur-md shadow-2xl overflow-hidden"
         >
           <div className="p-1">
             {TEMPLATES.map((t) => (
@@ -182,7 +177,7 @@ function TemplatePanel({
   );
 }
 
-// ─── Main Header Bar ─────────────────────────────────────────────
+// ─── Main Command Settings Hub ───────────────────────────────────
 
 interface HeaderBarProps {
   onApplyTemplate: (labels: string[]) => void;
@@ -190,49 +185,125 @@ interface HeaderBarProps {
 }
 
 export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
+  const [hubOpen, setHubOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const hubRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
+
+  // Close hub when clicking outside
+  useEffect(() => {
+    if (!hubOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (hubRef.current && !hubRef.current.contains(e.target as Node)) {
+        setHubOpen(false);
+        setManualOpen(false);
+        setTemplateOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [hubOpen]);
 
   const handleReset = () => {
     if (confirmReset) {
       onReset();
       setConfirmReset(false);
+      setHubOpen(false);
     } else {
       setConfirmReset(true);
       setTimeout(() => setConfirmReset(false), 3000);
     }
   };
 
+  const closeSubPanels = () => { setManualOpen(false); setTemplateOpen(false); };
+
   if (!mounted) return null;
 
   return createPortal(
-    <div className="!fixed top-8 right-10 z-[9999] flex items-center gap-6 max-md:top-4 max-md:right-4 max-md:scale-[0.85] max-md:origin-top-right">
-      <div className="relative flex items-center gap-6 bg-transparent border-0 shadow-none outline-none">
-        <UtilityIcon
-          icon={BookOpen}
-          label="Manual"
-          onClick={() => { setManualOpen(!manualOpen); setTemplateOpen(false); }}
-          isActive={manualOpen}
-        />
-        <UtilityIcon
-          icon={Wrench}
-          label="Templates"
-          onClick={() => { setTemplateOpen(!templateOpen); setManualOpen(false); }}
-          isActive={templateOpen}
-        />
-        <UtilityIcon
-          icon={Power}
-          label={confirmReset ? "Confirm Reset?" : "Reset Session"}
-          onClick={handleReset}
-          isActive={confirmReset}
-        />
-        <ManualPanel isOpen={manualOpen} onClose={() => setManualOpen(false)} />
-        <TemplatePanel isOpen={templateOpen} onClose={() => setTemplateOpen(false)} onSelect={onApplyTemplate} />
-      </div>
+    <div
+      ref={hubRef}
+      className="!fixed top-8 right-8 z-[9999] max-md:top-4 max-md:right-4"
+    >
+      {/* Cog master toggle */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <motion.button
+            onClick={() => { setHubOpen(!hubOpen); if (hubOpen) closeSubPanels(); }}
+            className="relative p-2.5 rounded-xl text-primary transition-colors"
+            style={{
+              background: hubOpen ? "hsl(var(--background) / 0.6)" : "transparent",
+              backdropFilter: hubOpen ? "blur(8px)" : undefined,
+            }}
+            animate={{ rotate: hubOpen ? 90 : 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            aria-label="Command Settings"
+          >
+            <Settings className="w-5 h-5" strokeWidth={1.5} />
+          </motion.button>
+        </TooltipTrigger>
+        {!hubOpen && (
+          <TooltipContent
+            side="left"
+            className="text-[10px] font-bold border-primary/30 text-primary"
+            style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0px #000000" }}
+          >
+            Settings
+          </TooltipContent>
+        )}
+      </Tooltip>
+
+      {/* Sub-menu fly-out */}
+      <AnimatePresence>
+        {hubOpen && (
+          <motion.div
+            className="absolute right-0 top-full mt-2 flex flex-col items-center gap-1 rounded-xl py-2 px-1"
+            style={{
+              background: "hsl(var(--background) / 0.5)",
+              backdropFilter: "blur(12px)",
+            }}
+            initial={{ opacity: 0, y: -4, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.9 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="relative">
+              <SubIcon
+                icon={BookOpen}
+                label="Manual"
+                onClick={() => { setManualOpen(!manualOpen); setTemplateOpen(false); }}
+                isActive={manualOpen}
+                index={0}
+              />
+              <ManualPanel isOpen={manualOpen} onClose={() => setManualOpen(false)} />
+            </div>
+
+            <div className="relative">
+              <SubIcon
+                icon={Wrench}
+                label="Templates"
+                onClick={() => { setTemplateOpen(!templateOpen); setManualOpen(false); }}
+                isActive={templateOpen}
+                index={1}
+              />
+              <TemplatePanel isOpen={templateOpen} onClose={() => setTemplateOpen(false)} onSelect={onApplyTemplate} />
+            </div>
+
+            <div className="w-6 h-px bg-primary/20 my-0.5" />
+
+            <SubIcon
+              icon={Power}
+              label={confirmReset ? "Confirm?" : "Reset"}
+              onClick={handleReset}
+              isActive={confirmReset}
+              index={2}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>,
     document.body,
   );
