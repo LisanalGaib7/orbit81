@@ -65,84 +65,82 @@ function SubIcon({
 
 function ManualPanel({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
+  const justOpened = useRef(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      justOpened.current = true;
+      requestAnimationFrame(() => { justOpened.current = false; });
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e: MouseEvent) => {
+      if (justOpened.current) return;
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [isOpen, onClose]);
 
-  return (
-    <AnimatePresence>
-      {isOpen && createPortal(
+  if (!isOpen) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[99999]">
+      {/* Backdrop — closes on tap */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      {/* Centered modal */}
+      <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
         <motion.div
-          className="fixed inset-0 z-[10000] md:absolute md:inset-auto md:right-full md:top-0 md:mr-3 md:z-[1000]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          ref={ref}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.15 }}
+          className="pointer-events-auto w-full max-w-md max-h-[85vh] rounded-xl bg-background/95 backdrop-blur-md shadow-2xl flex flex-col overflow-hidden"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
-          {/* Mobile backdrop */}
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm md:hidden" onClick={onClose} />
-          <motion.div
-            ref={ref}
-            initial={{ opacity: 0, x: 8, y: 0 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            exit={{ opacity: 0, x: 8 }}
-            transition={{ duration: 0.15 }}
-            className={[
-              "relative md:absolute md:right-0 md:top-0",
-              "md:w-[85vw] md:max-w-sm md:rounded-lg",
-              "max-md:fixed max-md:inset-x-4 max-md:top-16 max-md:bottom-4 max-md:rounded-xl",
-              "bg-background/95 backdrop-blur-md shadow-2xl",
-              "flex flex-col overflow-hidden",
-            ].join(" ")}
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-          >
-            {/* Sticky header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-primary/10 bg-background/90 backdrop-blur-sm">
-              <h3 className="text-sm md:text-xs font-bold text-primary" style={{ fontFamily: "var(--font-header)", textShadow: "1px 1px 0px #000" }}>
-                Mission Manual
-              </h3>
-              <button onClick={onClose} className="min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors p-1" aria-label="Close">
-                <X className="w-5 h-5 md:w-3.5 md:h-3.5" />
-              </button>
+          {/* Sticky header */}
+          <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-primary/10 bg-background/90 backdrop-blur-sm">
+            <h3 className="text-sm font-bold text-primary" style={{ fontFamily: "var(--font-header)", textShadow: "1px 1px 0px #000" }}>
+              Mission Manual
+            </h3>
+            <button onClick={onClose} className="min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors" aria-label="Close">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-4 text-muted-foreground" style={{ fontFamily: "var(--font-body)" }}>
+            <div>
+              <h4 className="font-bold text-foreground mb-1.5 text-xs" style={{ fontFamily: "var(--font-data)" }}>
+                The 81-Square Method
+              </h4>
+              <p className="text-sm leading-relaxed">
+                Break down your core goal into 8 sub-goals, each with 8 actionable steps.
+              </p>
             </div>
-            {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-4 text-muted-foreground" style={{ fontFamily: "var(--font-body)" }}>
-              <div>
-                <h4 className="font-bold text-foreground mb-1.5 text-xs md:text-[10px]" style={{ fontFamily: "var(--font-data)" }}>
-                  The 81-Square Method
-                </h4>
-                <p className="text-sm md:text-[11px] leading-relaxed">
-                  Break down your core goal into 8 sub-goals, each with 8 actionable steps.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-bold text-foreground mb-1.5 text-xs md:text-[10px]" style={{ fontFamily: "var(--font-data)" }}>
-                  How to Use
-                </h4>
-                <ul className="list-disc list-inside space-y-1 text-sm md:text-[11px]">
-                  <li>Click any sub-goal block to expand</li>
-                  <li>Double-click labels to rename</li>
-                  <li>Check off actions to fuel your rocket</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-bold text-foreground mb-1.5 text-xs md:text-[10px]" style={{ fontFamily: "var(--font-data)" }}>
-                  Launch Sequence
-                </h4>
-                <p className="text-sm md:text-[11px] leading-relaxed">At 100%, witness the grand liftoff!</p>
-              </div>
+            <div>
+              <h4 className="font-bold text-foreground mb-1.5 text-xs" style={{ fontFamily: "var(--font-data)" }}>
+                How to Use
+              </h4>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>Click any sub-goal block to expand</li>
+                <li>Double-click labels to rename</li>
+                <li>Check off actions to fuel your rocket</li>
+              </ul>
             </div>
-          </motion.div>
-        </motion.div>,
-        document.body
-      )}
-    </AnimatePresence>
+            <div>
+              <h4 className="font-bold text-foreground mb-1.5 text-xs" style={{ fontFamily: "var(--font-data)" }}>
+                Launch Sequence
+              </h4>
+              <p className="text-sm leading-relaxed">At 100%, witness the grand liftoff!</p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>,
+    document.body
   );
 }
 
