@@ -212,19 +212,18 @@ export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Close hub when clicking outside
+  // Close hub when clicking outside (but not when clicking portaled panels)
   useEffect(() => {
     if (!hubOpen) return;
     const handler = (e: MouseEvent) => {
+      if (manualOpen || templateOpen) return; // sub-panel is open, let its own handler manage
       if (hubRef.current && !hubRef.current.contains(e.target as Node)) {
         setHubOpen(false);
-        setManualOpen(false);
-        setTemplateOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [hubOpen]);
+  }, [hubOpen, manualOpen, templateOpen]);
 
   const handleReset = () => {
     if (confirmReset) {
