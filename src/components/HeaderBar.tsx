@@ -25,15 +25,11 @@ function UtilityIcon({
       <TooltipTrigger asChild>
         <motion.button
           onClick={onClick}
-          className={`relative p-2 rounded-md transition-colors ${
-            isActive 
-              ? "text-[#FFD700]" 
-              : "text-muted-foreground hover:text-[#FFD700]"
+          className={`relative p-2 rounded-md text-primary transition-colors ${
+            isActive ? "" : "hover:text-primary"
           }`}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
           style={{
-            filter: isActive ? 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.5))' : undefined,
+            filter: isActive ? "drop-shadow(0 0 6px hsl(var(--primary) / 0.7))" : undefined,
           }}
           aria-label={label}
         >
