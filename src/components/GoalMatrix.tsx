@@ -237,15 +237,8 @@ export function GoalMatrix() {
     <>
       <Starfield progress={globalProgress} />
       
-      {/* Utility-Anchor: rendered OUTSIDE the transformed container */}
-      <div 
-        className="fixed top-8 right-8 z-[9999] flex items-center gap-6 px-3 py-2 rounded-lg max-sm:top-3 max-sm:right-3 max-sm:gap-4 max-sm:scale-[0.85] max-sm:origin-top-right"
-        style={{ 
-          background: 'transparent',
-        }}
-      >
-        <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} />
-      </div>
+      {/* Utility-Anchor: portal renders at root-level (document.body) */}
+      <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} />
 
       <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 max-w-3xl mx-auto">
 

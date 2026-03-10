@@ -181,6 +181,11 @@ export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
   const [manualOpen, setManualOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleReset = () => {
     if (confirmReset) {
@@ -192,29 +197,34 @@ export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
     }
   };
 
-  return (
-    <div className="relative flex items-center gap-4 sm:gap-5">
-          <UtilityIcon
-            icon={BookOpen}
-            label="Manual"
-            onClick={() => { setManualOpen(!manualOpen); setTemplateOpen(false); }}
-            isActive={manualOpen}
-          />
-          <UtilityIcon
-            icon={Wrench}
-            label="Templates"
-            onClick={() => { setTemplateOpen(!templateOpen); setManualOpen(false); }}
-            isActive={templateOpen}
-          />
-          <UtilityIcon
-            icon={Power}
-            label={confirmReset ? "Confirm Reset?" : "Reset Session"}
-            onClick={handleReset}
-            isActive={confirmReset}
-          />
+  if (!mounted) return null;
 
-          <ManualPanel isOpen={manualOpen} onClose={() => setManualOpen(false)} />
-          <TemplatePanel isOpen={templateOpen} onClose={() => setTemplateOpen(false)} onSelect={onApplyTemplate} />
-    </div>
+  return createPortal(
+    <div className="!fixed top-8 right-10 z-[9999] flex items-center gap-6 max-md:top-4 max-md:right-4 max-md:scale-[0.85] max-md:origin-top-right">
+      <div className="relative flex items-center gap-6 bg-transparent border-0 shadow-none outline-none">
+        <UtilityIcon
+          icon={BookOpen}
+          label="Manual"
+          onClick={() => { setManualOpen(!manualOpen); setTemplateOpen(false); }}
+          isActive={manualOpen}
+        />
+        <UtilityIcon
+          icon={Wrench}
+          label="Templates"
+          onClick={() => { setTemplateOpen(!templateOpen); setManualOpen(false); }}
+          isActive={templateOpen}
+        />
+        <UtilityIcon
+          icon={Power}
+          label={confirmReset ? "Confirm Reset?" : "Reset Session"}
+          onClick={handleReset}
+          isActive={confirmReset}
+        />
+
+        <ManualPanel isOpen={manualOpen} onClose={() => setManualOpen(false)} />
+        <TemplatePanel isOpen={templateOpen} onClose={() => setTemplateOpen(false)} onSelect={onApplyTemplate} />
+      </div>
+    </div>,
+    document.body
   );
 }
