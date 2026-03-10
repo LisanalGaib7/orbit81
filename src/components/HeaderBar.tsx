@@ -25,7 +25,7 @@ function UtilityIcon({
       <TooltipTrigger asChild>
         <motion.button
           onClick={onClick}
-          className={`relative p-2 rounded-md text-primary transition-colors ${
+          className={`relative p-2 rounded-md text-primary transition-colors hover:drop-shadow-[0_0_6px_hsl(var(--primary)/0.7)] ${
             isActive ? "" : "hover:text-primary"
           }`}
           style={{
