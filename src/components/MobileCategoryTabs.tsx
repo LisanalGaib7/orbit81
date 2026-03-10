@@ -132,7 +132,7 @@ export function MobileCategoryTabs({
                         className="text-[10px]"
                         style={{ 
                           fontFamily: 'var(--font-data)',
-                          color: progress === 100 ? 'hsl(120, 60%, 50%)' : '#FFD700',
+                          color: progress === 100 ? 'hsl(120, 60%, 50%)' : 'hsl(var(--primary))',
                           textShadow: '1px 1px 0px #000000',
                         }}
                       >
