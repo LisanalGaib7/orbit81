@@ -1,33 +1,23 @@
+/**
+ * RocketLaunchSequence — Animated rocket with 6 pre-launch stages + launch.
+ *
+ * WHY: Encapsulates all rocket animation state (pre-launch stages,
+ * countdown, ignition, liftoff, ascending) so the parent only needs
+ * to pass `progress` (0-100) and an `onLaunchStart` callback.
+ *
+ * Stage definitions are sourced from constants/missionData.ts.
+ */
+
 import { useMemo, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, animate } from "framer-motion";
 import { PixelRocketBody } from "./PixelRocketBody";
 import { GroundSmoke, AscendingSmoke } from "./VolumetricSmoke";
+import { getPreLaunchStage, type PreLaunchStage, type LaunchPhase } from "@/constants/missionData";
 
 interface RocketLaunchSequenceProps {
   progress: number; // 0-100
   onLaunchStart?: () => void;
   ignitionBurst?: number; // increments when a checkbox is checked
-}
-
-// 7-Stage Pre-launch states (0-99%) - rocket stays grounded
-type PreLaunchStage = 
-  | "idle"           // 0-15%: Static on launchpad, subtle rumble vibration
-  | "systems-on"     // 16-30%: Gantry arms open, release white pixel steam
-  | "fueling"        // 31-45%: Blue energy glow effect on hull
-  | "engine-test"    // 46-60%: Flicker orange pixel sparks from nozzles
-  | "power-up"       // 61-80%: Increase screen shake, base smoke clouds
-  | "high-tension";  // 81-99%: Maximum smoke, rapid engine flickering, heavy vibration
-
-// Launch stages (100%)
-type LaunchPhase = "idle" | "countdown" | "ignition" | "liftoff" | "ascending" | "exited";
-
-function getPreLaunchStage(progress: number): PreLaunchStage {
-  if (progress <= 15) return "idle";
-  if (progress <= 30) return "systems-on";
-  if (progress <= 45) return "fueling";
-  if (progress <= 60) return "engine-test";
-  if (progress <= 80) return "power-up";
-  return "high-tension";
 }
 
 // Steam particle component - round pixel particles
@@ -121,10 +111,7 @@ function Launchpad({ stage, isLaunching }: { stage: PreLaunchStage; isLaunching:
       className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 transition-all duration-1000" 
       style={{ zIndex: 1, imageRendering: "pixelated" }}
     >
-      {/* Platform base */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-2 bg-muted rounded-sm" />
-      
-      {/* Gantry tower left */}
       <div 
         className="absolute bottom-2 w-1 h-16 bg-muted-foreground/60 transition-transform duration-700"
         style={{ 
@@ -138,8 +125,6 @@ function Launchpad({ stage, isLaunching }: { stage: PreLaunchStage; isLaunching:
           style={{ transform: `rotate(${armOpening * 2}deg)` }}
         />
       </div>
-      
-      {/* Gantry tower right */}
       <div 
         className="absolute bottom-2 w-1 h-16 bg-muted-foreground/60 transition-transform duration-700"
         style={{ 
@@ -157,7 +142,7 @@ function Launchpad({ stage, isLaunching }: { stage: PreLaunchStage; isLaunching:
   );
 }
 
-// Pre-launch exhaust effects - child of Rocket-Assembly
+// Pre-launch exhaust effects
 function PreLaunchEffects({ stage }: { stage: PreLaunchStage }) {
   const steamParticles = useMemo(() => 
     Array.from({ length: 8 }, (_, i) => ({
@@ -189,11 +174,7 @@ function PreLaunchEffects({ stage }: { stage: PreLaunchStage }) {
   return (
     <div 
       className="absolute left-1/2 -translate-x-1/2 w-20 h-16 pointer-events-none"
-      style={{ 
-        bottom: '-12px',
-        imageRendering: "pixelated",
-        zIndex: 0,
-      }}
+      style={{ bottom: '-12px', imageRendering: "pixelated", zIndex: 0 }}
     >
       {showSteam && (
         <div className="absolute bottom-0 left-0 right-0 h-12">
@@ -202,20 +183,13 @@ function PreLaunchEffects({ stage }: { stage: PreLaunchStage }) {
           ))}
         </div>
       )}
-      
       {showSmoke && (
         <div className="absolute bottom-0 left-0 right-0 h-16">
           {smokeParticles.map((p) => (
-            <SmokeParticle 
-              key={p.id} 
-              delay={p.delay} 
-              left={p.left} 
-              size={p.size * smokeIntensity}
-            />
+            <SmokeParticle key={p.id} delay={p.delay} left={p.left} size={p.size * smokeIntensity} />
           ))}
         </div>
       )}
-      
       {showSparks && (
         <div className="absolute bottom-0 left-0 right-0 h-12 flex justify-center">
           {sparkParticles.map((p) => (
@@ -230,7 +204,6 @@ function PreLaunchEffects({ stage }: { stage: PreLaunchStage }) {
 // Blue energy glow for fueling stage
 function FuelingGlow({ active }: { active: boolean }) {
   if (!active) return null;
-  
   return (
     <motion.div 
       className="absolute inset-0 pointer-events-none"
@@ -253,7 +226,6 @@ function FuelingGlow({ active }: { active: boolean }) {
 // High tension flickering engine light
 function HighTensionFlicker({ active }: { active: boolean }) {
   if (!active) return null;
-  
   return (
     <motion.div
       className="absolute left-1/2 -translate-x-1/2"
@@ -285,10 +257,7 @@ function CountdownDisplay({ phase }: { phase: LaunchPhase }) {
       setCount(3);
       const interval = setInterval(() => {
         setCount((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            return 0;
-          }
+          if (prev <= 1) { clearInterval(interval); return 0; }
           return prev - 1;
         });
       }, 800);
@@ -302,9 +271,7 @@ function CountdownDisplay({ phase }: { phase: LaunchPhase }) {
     <motion.div 
       className="absolute font-pixel text-2xl font-bold text-primary"
       style={{ 
-        left: '-50px',
-        top: '50%',
-        transform: 'translateY(-50%)',
+        left: '-50px', top: '50%', transform: 'translateY(-50%)',
         imageRendering: "pixelated",
         textShadow: "0 0 12px hsl(var(--primary) / 0.7), 0 0 24px hsl(var(--primary) / 0.4)",
         zIndex: 10,
@@ -319,94 +286,51 @@ function CountdownDisplay({ phase }: { phase: LaunchPhase }) {
   );
 }
 
-// Checkbox ignition burst - sparks, flame, smoke, shake triggered on task completion
+// Checkbox ignition burst
 function CheckIgnitionBurst({ active }: { active: boolean }) {
   if (!active) return null;
-  
   return (
     <>
-      {/* Phase A: Sparks - orange/yellow particles from nozzle */}
-      <div 
-        className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{ bottom: '-8px', zIndex: 5, imageRendering: 'pixelated' }}
-      >
+      <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none" style={{ bottom: '-8px', zIndex: 5, imageRendering: 'pixelated' }}>
         {Array.from({ length: 10 }, (_, i) => (
           <motion.div
             key={`spark-${i}`}
             className="absolute"
             style={{
-              width: '3px',
-              height: '3px',
-              borderRadius: '50%',
-              background: i % 2 === 0 
-                ? 'hsl(30, 100%, 55%)' 
-                : 'hsl(45, 100%, 65%)',
+              width: '3px', height: '3px', borderRadius: '50%',
+              background: i % 2 === 0 ? 'hsl(30, 100%, 55%)' : 'hsl(45, 100%, 65%)',
             }}
             initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-            animate={{ 
-              x: (Math.random() - 0.5) * 40,
-              y: [0, 8 + Math.random() * 16],
-              opacity: [1, 0.8, 0],
-              scale: [1, 0.6, 0.2],
-            }}
-            transition={{
-              duration: 0.4 + Math.random() * 0.3,
-              delay: Math.random() * 0.15,
-              ease: 'easeOut',
-            }}
+            animate={{ x: (Math.random() - 0.5) * 40, y: [0, 8 + Math.random() * 16], opacity: [1, 0.8, 0], scale: [1, 0.6, 0.2] }}
+            transition={{ duration: 0.4 + Math.random() * 0.3, delay: Math.random() * 0.15, ease: 'easeOut' }}
           />
         ))}
       </div>
-
-      {/* Phase B: Ignition pulse - brief bright flame */}
       <motion.div
         className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
         style={{ bottom: '-10px', zIndex: 4, imageRendering: 'pixelated' }}
         initial={{ opacity: 0, scale: 0.3 }}
-        animate={{ 
-          opacity: [0, 1, 0.8, 0],
-          scale: [0.3, 1.2, 1, 0.5],
-        }}
+        animate={{ opacity: [0, 1, 0.8, 0], scale: [0.3, 1.2, 1, 0.5] }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        <div 
-          style={{
-            width: '14px',
-            height: '20px',
-            borderRadius: '50% 50% 40% 40%',
-            background: 'linear-gradient(to bottom, hsl(45, 100%, 70%), hsl(30, 100%, 55%), hsl(15, 90%, 45%))',
-            boxShadow: '0 4px 12px hsl(30, 100%, 50% / 0.6)',
-          }}
-        />
+        <div style={{
+          width: '14px', height: '20px', borderRadius: '50% 50% 40% 40%',
+          background: 'linear-gradient(to bottom, hsl(45, 100%, 70%), hsl(30, 100%, 55%), hsl(15, 90%, 45%))',
+          boxShadow: '0 4px 12px hsl(30, 100%, 50% / 0.6)',
+        }} />
       </motion.div>
-
-      {/* Phase C: Smoke puff */}
-      <div
-        className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{ bottom: '-6px', zIndex: 3, imageRendering: 'pixelated' }}
-      >
+      <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none" style={{ bottom: '-6px', zIndex: 3, imageRendering: 'pixelated' }}>
         {Array.from({ length: 8 }, (_, i) => (
           <motion.div
             key={`smoke-${i}`}
             className="absolute"
             style={{
-              width: `${6 + Math.random() * 6}px`,
-              height: `${6 + Math.random() * 6}px`,
-              borderRadius: '50%',
-              backgroundColor: `hsl(var(--muted-foreground) / 0.35)`,
+              width: `${6 + Math.random() * 6}px`, height: `${6 + Math.random() * 6}px`,
+              borderRadius: '50%', backgroundColor: `hsl(var(--muted-foreground) / 0.35)`,
             }}
             initial={{ x: 0, y: 0, opacity: 0, scale: 0.5 }}
-            animate={{
-              x: (Math.random() - 0.5) * 50,
-              y: [0, 5 + Math.random() * 15],
-              opacity: [0, 0.4, 0.2, 0],
-              scale: [0.5, 1.3, 1.8],
-            }}
-            transition={{
-              duration: 0.8 + Math.random() * 0.4,
-              delay: 0.15 + Math.random() * 0.2,
-              ease: 'easeOut',
-            }}
+            animate={{ x: (Math.random() - 0.5) * 50, y: [0, 5 + Math.random() * 15], opacity: [0, 0.4, 0.2, 0], scale: [0.5, 1.3, 1.8] }}
+            transition={{ duration: 0.8 + Math.random() * 0.4, delay: 0.15 + Math.random() * 0.2, ease: 'easeOut' }}
           />
         ))}
       </div>
@@ -431,39 +355,28 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
       prevBurstRef.current = ignitionBurst;
       setBurstActive(true);
       setBurstShake(true);
-      // Phase D: Shake lasts 500ms
       setTimeout(() => setBurstShake(false), 500);
-      // Full burst lasts 800ms
       setTimeout(() => setBurstActive(false), 800);
     }
   }, [ignitionBurst, progress]);
   
   useEffect(() => {
-    const unsubscribe = rocketY.on("change", (latest) => {
-      setCurrentRocketY(latest);
-    });
+    const unsubscribe = rocketY.on("change", (latest) => { setCurrentRocketY(latest); });
     return () => unsubscribe();
   }, [rocketY]);
   
   const preLaunchStage = getPreLaunchStage(progress);
   
-  // Vibration class based on 7-stage state machine
   const getVibrationClass = () => {
     if (progress === 100) return "";
     switch (preLaunchStage) {
-      case "idle":
-        return "animate-subtle-shake"; // Subtle rumble even at idle
+      case "idle": return "animate-subtle-shake";
       case "systems-on":
-      case "fueling":
-        return "";
-      case "engine-test":
-        return "animate-subtle-shake";
-      case "power-up":
-        return "animate-medium-shake";
-      case "high-tension":
-        return "animate-intense-shake";
-      default:
-        return "";
+      case "fueling": return "";
+      case "engine-test": return "animate-subtle-shake";
+      case "power-up": return "animate-medium-shake";
+      case "high-tension": return "animate-intense-shake";
+      default: return "";
     }
   };
   
@@ -471,50 +384,29 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
   useEffect(() => {
     if (progress === 100 && !hasLaunched) {
       setHasLaunched(true);
-      
-      // Phase 1: Countdown (3, 2, 1)
       setLaunchPhase("countdown");
       
-      // Phase 2: Ignition after countdown (2.4s for 3 counts at 0.8s each)
       setTimeout(() => {
         setShowFlash(true);
         setTimeout(() => setShowFlash(false), 150);
         setLaunchPhase("ignition");
-        
-        // Slight lift during ignition
-        animate(rocketY, -8, {
-          duration: 0.8,
-          ease: "easeOut",
-        });
+        animate(rocketY, -8, { duration: 0.8, ease: "easeOut" });
       }, 2400);
       
-      // Phase 3: Liftoff - slow initial ascent (3s)
       setTimeout(() => {
         setShowFlash(true);
         setTimeout(() => setShowFlash(false), 200);
         setLaunchPhase("liftoff");
-        
-        animate(rocketY, -60, {
-          duration: 3,
-          ease: "easeInOut",
-        });
+        animate(rocketY, -60, { duration: 3, ease: "easeInOut" });
       }, 3200);
       
-      // Phase 4: Ascending - rapid acceleration off-screen (3s)
       setTimeout(() => {
         setLaunchPhase("ascending");
-        animate(rocketY, -2500, {
-          duration: 3,
-          ease: [0.4, 0, 0.2, 1],
-        });
+        animate(rocketY, -2500, { duration: 3, ease: [0.4, 0, 0.2, 1] });
       }, 6200);
       
-      // Trigger celebration
-      setTimeout(() => {
-        onLaunchStart?.();
-      }, 8500);
+      setTimeout(() => { onLaunchStart?.(); }, 8500);
       
-      // Hide rocket
       setTimeout(() => {
         setShowRocket(false);
         setLaunchPhase("exited");
@@ -539,10 +431,7 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
   // After launch, show empty launchpad with residual smoke
   if (!showRocket && progress === 100) {
     return (
-      <div 
-        className="relative w-24 h-32 flex items-end justify-center"
-        style={{ imageRendering: "pixelated" }}
-      >
+      <div className="relative w-24 h-32 flex items-end justify-center" style={{ imageRendering: "pixelated" }}>
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24">
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-2 bg-muted rounded-sm" />
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-16 h-8 opacity-50">
@@ -551,12 +440,8 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                 key={i}
                 className="absolute bottom-0 bg-muted-foreground/30"
                 style={{
-                  left: `${25 + i * 15}%`,
-                  width: "6px",
-                  height: "6px",
-                  borderRadius: "50%",
-                  animation: `smoke-billow 2s ease-out infinite`,
-                  animationDelay: `${i * 0.3}s`,
+                  left: `${25 + i * 15}%`, width: "6px", height: "6px", borderRadius: "50%",
+                  animation: `smoke-billow 2s ease-out infinite`, animationDelay: `${i * 0.3}s`,
                   imageRendering: "pixelated",
                 }}
               />
@@ -576,7 +461,6 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
 
   return (
     <>
-      {/* Flash effect */}
       <AnimatePresence>
         {showFlash && (
           <motion.div
@@ -589,46 +473,26 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
         )}
       </AnimatePresence>
 
-      {/* Volumetric smoke effects during launch */}
       {launchPhase === "ignition" && <GroundSmoke intensity={1} />}
       {launchPhase === "ascending" && <AscendingSmoke rocketY={currentRocketY} />}
       
-      {/* ROCKET-ASSEMBLY: Main container with shake */}
       <div 
         className={`relative flex items-end justify-center ${isLaunching ? getLaunchShakeClass() : getVibrationClass()}`}
-        style={{ 
-          width: '96px',
-          height: '140px',
-          imageRendering: "pixelated",
-        }}
+        style={{ width: '96px', height: '140px', imageRendering: "pixelated" }}
       >
-        {/* Launchpad - positioned at bottom, not part of moving assembly */}
         <Launchpad stage={preLaunchStage} isLaunching={isLaunching} />
         
-        {/* ROCKET-ASSEMBLY: Contains rocket + flame + effects, moves as one unit */}
         <AnimatePresence>
           {launchPhase === "ascending" ? (
             <motion.div
               key="rocket-assembly-ascending"
               className="absolute"
-              style={{ 
-                y: rocketY,
-                bottom: '16px',
-                left: '50%',
-                x: '-50%',
-                zIndex: 10,
-              }}
+              style={{ y: rocketY, bottom: '16px', left: '50%', x: '-50%', zIndex: 10 }}
             >
-              {/* Rocket Assembly wrapper - position: relative */}
               <div className="relative" style={{ imageRendering: "pixelated" }}>
-                {/* Rocket Body with intense vibration */}
                 <motion.div 
-                  className="relative"
-                  style={{ zIndex: 2 }}
-                  animate={{ 
-                    x: [-0.5, 0.5, -0.3, 0.3, 0],
-                    y: [-0.3, 0.3, -0.2, 0.2, 0],
-                  }}
+                  className="relative" style={{ zIndex: 2 }}
+                  animate={{ x: [-0.5, 0.5, -0.3, 0.3, 0], y: [-0.3, 0.3, -0.2, 0.2, 0] }}
                   transition={{ duration: 0.04, repeat: Infinity }}
                 >
                   <PixelRocketBody stage="ascending" showExhaust exhaustIntensity={1} />
@@ -639,56 +503,30 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
             <motion.div
               key="rocket-assembly-grounded"
               className="absolute"
-              style={{ 
-                y: rocketY,
-                bottom: '16px',
-                left: '50%',
-                x: '-50%',
-                zIndex: 10,
-              }}
+              style={{ y: rocketY, bottom: '16px', left: '50%', x: '-50%', zIndex: 10 }}
             >
-              {/* Rocket Assembly wrapper - position: relative */}
               <div className="relative" style={{ imageRendering: "pixelated" }}>
-                {/* Countdown display - positioned left of rocket */}
                 <CountdownDisplay phase={launchPhase} />
-                
-                {/* Blue energy glow for fueling stage */}
                 <FuelingGlow active={preLaunchStage === "fueling" && !isLaunching} />
                 
-                {/* Rocket Body - z-index 2 */}
                 {(launchPhase === "ignition" || launchPhase === "liftoff") ? (
                   <motion.div
-                    className="relative"
-                    style={{ zIndex: 2 }}
-                    animate={{ 
-                      x: [-0.8, 0.8, -0.5, 0.5, 0],
-                      y: [-0.4, 0.4, -0.3, 0.3, 0],
-                    }}
+                    className="relative" style={{ zIndex: 2 }}
+                    animate={{ x: [-0.8, 0.8, -0.5, 0.5, 0], y: [-0.4, 0.4, -0.3, 0.3, 0] }}
                     transition={{ duration: 0.025, repeat: Infinity }}
                   >
-                    <PixelRocketBody 
-                      stage="struggle" 
-                      showExhaust 
-                      exhaustIntensity={launchPhase === "liftoff" ? 1 : 0.85} 
-                    />
+                    <PixelRocketBody stage="struggle" showExhaust exhaustIntensity={launchPhase === "liftoff" ? 1 : 0.85} />
                   </motion.div>
                 ) : burstShake ? (
                   <motion.div
-                    className="relative"
-                    style={{ zIndex: 2 }}
-                    animate={{ 
-                      x: [-1, 1, -0.6, 0.6, 0],
-                      y: [-0.5, 0.5, -0.3, 0.3, 0],
-                    }}
+                    className="relative" style={{ zIndex: 2 }}
+                    animate={{ x: [-1, 1, -0.6, 0.6, 0], y: [-0.5, 0.5, -0.3, 0.3, 0] }}
                     transition={{ duration: 0.05, repeat: Infinity }}
                   >
                     <PixelRocketBody 
                       stage="idle" 
                       showExhaust={preLaunchStage === "engine-test" || preLaunchStage === "power-up"}
-                      exhaustIntensity={
-                        preLaunchStage === "power-up" ? 0.3 :
-                        preLaunchStage === "engine-test" ? 0.15 : 0
-                      }
+                      exhaustIntensity={preLaunchStage === "power-up" ? 0.3 : preLaunchStage === "engine-test" ? 0.15 : 0}
                     />
                   </motion.div>
                 ) : (
@@ -696,21 +534,14 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                     <PixelRocketBody 
                       stage="idle" 
                       showExhaust={preLaunchStage === "engine-test" || preLaunchStage === "power-up"}
-                      exhaustIntensity={
-                        preLaunchStage === "power-up" ? 0.3 :
-                        preLaunchStage === "engine-test" ? 0.15 : 0
-                      }
+                      exhaustIntensity={preLaunchStage === "power-up" ? 0.3 : preLaunchStage === "engine-test" ? 0.15 : 0}
                     />
                   </div>
                 )}
                 
-                {/* Pre-launch effects (steam, smoke, sparks) - child of rocket assembly */}
                 {!isLaunching && <PreLaunchEffects stage={preLaunchStage} />}
-                
-                {/* High tension flickering engine - positioned at nozzle */}
                 <HighTensionFlicker active={preLaunchStage === "high-tension" && !isLaunching} />
                 
-                {/* Checkbox ignition burst effects */}
                 <AnimatePresence>
                   {burstActive && <CheckIgnitionBurst active={burstActive} />}
                 </AnimatePresence>

@@ -1,5 +1,11 @@
-// GoalMatrix - Main application component
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+/**
+ * GoalMatrix — Root orchestrator for the Orbit 81 mission dashboard.
+ *
+ * WHY: This component wires together the visual shell (starfield, rocket,
+ * grid, sidebar, fireworks) with the state machine provided by
+ * useMissionProgress. It owns no business logic itself.
+ */
+
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { ProgressBar } from "./ProgressBar";
@@ -13,278 +19,84 @@ import { TypewriterText } from "./TypewriterText";
 import { MobileCategoryTabs } from "./MobileCategoryTabs";
 import { HeaderBar } from "./HeaderBar";
 import { useIsMobile } from "@/hooks/use-mobile";
-// Default sub-goal labels
-const DEFAULT_SUBGOALS = [
-  "Health",
-  "Career",
-  "Finance",
-  "Learning",
-  "Relationships",
-  "Creativity",
-  "Mindfulness",
-  "Adventure",
-];
-
-// localStorage keys
-const STORAGE_KEYS = {
-  actions: "goalMatrix_actions",
-  labels: "goalMatrix_labels",
-  actionLabels: "goalMatrix_actionLabels",
-};
-
-// Helper to ensure arrays are properly sized
-const ensureArraySize = <T,>(arr: T[] | undefined, size: number, defaultValue: T): T[] => {
-  if (!Array.isArray(arr) || arr.length < size) {
-    return Array(size).fill(defaultValue);
-  }
-  return arr;
-};
-
-const ensure2DArraySize = <T,>(arr: T[][] | undefined, outerSize: number, innerSize: number, defaultValue: T): T[][] => {
-  if (!Array.isArray(arr) || arr.length < outerSize) {
-    return Array(outerSize).fill(null).map(() => Array(innerSize).fill(defaultValue));
-  }
-  return arr.map(inner => ensureArraySize(inner, innerSize, defaultValue));
-};
+import { useMissionProgress } from "@/hooks/useMissionProgress";
+import { GRID_POSITIONS, TOTAL_ACTIONS } from "@/constants/missionData";
 
 export function GoalMatrix() {
-  // State: 8 sub-goal blocks, each with 8 actions
-  const [actions, setActions] = useState<boolean[][]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.actions);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return ensure2DArraySize(parsed, 8, 8, false);
-      }
-    } catch (e) {
-      console.warn("Failed to parse saved actions, using defaults");
-    }
-    return Array(8).fill(null).map(() => Array(8).fill(false));
-  });
+  const {
+    actions,
+    subGoalLabels,
+    actionLabels,
+    activeBlockIndex,
+    focusActionIndex,
+    ignitionBurst,
+    subGoalProgress,
+    globalProgress,
+    completedCount,
+    completedSubGoals,
+    showMissionComplete,
+    showMissionModal,
+    showFireworks,
+    toggleAction,
+    updateLabel,
+    updateActionLabel,
+    applyTemplate,
+    resetSession,
+    handleActionSlotClick,
+    clearConfetti,
+    handleLaunchComplete,
+    dismissMission,
+    setActiveBlockIndex,
+    setFocusActionIndex,
+  } = useMissionProgress();
 
-  const [subGoalLabels, setSubGoalLabels] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.labels);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return ensureArraySize(parsed, 8, "Goal");
-      }
-    } catch (e) {
-      console.warn("Failed to parse saved labels, using defaults");
-    }
-    return [...DEFAULT_SUBGOALS];
-  });
-
-  // Action item labels: 8 sub-goals × 8 actions
-  const [actionLabels, setActionLabels] = useState<string[][]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.actionLabels);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return ensure2DArraySize(parsed, 8, 8, "");
-      }
-    } catch (e) {
-      console.warn("Failed to parse saved action labels, using defaults");
-    }
-    return Array(8).fill(null).map(() => Array(8).fill(""));
-  });
-
-  const [showMissionComplete, setShowMissionComplete] = useState(false);
-  const [showMissionModal, setShowMissionModal] = useState(false);
-  const [rocketLaunching, setRocketLaunching] = useState(false);
-  const [showFireworks, setShowFireworks] = useState(false);
-  const [completedSubGoals, setCompletedSubGoals] = useState<Set<number>>(new Set());
-  const prevCompletedRef = useRef<Set<number>>(new Set());
-  const missionTriggeredRef = useRef(false);
-  const [ignitionBurst, setIgnitionBurst] = useState(0);
-
-  // Active block for sidebar
-  const [activeBlockIndex, setActiveBlockIndex] = useState<number | null>(null);
-  const [focusActionIndex, setFocusActionIndex] = useState<number | null>(null);
-
-  // Handle clicking a specific action slot in the grid
-  const handleActionSlotClick = useCallback((blockIndex: number, actionIndex: number) => {
-    setActiveBlockIndex(blockIndex);
-    setFocusActionIndex(actionIndex);
-  }, []);
-
-  // Persist to localStorage
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.actions, JSON.stringify(actions));
-  }, [actions]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.labels, JSON.stringify(subGoalLabels));
-  }, [subGoalLabels]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.actionLabels, JSON.stringify(actionLabels));
-  }, [actionLabels]);
-
-  // Toggle a specific action
-  const toggleAction = useCallback((blockIndex: number, actionIndex: number) => {
-    setActions(prev => {
-      const newActions = prev.map(block => [...block]);
-      const wasChecked = newActions[blockIndex][actionIndex];
-      newActions[blockIndex][actionIndex] = !wasChecked;
-      // Trigger ignition burst only when checking (not unchecking)
-      if (!wasChecked) {
-        setIgnitionBurst(c => c + 1);
-      }
-      return newActions;
-    });
-  }, []);
-
-  // Update a sub-goal label
-  const updateLabel = useCallback((index: number, newLabel: string) => {
-    setSubGoalLabels(prev => {
-      const newLabels = [...prev];
-      newLabels[index] = newLabel;
-      return newLabels;
-    });
-  }, []);
-
-  // Update an action label
-  const updateActionLabel = useCallback((blockIndex: number, actionIndex: number, label: string) => {
-    setActionLabels(prev => {
-      const newLabels = prev.map(block => [...block]);
-      newLabels[blockIndex][actionIndex] = label;
-      return newLabels;
-    });
-  }, []);
-
-  // Apply template
-  const applyTemplate = useCallback((labels: string[]) => {
-    setSubGoalLabels(labels);
-  }, []);
-
-  // Reset session
-  const resetSession = useCallback(() => {
-    setActions(Array(8).fill(null).map(() => Array(8).fill(false)));
-    setSubGoalLabels([...DEFAULT_SUBGOALS]);
-    setActionLabels(Array(8).fill(null).map(() => Array(8).fill("")));
-    setActiveBlockIndex(null);
-    setFocusActionIndex(null);
-  }, []);
-
-  // Calculate progress for each sub-goal
-  const subGoalProgress = useMemo(() => {
-    return actions.map(block => {
-      const completed = block.filter(Boolean).length;
-      return (completed / 8) * 100;
-    });
-  }, [actions]);
-
-  // Calculate global progress
-  const globalProgress = useMemo(() => {
-    const totalCompleted = actions.flat().filter(Boolean).length;
-    return (totalCompleted / 64) * 100;
-  }, [actions]);
-
-  // Track newly completed sub-goals for confetti
-  useEffect(() => {
-    const newCompleted = new Set<number>();
-    subGoalProgress.forEach((progress, idx) => {
-      if (progress === 100) newCompleted.add(idx);
-    });
-
-    // Find newly completed
-    newCompleted.forEach(idx => {
-      if (!prevCompletedRef.current.has(idx)) {
-        setCompletedSubGoals(prev => new Set(prev).add(idx));
-      }
-    });
-
-    prevCompletedRef.current = newCompleted;
-  }, [subGoalProgress]);
-
-  // Clear confetti after animation
-  const clearConfetti = useCallback((idx: number) => {
-    setCompletedSubGoals(prev => {
-      const next = new Set(prev);
-      next.delete(idx);
-      return next;
-    });
-  }, []);
-
-  // Callback when rocket is about to exit - trigger fireworks at 5.5s
-  const handleLaunchComplete = useCallback(() => {
-    setShowFireworks(true);
-    
-    // Show modal 1.0s after fireworks start (at 6.5s total)
-    setTimeout(() => {
-      setShowMissionModal(true);
-    }, 1000);
-  }, []);
-
-  // Grand finale launch sequence
-  useEffect(() => {
-    if (globalProgress === 100 && !missionTriggeredRef.current) {
-      missionTriggeredRef.current = true;
-      setShowMissionComplete(true);
-      // Note: Fireworks and modal are now triggered by handleLaunchComplete callback
-    }
-  }, [globalProgress]);
-
-  const completedCount = actions.flat().filter(Boolean).length;
   const isMobile = useIsMobile();
-
-  // Grid positions: 0-7 are sub-goals, 4 is center (core goal)
-  // Layout: [0][1][2] / [3][C][4] / [5][6][7]
-  const gridPositions = [0, 1, 2, 3, -1, 4, 5, 6, 7];
 
   return (
     <>
       <Starfield progress={globalProgress} />
-      
-      {/* Utility-Anchor: portal renders at root-level (document.body) */}
+
+      {/* HUD utility icons — rendered via portal to document.body */}
       <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} />
 
       <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 max-w-3xl mx-auto">
-
-        {/* SECTION 1: Centered Logo */}
+        {/* SECTION 1: Brand */}
         <div className="text-center pt-2">
-          <h1 
+          <h1
             className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide pixel-title-3d whitespace-nowrap"
-            style={{ imageRendering: 'pixelated' }}
+            style={{ imageRendering: "pixelated" }}
           >
             <span className="text-primary">Orbit</span>{" "}
             <span className="text-foreground">81</span>
           </h1>
-          <p 
-            className="font-pixel text-[6px] sm:text-[7px] text-muted-foreground mt-2 whitespace-nowrap" 
-            style={{ imageRendering: 'pixelated' }}
+          <p
+            className="font-pixel text-[6px] sm:text-[7px] text-muted-foreground mt-2 whitespace-nowrap"
+            style={{ imageRendering: "pixelated" }}
           >
-            <TypewriterText 
-              text="Writing the greatest chapter yet" 
-              typingSpeed={60}
-            />
+            <TypewriterText text="Writing the greatest chapter yet" typingSpeed={60} />
           </p>
         </div>
 
-        {/* SECTION 2: Mission Control - Rocket-Assembly + Progress Bar BELOW */}
+        {/* SECTION 2: Rocket + Progress */}
         <div className="w-full flex flex-col items-center gap-6" style={{ zIndex: 100 }}>
-          {/* Rocket Launch Sequence (Rocket-Assembly) */}
-          <div className="relative" style={{ minHeight: '140px' }}>
-            <RocketLaunchSequence progress={globalProgress} onLaunchStart={handleLaunchComplete} ignitionBurst={ignitionBurst} />
+          <div className="relative" style={{ minHeight: "140px" }}>
+            <RocketLaunchSequence
+              progress={globalProgress}
+              onLaunchStart={handleLaunchComplete}
+              ignitionBurst={ignitionBurst}
+            />
           </div>
 
-          {/* Progress Section - Directly BELOW the rocket */}
           <div className="w-full max-w-md space-y-2">
-            {/* Header: Label left, Stats right - ABOVE progress bar */}
             <div className="flex justify-between items-center">
-              <span className="font-pixel text-[8px] text-muted-foreground" style={{ imageRendering: 'pixelated' }}>
+              <span className="font-pixel text-[8px] text-muted-foreground" style={{ imageRendering: "pixelated" }}>
                 Total Progress
               </span>
               <span className="pixel-gold-stat-outlined text-xl">
-                {completedCount}/64 ({Math.round(globalProgress)}%)
+                {completedCount}/{TOTAL_ACTIONS} ({Math.round(globalProgress)}%)
               </span>
             </div>
-            
-            {/* Progress Bar - 3D Glass Tube */}
             <ProgressBar progress={globalProgress} />
-            
-            {/* Milestone Markers BELOW the bar */}
             <ProgressMilestones progress={globalProgress} />
           </div>
         </div>
@@ -306,13 +118,10 @@ export function GoalMatrix() {
           />
         ) : (
           <div className="goal-grid w-full aspect-square max-w-2xl" style={{ zIndex: 50 }}>
-            {gridPositions.map((subIdx, gridIdx) => (
+            {GRID_POSITIONS.map((subIdx, gridIdx) => (
               <div key={gridIdx} className="aspect-square">
                 {subIdx === -1 ? (
-                  <CoreGoalBlock 
-                    subGoalProgress={subGoalProgress}
-                    subGoalLabels={subGoalLabels}
-                  />
+                  <CoreGoalBlock subGoalProgress={subGoalProgress} subGoalLabels={subGoalLabels} />
                 ) : (
                   <SubGoalBlock
                     blockIndex={subIdx}
@@ -350,7 +159,7 @@ export function GoalMatrix() {
         </div>
       </div>
 
-      {/* Action Sidebar */}
+      {/* Action Sidebar (Task Drawer) */}
       {activeBlockIndex !== null && (
         <ActionSidebar
           isOpen={activeBlockIndex !== null}
@@ -365,17 +174,11 @@ export function GoalMatrix() {
         />
       )}
 
-      {/* Deep Space Fireworks */}
       <DeepSpaceFireworks active={showFireworks} />
 
-      <MissionAccomplished 
-        isOpen={showMissionComplete} 
-        onClose={() => {
-          setShowMissionComplete(false);
-          setShowMissionModal(false);
-          setShowFireworks(false);
-          missionTriggeredRef.current = false;
-        }}
+      <MissionAccomplished
+        isOpen={showMissionComplete}
+        onClose={dismissMission}
         showModal={showMissionModal}
       />
     </>

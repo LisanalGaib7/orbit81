@@ -71,7 +71,7 @@ export function MobileCategoryTabs({
               style={{ 
                 fontFamily: 'var(--font-data)',
                 textShadow: '1px 1px 0px #000000',
-                color: isActive ? '#FFD700' : 'hsl(var(--muted-foreground))',
+                color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
               }}
             >
               <span>{tab.prefix}</span>
@@ -115,7 +115,7 @@ export function MobileCategoryTabs({
                           className="text-[10px] font-bold"
                           style={{ 
                             fontFamily: 'var(--font-data)', 
-                            color: '#FFD700',
+                            color: 'hsl(var(--primary))',
                             textShadow: '1px 1px 0px #000000',
                           }}
                         >
@@ -132,7 +132,7 @@ export function MobileCategoryTabs({
                         className="text-[10px]"
                         style={{ 
                           fontFamily: 'var(--font-data)',
-                          color: progress === 100 ? 'hsl(120, 60%, 50%)' : '#FFD700',
+                          color: progress === 100 ? 'hsl(120, 60%, 50%)' : 'hsl(var(--primary))',
                           textShadow: '1px 1px 0px #000000',
                         }}
                       >
