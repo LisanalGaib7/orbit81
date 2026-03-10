@@ -1,7 +1,16 @@
+/**
+ * SubGoalBlock — A single 3×3 tile within the mission grid.
+ *
+ * WHY: Renders 8 action checkboxes + 1 editable label centre cell for
+ * one of the 8 sub-goal categories. Uses ACTION_POSITIONS from the
+ * central constants file so the grid layout is defined once.
+ */
+
 import { GoalCheckbox } from "./GoalCheckbox";
 import { EditableLabel } from "./EditableLabel";
 import { PixelConfetti } from "./PixelConfetti";
 import { generateActionId } from "@/lib/goalIds";
+import { ACTION_POSITIONS } from "@/constants/missionData";
 import {
   Tooltip,
   TooltipContent,
@@ -26,12 +35,12 @@ interface SubGoalBlockProps {
 const DEFAULT_ACTIONS = Array(8).fill(false);
 const DEFAULT_ACTION_LABELS = Array(8).fill("");
 
-export function SubGoalBlock({ 
-  blockIndex, 
+export function SubGoalBlock({
+  blockIndex,
   actions = DEFAULT_ACTIONS,
   actionLabels = DEFAULT_ACTION_LABELS,
-  onToggle, 
-  label = "Goal", 
+  onToggle,
+  label = "Goal",
   onLabelChange,
   showConfetti = false,
   onConfettiComplete,
@@ -39,19 +48,12 @@ export function SubGoalBlock({
   onBlockClick,
   onActionClick,
 }: SubGoalBlockProps) {
-  const actionPositions = [0, 1, 2, 3, -1, 4, 5, 6, 7];
   const safeActions = actions ?? DEFAULT_ACTIONS;
   const safeActionLabels = actionLabels ?? DEFAULT_ACTION_LABELS;
 
   const handleBlockClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    if (
-      target.closest('.checkbox-goal') || 
-      target.closest('input') || 
-      target.closest('button')
-    ) {
-      return;
-    }
+    if (target.closest(".checkbox-goal") || target.closest("input") || target.closest("button")) return;
     onBlockClick?.();
   };
 
@@ -70,53 +72,50 @@ export function SubGoalBlock({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div 
+      <div
         className={`goal-block goal-block-sub p-2 relative cursor-pointer transition-all duration-300 ${
-          isActive 
-            ? "ring-2 ring-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] scale-[1.02]" 
+          isActive
+            ? "ring-2 ring-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] scale-[1.02]"
             : "hover:ring-1 hover:ring-primary/30"
         }`}
         onClick={handleBlockClick}
       >
         <PixelConfetti trigger={showConfetti} onComplete={onConfettiComplete} />
-        
+
         <div className="grid grid-cols-3 gap-1">
-          {actionPositions.map((actionIdx, gridIdx) => (
+          {ACTION_POSITIONS.map((actionIdx, gridIdx) => (
             <div
               key={gridIdx}
               className="tile-cell aspect-square flex items-center justify-center overflow-visible"
             >
               {actionIdx === -1 ? (
-              <div style={{ fontFamily: 'var(--font-header)' }}>
-                <EditableLabel
-                  value={label || "Goal"}
-                  onChange={onLabelChange}
-                  className="text-[10px] sm:text-xs font-medium leading-tight px-0.5 w-full"
-                />
-              </div>
+                <div style={{ fontFamily: "var(--font-header)" }}>
+                  <EditableLabel
+                    value={label || "Goal"}
+                    onChange={onLabelChange}
+                    className="text-[10px] sm:text-xs font-medium leading-tight px-0.5 w-full"
+                  />
+                </div>
               ) : (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div 
+                    <div
                       className="relative w-full h-full flex flex-col items-center justify-center gap-0.5 cursor-pointer hover:bg-primary/10 rounded transition-colors"
                       onClick={(e) => handleActionSlotClick(actionIdx, e)}
                     >
-                      {/* ID Code - data font */}
-                      <span 
+                      {/* Action ID badge */}
+                      <span
                         className={`text-[7px] sm:text-[9px] font-bold tracking-tight leading-none ${
-                          safeActions[actionIdx] 
-                            ? "text-primary/50 line-through" 
-                            : ""
+                          safeActions[actionIdx] ? "text-primary/50 line-through" : "text-primary"
                         }`}
-                        style={{ 
-                          fontFamily: 'var(--font-data)',
-                          textShadow: '1px 1px 0px #000000',
-                          color: safeActions[actionIdx] ? undefined : '#FFD700',
+                        style={{
+                          fontFamily: "var(--font-data)",
+                          textShadow: "1px 1px 0px #000000",
                         }}
                       >
                         {generateActionId(label, actionIdx)}
                       </span>
-                      
+
                       <GoalCheckbox
                         checked={Boolean(safeActions[actionIdx])}
                         onChange={() => onToggle(blockIndex, actionIdx)}
@@ -125,13 +124,10 @@ export function SubGoalBlock({
                       />
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent 
-                    side="top" 
-                    className="max-w-[200px] text-xs"
-                    sideOffset={5}
-                    style={{ fontFamily: 'var(--font-body)' }}
-                  >
-                    <span style={{ fontFamily: 'var(--font-data)', color: '#FFD700' }} className="font-bold">[{generateActionId(label, actionIdx)}]</span>{" "}
+                  <TooltipContent side="top" className="max-w-[200px] text-xs" sideOffset={5} style={{ fontFamily: "var(--font-body)" }}>
+                    <span style={{ fontFamily: "var(--font-data)" }} className="font-bold text-primary">
+                      [{generateActionId(label, actionIdx)}]
+                    </span>{" "}
                     {safeActionLabels[actionIdx] || "Click to define action"}
                   </TooltipContent>
                 </Tooltip>
