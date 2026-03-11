@@ -45,7 +45,7 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
           />
 
           {/* 10% Tick Marks */}
-          {Array.from({ length: 9 }, (_, i) => {
+          {showTicks && Array.from({ length: 9 }, (_, i) => {
             const pct = (i + 1) * 10;
             const isReached = clampedProgress >= pct;
             return (
@@ -60,7 +60,6 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
                   zIndex: 2,
                 }}
               >
-                {/* Top notch */}
                 <div
                   className="absolute -top-px w-px h-1.5"
                   style={{
@@ -69,7 +68,6 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
                       : "hsl(220 10% 35%)",
                   }}
                 />
-                {/* Bottom notch */}
                 <div
                   className="absolute -bottom-px w-px h-1.5"
                   style={{
