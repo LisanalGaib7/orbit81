@@ -137,7 +137,7 @@ export function GoalMatrix() {
             {GRID_POSITIONS.map((subIdx, gridIdx) => (
               <div key={gridIdx} className="aspect-square">
                 {subIdx === -1 ? (
-                  <CoreGoalBlock subGoalProgress={subGoalProgress} subGoalLabels={subGoalLabels} />
+                  <CoreGoalBlock subGoalProgress={subGoalProgress} subGoalLabels={subGoalLabels} coreProgress={globalProgress} />
                 ) : (
                   <SubGoalBlock
                     blockIndex={subIdx}
