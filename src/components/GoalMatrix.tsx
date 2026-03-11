@@ -131,13 +131,14 @@ export function GoalMatrix() {
             activeBlockIndex={activeBlockIndex}
             onBlockClick={(idx) => { setActiveBlockIndex(idx); setFocusActionIndex(null); }}
             onActionClick={handleActionSlotClick}
+            globalProgress={globalProgress}
           />
         ) : (
           <div className="goal-grid w-full aspect-square max-w-2xl" style={{ zIndex: 50 }}>
             {GRID_POSITIONS.map((subIdx, gridIdx) => (
               <div key={gridIdx} className="aspect-square">
                 {subIdx === -1 ? (
-                  <CoreGoalBlock subGoalProgress={subGoalProgress} subGoalLabels={subGoalLabels} />
+                  <CoreGoalBlock subGoalProgress={subGoalProgress} subGoalLabels={subGoalLabels} coreProgress={globalProgress} />
                 ) : (
                   <SubGoalBlock
                     blockIndex={subIdx}

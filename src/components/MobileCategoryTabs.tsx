@@ -16,6 +16,7 @@ interface MobileCategoryTabsProps {
   activeBlockIndex: number | null;
   onBlockClick: (idx: number) => void;
   onActionClick: (blockIndex: number, actionIndex: number) => void;
+  globalProgress?: number;
 }
 
 export function MobileCategoryTabs({
@@ -30,6 +31,7 @@ export function MobileCategoryTabs({
   activeBlockIndex,
   onBlockClick,
   onActionClick,
+  globalProgress = 0,
 }: MobileCategoryTabsProps) {
   // -1 = core overview, 0-7 = sub-goal blocks
   const [selectedTab, setSelectedTab] = useState<number>(-1);
@@ -98,6 +100,7 @@ export function MobileCategoryTabs({
               <CoreGoalBlock 
                 subGoalProgress={subGoalProgress}
                 subGoalLabels={subGoalLabels}
+                coreProgress={globalProgress}
               />
               {/* Category summary list */}
               <div className="grid grid-cols-2 gap-2">

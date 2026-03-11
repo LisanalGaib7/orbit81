@@ -10,9 +10,10 @@ interface ProgressBarProps {
   progress: number;
   className?: string;
   showLabel?: boolean;
+  showTicks?: boolean;
 }
 
-export function ProgressBar({ progress, className, showLabel = false }: ProgressBarProps) {
+export function ProgressBar({ progress, className, showLabel = false, showTicks = true }: ProgressBarProps) {
   const clampedProgress = Math.min(100, Math.max(0, progress));
 
   // Glow intensity increases at each 10% mark
@@ -44,7 +45,7 @@ export function ProgressBar({ progress, className, showLabel = false }: Progress
           />
 
           {/* 10% Tick Marks */}
-          {Array.from({ length: 9 }, (_, i) => {
+          {showTicks && Array.from({ length: 9 }, (_, i) => {
             const pct = (i + 1) * 10;
             const isReached = clampedProgress >= pct;
             return (
@@ -59,7 +60,6 @@ export function ProgressBar({ progress, className, showLabel = false }: Progress
                   zIndex: 2,
                 }}
               >
-                {/* Top notch */}
                 <div
                   className="absolute -top-px w-px h-1.5"
                   style={{
@@ -68,7 +68,6 @@ export function ProgressBar({ progress, className, showLabel = false }: Progress
                       : "hsl(220 10% 35%)",
                   }}
                 />
-                {/* Bottom notch */}
                 <div
                   className="absolute -bottom-px w-px h-1.5"
                   style={{
@@ -83,24 +82,26 @@ export function ProgressBar({ progress, className, showLabel = false }: Progress
         </div>
 
         {/* Tick labels below */}
-        <div className="relative w-full h-3 mt-0.5">
-          {[0, 50, 100].map((pct) => (
-            <span
-              key={pct}
-              className="absolute font-mono text-[7px] -translate-x-1/2"
-              style={{
-                left: `${pct}%`,
-                color: clampedProgress >= pct
-                  ? "hsl(45 100% 50%)"
-                  : "hsl(220 10% 40%)",
-                textShadow: "1px 1px 0px #000000",
-                imageRendering: "pixelated",
-              }}
-            >
-              {pct}
-            </span>
-          ))}
-        </div>
+        {showTicks && (
+          <div className="relative w-full h-3 mt-0.5">
+            {[0, 50, 100].map((pct) => (
+              <span
+                key={pct}
+                className="absolute font-mono text-[7px] -translate-x-1/2"
+                style={{
+                  left: `${pct}%`,
+                  color: clampedProgress >= pct
+                    ? "hsl(45 100% 50%)"
+                    : "hsl(220 10% 40%)",
+                  textShadow: "1px 1px 0px #000000",
+                  imageRendering: "pixelated",
+                }}
+              >
+                {pct}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {showLabel && (
