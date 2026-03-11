@@ -89,6 +89,16 @@ export function GoalMatrix() {
           </div>
 
           <div className="w-full max-w-md space-y-2">
+            {/* Evolution Stage HUD */}
+            <div className="text-center mb-1">
+              <span
+                className="font-mono text-[10px] sm:text-xs tracking-[0.25em] uppercase text-primary"
+                style={{ textShadow: "1px 1px 0px #000000", imageRendering: "pixelated" }}
+              >
+                STATUS: {currentStage.name}
+              </span>
+            </div>
+
             <div className="flex justify-between items-center">
               <span className="font-pixel text-[8px] text-muted-foreground" style={{ imageRendering: "pixelated" }}>
                 Total Progress
