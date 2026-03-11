@@ -82,7 +82,7 @@ export function SubGoalBlock({
       >
         <PixelConfetti trigger={showConfetti} onComplete={onConfettiComplete} />
 
-        <div className="grid grid-cols-3 gap-1">
+        <div className="grid grid-cols-3 gap-2 sm:gap-1">
           {ACTION_POSITIONS.map((actionIdx, gridIdx) => (
             <div
               key={gridIdx}
