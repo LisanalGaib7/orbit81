@@ -27,7 +27,7 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
       {/* Engineering Gauge Bar */}
       <div className="relative">
         <div
-          className="progress-bar-3d h-5 relative"
+          className="progress-bar-3d h-2.5 relative rounded-sm"
           style={{ imageRendering: "pixelated" }}
         >
           {/* Fill with dynamic glow */}
