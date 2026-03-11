@@ -30,6 +30,7 @@ interface SubGoalBlockProps {
   isActive?: boolean;
   onBlockClick?: () => void;
   onActionClick?: (blockIndex: number, actionIndex: number) => void;
+  progress?: number;
 }
 
 const DEFAULT_ACTIONS = Array(8).fill(false);
@@ -47,6 +48,7 @@ export function SubGoalBlock({
   isActive = false,
   onBlockClick,
   onActionClick,
+  progress = 0,
 }: SubGoalBlockProps) {
   const safeActions = actions ?? DEFAULT_ACTIONS;
   const safeActionLabels = actionLabels ?? DEFAULT_ACTION_LABELS;
@@ -134,6 +136,18 @@ export function SubGoalBlock({
               )}
             </div>
           ))}
+        </div>
+
+        {/* Slim progress gauge */}
+        <div className="w-full h-1 rounded-full bg-muted/30 mt-1 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${progress}%`,
+              background: "hsl(45 100% 50%)",
+              boxShadow: progress > 0 ? "0 0 6px hsl(45 100% 50% / 0.5)" : "none",
+            }}
+          />
         </div>
       </div>
     </TooltipProvider>
