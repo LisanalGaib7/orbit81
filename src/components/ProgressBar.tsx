@@ -69,7 +69,7 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
                   }}
                 />
                 <div
-                  className="absolute -bottom-px w-px h-1.5"
+                  className="absolute -bottom-px w-px h-1"
                   style={{
                     background: isReached
                       ? "hsl(45 100% 55%)"
