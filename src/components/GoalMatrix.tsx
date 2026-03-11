@@ -1,9 +1,5 @@
 /**
  * GoalMatrix — Root orchestrator for the Orbit 81 mission dashboard.
- *
- * WHY: This component wires together the visual shell (starfield, rocket,
- * grid, sidebar, fireworks) with the state machine provided by
- * useMissionProgress. It owns no business logic itself.
  */
 
 import { SubGoalBlock } from "./SubGoalBlock";
@@ -11,6 +7,7 @@ import { CoreGoalBlock } from "./CoreGoalBlock";
 import { ProgressBar } from "./ProgressBar";
 import { ProgressMilestones } from "./ProgressMilestones";
 import { RocketLaunchSequence } from "./RocketLaunchSequence";
+import { LaunchStructure } from "./LaunchStructure";
 import { Starfield } from "./Starfield";
 import { MissionAccomplished } from "./MissionAccomplished";
 import { DeepSpaceFireworks } from "./DeepSpaceFireworks";
@@ -78,9 +75,11 @@ export function GoalMatrix() {
           </p>
         </div>
 
-        {/* SECTION 2: Rocket + Progress */}
+        {/* SECTION 2: Rocket + Launch Structure + Progress */}
         <div className="w-full flex flex-col items-center gap-6" style={{ zIndex: 100 }}>
-          <div className="relative" style={{ minHeight: "140px" }}>
+          <div className="relative" style={{ minHeight: "160px", width: "120px" }}>
+            {/* Mechazilla launch structure behind rocket */}
+            <LaunchStructure stage={currentStage} />
             <RocketLaunchSequence
               progress={globalProgress}
               onLaunchStart={handleLaunchComplete}
@@ -88,25 +87,31 @@ export function GoalMatrix() {
             />
           </div>
 
-          <div className="w-full max-w-md space-y-2">
+          <div className="w-full max-w-md space-y-1">
+            {/* Mission Readout */}
+            <div className="text-center mb-2">
+              <span
+                className="font-mono text-[9px] sm:text-[11px] tracking-[0.2em] uppercase"
+                style={{
+                  color: "hsl(45 100% 50%)",
+                  textShadow: "1px 1px 0px #000000, 0 0 8px hsl(45 100% 50% / 0.3)",
+                  imageRendering: "pixelated",
+                }}
+              >
+                [ MISSION PROGRESS: {completedCount}/{TOTAL_ACTIONS} ({Math.round(globalProgress)}%) ]
+              </span>
+            </div>
+
             {/* Evolution Stage HUD */}
             <div className="text-center mb-1">
               <span
-                className="font-mono text-[10px] sm:text-xs tracking-[0.25em] uppercase text-primary"
+                className="font-mono text-[8px] sm:text-[10px] tracking-[0.3em] uppercase text-primary"
                 style={{ textShadow: "1px 1px 0px #000000", imageRendering: "pixelated" }}
               >
                 STATUS: {currentStage.name}
               </span>
             </div>
 
-            <div className="flex justify-between items-center">
-              <span className="font-pixel text-[8px] text-muted-foreground" style={{ imageRendering: "pixelated" }}>
-                Total Progress
-              </span>
-              <span className="pixel-gold-stat-outlined text-xl">
-                {completedCount}/{TOTAL_ACTIONS} ({Math.round(globalProgress)}%)
-              </span>
-            </div>
             <ProgressBar progress={globalProgress} />
             <ProgressMilestones progress={globalProgress} />
           </div>
