@@ -100,6 +100,7 @@ export function MobileCategoryTabs({
               <CoreGoalBlock 
                 subGoalProgress={subGoalProgress}
                 subGoalLabels={subGoalLabels}
+                coreProgress={globalProgress}
               />
               {/* Category summary list */}
               <div className="grid grid-cols-2 gap-2">
