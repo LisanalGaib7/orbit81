@@ -82,7 +82,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 8,
     name: "FULL SUPPORT",
-    range: [71, 80],
+    range: [70, 79],
     rocketState: "warning-lights",
     structureState: "atmospheric-smoke",
     particleTriggers: ["ground-smoke"],
