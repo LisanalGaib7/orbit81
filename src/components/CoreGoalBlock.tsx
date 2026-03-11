@@ -1,4 +1,3 @@
-import { ProgressBar } from "./ProgressBar";
 import { Target } from "lucide-react";
 
 interface CoreGoalBlockProps {
