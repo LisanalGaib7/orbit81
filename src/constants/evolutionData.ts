@@ -64,7 +64,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 6,
     name: "CATCHING ARM",
-    range: [51, 60],
+    range: [50, 59],
     rocketState: "mechazilla-secured",
     structureState: "lower-supports-clear",
     particleTriggers: ["hydraulic-steam"],
