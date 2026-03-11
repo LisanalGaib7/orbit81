@@ -28,7 +28,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 2,
     name: "CORE TOWER",
-    range: [11, 20],
+    range: [10, 19],
     rocketState: "vertical-skeleton",
     structureState: "engine-components",
     particleTriggers: ["welding-sparks"],
