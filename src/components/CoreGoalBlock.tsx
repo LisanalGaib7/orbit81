@@ -19,14 +19,10 @@ export function CoreGoalBlock({ subGoalProgress, subGoalLabels, coreProgress = 0
             className="tile-cell aspect-square flex flex-col items-center justify-center gap-1"
           >
             {subIdx === -1 ? (
-              <div className="flex flex-col items-center gap-1 w-full">
-                <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary glow-text animate-pulse" />
-                <span className="text-[9px] sm:text-[10px] font-semibold text-primary uppercase tracking-wider">
+              <div className="flex flex-col items-center justify-center gap-1.5 w-full h-full">
+                <Target className="w-6 h-6 sm:w-7 sm:h-7 text-primary glow-text animate-pulse" />
+                <span className="text-[10px] sm:text-[11px] font-semibold text-primary uppercase tracking-wider">
                   Core
-                </span>
-                <ProgressBar progress={coreProgress} className="w-full" showTicks={false} />
-                <span className="text-[9px] sm:text-[10px] font-mono text-primary font-medium">
-                  {Math.round(coreProgress)}%
                 </span>
               </div>
             ) : (
