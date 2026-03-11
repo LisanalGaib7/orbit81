@@ -121,11 +121,8 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
  * Returns the current evolution stage for a given progress percentage.
  */
 export function getEvolutionStage(progress: number): EvolutionStage {
-  const clamped = Math.min(100, Math.max(0, Math.round(progress)));
-  for (let i = EVOLUTION_STAGES.length - 1; i >= 0; i--) {
-    if (clamped >= EVOLUTION_STAGES[i].range[0]) {
-      return EVOLUTION_STAGES[i];
-    }
-  }
-  return EVOLUTION_STAGES[0];
+  const clamped = Math.min(100, Math.max(0, progress));
+  if (clamped >= 100) return EVOLUTION_STAGES[10]; // LIFTOFF
+  const index = Math.min(Math.floor(clamped / 10), 9);
+  return EVOLUTION_STAGES[index];
 }
