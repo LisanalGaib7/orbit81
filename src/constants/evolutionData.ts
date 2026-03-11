@@ -55,7 +55,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 5,
     name: "STRUCTURE UP",
-    range: [41, 50],
+    range: [40, 49],
     rocketState: "upper-platforms",
     structureState: "navigation-lights",
     particleTriggers: ["nav-blink"],
