@@ -13,7 +13,7 @@ interface ProgressBarProps {
   showTicks?: boolean;
 }
 
-export function ProgressBar({ progress, className, showLabel = false }: ProgressBarProps) {
+export function ProgressBar({ progress, className, showLabel = false, showTicks = true }: ProgressBarProps) {
   const clampedProgress = Math.min(100, Math.max(0, progress));
 
   // Glow intensity increases at each 10% mark
