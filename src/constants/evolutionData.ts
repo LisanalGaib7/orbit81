@@ -37,7 +37,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 3,
     name: "POWER LINE",
-    range: [21, 30],
+    range: [20, 29],
     rocketState: "data-cables",
     structureState: "vibration-checks",
     particleTriggers: ["electric-arcs"],
