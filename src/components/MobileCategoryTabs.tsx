@@ -31,6 +31,7 @@ export function MobileCategoryTabs({
   activeBlockIndex,
   onBlockClick,
   onActionClick,
+  globalProgress = 0,
 }: MobileCategoryTabsProps) {
   // -1 = core overview, 0-7 = sub-goal blocks
   const [selectedTab, setSelectedTab] = useState<number>(-1);
