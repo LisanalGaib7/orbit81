@@ -48,6 +48,7 @@ export function SubGoalBlock({
   isActive = false,
   onBlockClick,
   onActionClick,
+  progress = 0,
 }: SubGoalBlockProps) {
   const safeActions = actions ?? DEFAULT_ACTIONS;
   const safeActionLabels = actionLabels ?? DEFAULT_ACTION_LABELS;
