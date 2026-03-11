@@ -46,7 +46,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 4,
     name: "FUEL ARM",
-    range: [31, 40],
+    range: [30, 39],
     rocketState: "fuel-arms-attached",
     structureState: "frost-effects",
     particleTriggers: ["frost-mist"],
