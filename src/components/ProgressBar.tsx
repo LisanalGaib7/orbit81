@@ -10,6 +10,7 @@ interface ProgressBarProps {
   progress: number;
   className?: string;
   showLabel?: boolean;
+  showTicks?: boolean;
 }
 
 export function ProgressBar({ progress, className, showLabel = false }: ProgressBarProps) {
