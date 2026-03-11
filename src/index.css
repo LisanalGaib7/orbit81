@@ -171,9 +171,21 @@
     background: transparent;
   }
 
+  @media (max-width: 767px) {
+    .checkbox-goal {
+      @apply w-6 h-6;
+    }
+  }
+
   .checkbox-goal:hover {
     border-color: hsl(var(--muted-foreground));
     background: hsl(var(--tile-hover));
+  }
+
+  .checkbox-goal:active {
+    box-shadow: 0 0 16px hsl(var(--progress-glow) / 0.6);
+    border-color: hsl(var(--primary));
+    transform: scale(1.15);
   }
 
   .checkbox-goal.checked {

@@ -82,7 +82,7 @@ export function SubGoalBlock({
       >
         <PixelConfetti trigger={showConfetti} onComplete={onConfettiComplete} />
 
-        <div className="grid grid-cols-3 gap-1">
+        <div className="grid grid-cols-3 gap-2 sm:gap-1">
           {ACTION_POSITIONS.map((actionIdx, gridIdx) => (
             <div
               key={gridIdx}
@@ -105,7 +105,7 @@ export function SubGoalBlock({
                     >
                       {/* Action ID badge */}
                       <span
-                        className={`text-[7px] sm:text-[9px] font-bold tracking-tight leading-none ${
+                        className={`text-[9px] sm:text-[9px] font-bold tracking-tight leading-none ${
                           safeActions[actionIdx] ? "text-primary/50 line-through" : "text-primary"
                         }`}
                         style={{
