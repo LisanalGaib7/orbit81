@@ -73,7 +73,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 7,
     name: "COMM SYSTEM",
-    range: [61, 70],
+    range: [60, 69],
     rocketState: "radar-operational",
     structureState: "antenna-active",
     particleTriggers: ["spark-tests"],
