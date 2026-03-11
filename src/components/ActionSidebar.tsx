@@ -66,7 +66,7 @@ const ActionItem = memo(function ActionItem({
 
   return (
     <div
-      className={`flex items-center gap-3 p-3 pr-4 rounded-lg transition-all ${
+      className={`flex items-center gap-3 p-3 sm:p-3 py-4 sm:py-3 pr-4 rounded-lg transition-all ${
         isHighlighted
           ? "ring-2 ring-primary shadow-[0_0_12px_hsl(var(--primary)/0.3)] bg-primary/15 border border-primary/50"
           : isChecked
@@ -76,7 +76,7 @@ const ActionItem = memo(function ActionItem({
     >
       {/* ID badge */}
       <span
-        className="flex-shrink-0 min-w-[52px] px-1.5 py-0.5 rounded text-[11px] font-bold tracking-tight text-center"
+        className="flex-shrink-0 min-w-[52px] px-1.5 py-0.5 rounded text-[11px] sm:text-[11px] font-bold tracking-tight text-center"
         style={{
           fontFamily: "var(--font-data)",
           textShadow: "1px 1px 0px #000000",
@@ -96,7 +96,7 @@ const ActionItem = memo(function ActionItem({
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         placeholder={`Action ${idx + 1}...`}
-        className={`flex-1 min-w-0 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground/50 ${
+        className={`flex-1 min-w-0 bg-transparent border-none outline-none text-base sm:text-sm leading-relaxed placeholder:text-muted-foreground/50 ${
           isChecked ? "line-through text-muted-foreground" : "text-foreground"
         }`}
         style={{ fontFamily: "var(--font-body)" }}
@@ -104,7 +104,7 @@ const ActionItem = memo(function ActionItem({
       />
 
       {/* Checkbox */}
-      <div className="flex-shrink-0" style={{ minWidth: "24px" }}>
+      <div className="flex-shrink-0">
         <GoalCheckbox
           checked={isChecked}
           onChange={() => onToggle(blockIndex, idx)}
