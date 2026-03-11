@@ -82,24 +82,26 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
         </div>
 
         {/* Tick labels below */}
-        <div className="relative w-full h-3 mt-0.5">
-          {[0, 50, 100].map((pct) => (
-            <span
-              key={pct}
-              className="absolute font-mono text-[7px] -translate-x-1/2"
-              style={{
-                left: `${pct}%`,
-                color: clampedProgress >= pct
-                  ? "hsl(45 100% 50%)"
-                  : "hsl(220 10% 40%)",
-                textShadow: "1px 1px 0px #000000",
-                imageRendering: "pixelated",
-              }}
-            >
-              {pct}
-            </span>
-          ))}
-        </div>
+        {showTicks && (
+          <div className="relative w-full h-3 mt-0.5">
+            {[0, 50, 100].map((pct) => (
+              <span
+                key={pct}
+                className="absolute font-mono text-[7px] -translate-x-1/2"
+                style={{
+                  left: `${pct}%`,
+                  color: clampedProgress >= pct
+                    ? "hsl(45 100% 50%)"
+                    : "hsl(220 10% 40%)",
+                  textShadow: "1px 1px 0px #000000",
+                  imageRendering: "pixelated",
+                }}
+              >
+                {pct}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {showLabel && (
