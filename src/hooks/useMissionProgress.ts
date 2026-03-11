@@ -15,6 +15,7 @@ import {
   ACTIONS_PER_BLOCK,
   TOTAL_ACTIONS,
 } from "@/constants/missionData";
+import { getEvolutionStage, type EvolutionStage } from "@/constants/evolutionData";
 
 // ─── Array helpers ───────────────────────────────────────────────
 
