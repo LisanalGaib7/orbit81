@@ -15,6 +15,7 @@ import {
   ACTIONS_PER_BLOCK,
   TOTAL_ACTIONS,
 } from "@/constants/missionData";
+import { getEvolutionStage, type EvolutionStage } from "@/constants/evolutionData";
 
 // ─── Array helpers ───────────────────────────────────────────────
 
@@ -98,6 +99,11 @@ export function useMissionProgress() {
   );
 
   const completedCount = useMemo(() => actions.flat().filter(Boolean).length, [actions]);
+
+  const currentStage: EvolutionStage = useMemo(
+    () => getEvolutionStage(globalProgress),
+    [globalProgress],
+  );
 
   // --- Persist to localStorage ---
   useEffect(() => localStorage.setItem(STORAGE_KEYS.actions, JSON.stringify(actions)), [actions]);
@@ -205,6 +211,7 @@ export function useMissionProgress() {
     globalProgress,
     completedCount,
     completedSubGoals,
+    currentStage,
 
     // Mission state
     showMissionComplete,
