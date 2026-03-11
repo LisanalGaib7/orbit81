@@ -172,7 +172,7 @@ export function ActionSidebar({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-4 space-y-3 overflow-y-auto pb-16 pr-1" style={{ maxHeight: "calc(100% - 100px)" }}>
+        <div className="mt-4 space-y-4 sm:space-y-3 overflow-y-auto pb-16 pr-1" style={{ maxHeight: "calc(100% - 100px)" }}>
           {Array.from({ length: 8 }, (_, idx) => (
             <ActionItem
               key={`${blockIndex}-${idx}`}
