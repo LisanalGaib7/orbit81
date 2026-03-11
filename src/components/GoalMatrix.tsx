@@ -113,7 +113,6 @@ export function GoalMatrix() {
             </div>
 
             <ProgressBar progress={globalProgress} />
-            <ProgressMilestones progress={globalProgress} />
           </div>
         </div>
 
