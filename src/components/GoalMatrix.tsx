@@ -34,6 +34,7 @@ export function GoalMatrix() {
     globalProgress,
     completedCount,
     completedSubGoals,
+    currentStage,
     showMissionComplete,
     showMissionModal,
     showFireworks,
