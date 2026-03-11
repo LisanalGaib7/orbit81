@@ -91,7 +91,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 9,
     name: "PRE-FLIGHT",
-    range: [81, 90],
+    range: [80, 89],
     rocketState: "arms-opening",
     structureState: "ignition-prep",
     particleTriggers: ["ignition-sparks", "steam-vents"],
