@@ -16,6 +16,7 @@ interface MobileCategoryTabsProps {
   activeBlockIndex: number | null;
   onBlockClick: (idx: number) => void;
   onActionClick: (blockIndex: number, actionIndex: number) => void;
+  globalProgress?: number;
 }
 
 export function MobileCategoryTabs({
