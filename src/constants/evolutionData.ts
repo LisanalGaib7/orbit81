@@ -100,7 +100,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 10,
     name: "FINAL T-MINUS",
-    range: [91, 99],
+    range: [90, 99],
     rocketState: "tower-retracted",
     structureState: "ground-fire",
     particleTriggers: ["ground-fire", "exhaust-plume"],
