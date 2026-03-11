@@ -1,4 +1,3 @@
-import { ProgressBar } from "./ProgressBar";
 import { Target } from "lucide-react";
 
 interface CoreGoalBlockProps {
@@ -27,15 +26,9 @@ export function CoreGoalBlock({ subGoalProgress, subGoalLabels }: CoreGoalBlockP
                 </span>
               </div>
             ) : (
-              <>
-                <span className="text-[8px] sm:text-[9px] text-muted-foreground text-center leading-tight line-clamp-2 px-0.5">
-                  {subGoalLabels[subIdx]}
-                </span>
-                <ProgressBar progress={subGoalProgress[subIdx]} className="w-full" />
-                <span className="text-[9px] sm:text-[10px] font-mono text-primary font-medium">
-                  {Math.round(subGoalProgress[subIdx])}%
-                </span>
-              </>
+              <span className="text-[8px] sm:text-[9px] text-muted-foreground text-center leading-tight line-clamp-2 px-0.5">
+                {subGoalLabels[subIdx]}
+              </span>
             )}
           </div>
         ))}

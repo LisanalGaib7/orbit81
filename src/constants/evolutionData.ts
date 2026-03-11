@@ -19,7 +19,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 1,
     name: "FOUNDATION",
-    range: [0, 10],
+    range: [0, 9],
     rocketState: "ground-construction",
     structureState: "raw-materials",
     particleTriggers: ["dust"],
@@ -28,7 +28,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 2,
     name: "CORE TOWER",
-    range: [11, 20],
+    range: [10, 19],
     rocketState: "vertical-skeleton",
     structureState: "engine-components",
     particleTriggers: ["welding-sparks"],
@@ -37,7 +37,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 3,
     name: "POWER LINE",
-    range: [21, 30],
+    range: [20, 29],
     rocketState: "data-cables",
     structureState: "vibration-checks",
     particleTriggers: ["electric-arcs"],
@@ -46,7 +46,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 4,
     name: "FUEL ARM",
-    range: [31, 40],
+    range: [30, 39],
     rocketState: "fuel-arms-attached",
     structureState: "frost-effects",
     particleTriggers: ["frost-mist"],
@@ -55,7 +55,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 5,
     name: "STRUCTURE UP",
-    range: [41, 50],
+    range: [40, 49],
     rocketState: "upper-platforms",
     structureState: "navigation-lights",
     particleTriggers: ["nav-blink"],
@@ -64,7 +64,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 6,
     name: "CATCHING ARM",
-    range: [51, 60],
+    range: [50, 59],
     rocketState: "mechazilla-secured",
     structureState: "lower-supports-clear",
     particleTriggers: ["hydraulic-steam"],
@@ -73,7 +73,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 7,
     name: "COMM SYSTEM",
-    range: [61, 70],
+    range: [60, 69],
     rocketState: "radar-operational",
     structureState: "antenna-active",
     particleTriggers: ["spark-tests"],
@@ -82,7 +82,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 8,
     name: "FULL SUPPORT",
-    range: [71, 80],
+    range: [70, 79],
     rocketState: "warning-lights",
     structureState: "atmospheric-smoke",
     particleTriggers: ["ground-smoke"],
@@ -91,7 +91,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 9,
     name: "PRE-FLIGHT",
-    range: [81, 90],
+    range: [80, 89],
     rocketState: "arms-opening",
     structureState: "ignition-prep",
     particleTriggers: ["ignition-sparks", "steam-vents"],
@@ -100,7 +100,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 10,
     name: "FINAL T-MINUS",
-    range: [91, 99],
+    range: [90, 99],
     rocketState: "tower-retracted",
     structureState: "ground-fire",
     particleTriggers: ["ground-fire", "exhaust-plume"],
@@ -121,11 +121,8 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
  * Returns the current evolution stage for a given progress percentage.
  */
 export function getEvolutionStage(progress: number): EvolutionStage {
-  const clamped = Math.min(100, Math.max(0, Math.round(progress)));
-  for (let i = EVOLUTION_STAGES.length - 1; i >= 0; i--) {
-    if (clamped >= EVOLUTION_STAGES[i].range[0]) {
-      return EVOLUTION_STAGES[i];
-    }
-  }
-  return EVOLUTION_STAGES[0];
+  const clamped = Math.min(100, Math.max(0, progress));
+  if (clamped >= 100) return EVOLUTION_STAGES[10]; // LIFTOFF
+  const index = Math.min(Math.floor(clamped / 10), 9);
+  return EVOLUTION_STAGES[index];
 }
