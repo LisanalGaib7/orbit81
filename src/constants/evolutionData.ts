@@ -19,7 +19,7 @@ export const EVOLUTION_STAGES: EvolutionStage[] = [
   {
     id: 1,
     name: "FOUNDATION",
-    range: [0, 10],
+    range: [0, 9],
     rocketState: "ground-construction",
     structureState: "raw-materials",
     particleTriggers: ["dust"],
