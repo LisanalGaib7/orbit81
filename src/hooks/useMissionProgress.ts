@@ -100,6 +100,11 @@ export function useMissionProgress() {
 
   const completedCount = useMemo(() => actions.flat().filter(Boolean).length, [actions]);
 
+  const currentStage: EvolutionStage = useMemo(
+    () => getEvolutionStage(globalProgress),
+    [globalProgress],
+  );
+
   // --- Persist to localStorage ---
   useEffect(() => localStorage.setItem(STORAGE_KEYS.actions, JSON.stringify(actions)), [actions]);
   useEffect(() => localStorage.setItem(STORAGE_KEYS.labels, JSON.stringify(subGoalLabels)), [subGoalLabels]);
