@@ -37,9 +37,9 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
               width: `${clampedProgress}%`,
               imageRendering: "pixelated",
               boxShadow: `
-                inset 0 1px 0 hsl(45 100% 70% / 0.6),
-                inset 0 -1px 2px hsl(25 100% 30% / 0.5),
-                0 0 ${12 + glowIntensity * 20}px hsl(38 100% 50% / ${glowIntensity})
+                inset 0 1px 0 hsl(45 100% 70% / 0.4),
+                inset 0 -1px 1px hsl(25 100% 30% / 0.4),
+                0 0 ${6 + glowIntensity * 10}px hsl(38 100% 50% / ${glowIntensity})
               `,
             }}
           />
