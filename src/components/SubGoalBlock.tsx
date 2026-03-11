@@ -30,6 +30,7 @@ interface SubGoalBlockProps {
   isActive?: boolean;
   onBlockClick?: () => void;
   onActionClick?: (blockIndex: number, actionIndex: number) => void;
+  progress?: number;
 }
 
 const DEFAULT_ACTIONS = Array(8).fill(false);
