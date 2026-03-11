@@ -152,7 +152,6 @@ export function GoalMatrix() {
                     isActive={activeBlockIndex === subIdx}
                     onBlockClick={() => { setActiveBlockIndex(subIdx); setFocusActionIndex(null); }}
                     onActionClick={handleActionSlotClick}
-                    progress={subGoalProgress[subIdx]}
                   />
                 )}
               </div>
