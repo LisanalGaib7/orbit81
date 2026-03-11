@@ -1,9 +1,5 @@
 /**
  * GoalMatrix — Root orchestrator for the Orbit 81 mission dashboard.
- *
- * WHY: This component wires together the visual shell (starfield, rocket,
- * grid, sidebar, fireworks) with the state machine provided by
- * useMissionProgress. It owns no business logic itself.
  */
 
 import { SubGoalBlock } from "./SubGoalBlock";
@@ -11,6 +7,7 @@ import { CoreGoalBlock } from "./CoreGoalBlock";
 import { ProgressBar } from "./ProgressBar";
 import { ProgressMilestones } from "./ProgressMilestones";
 import { RocketLaunchSequence } from "./RocketLaunchSequence";
+import { LaunchStructure } from "./LaunchStructure";
 import { Starfield } from "./Starfield";
 import { MissionAccomplished } from "./MissionAccomplished";
 import { DeepSpaceFireworks } from "./DeepSpaceFireworks";
