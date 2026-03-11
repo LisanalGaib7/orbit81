@@ -27,7 +27,7 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
       {/* Engineering Gauge Bar */}
       <div className="relative">
         <div
-          className="progress-bar-3d h-5 relative"
+          className="progress-bar-3d h-2.5 relative rounded-sm"
           style={{ imageRendering: "pixelated" }}
         >
           {/* Fill with dynamic glow */}
@@ -37,9 +37,9 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
               width: `${clampedProgress}%`,
               imageRendering: "pixelated",
               boxShadow: `
-                inset 0 1px 0 hsl(45 100% 70% / 0.6),
-                inset 0 -1px 2px hsl(25 100% 30% / 0.5),
-                0 0 ${12 + glowIntensity * 20}px hsl(38 100% 50% / ${glowIntensity})
+                inset 0 1px 0 hsl(45 100% 70% / 0.4),
+                inset 0 -1px 1px hsl(25 100% 30% / 0.4),
+                0 0 ${6 + glowIntensity * 10}px hsl(38 100% 50% / ${glowIntensity})
               `,
             }}
           />
@@ -61,7 +61,7 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
                 }}
               >
                 <div
-                  className="absolute -top-px w-px h-1.5"
+                  className="absolute -top-px w-px h-1"
                   style={{
                     background: isReached
                       ? "hsl(45 100% 55%)"
@@ -69,7 +69,7 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
                   }}
                 />
                 <div
-                  className="absolute -bottom-px w-px h-1.5"
+                  className="absolute -bottom-px w-px h-1"
                   style={{
                     background: isReached
                       ? "hsl(45 100% 55%)"
