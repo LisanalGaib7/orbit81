@@ -211,6 +211,7 @@ export function useMissionProgress() {
     globalProgress,
     completedCount,
     completedSubGoals,
+    currentStage,
 
     // Mission state
     showMissionComplete,
