@@ -11,9 +11,10 @@ interface ProgressBarProps {
   className?: string;
   showLabel?: boolean;
   showTicks?: boolean;
+  barHeight?: string;
 }
 
-export function ProgressBar({ progress, className, showLabel = false, showTicks = true }: ProgressBarProps) {
+export function ProgressBar({ progress, className, showLabel = false, showTicks = true, barHeight = "h-5" }: ProgressBarProps) {
   const clampedProgress = Math.min(100, Math.max(0, progress));
 
   // Glow intensity increases at each 10% mark
@@ -27,7 +28,7 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
       {/* Engineering Gauge Bar */}
       <div className="relative">
         <div
-          className="progress-bar-3d h-5 relative"
+          className={`progress-bar-3d ${barHeight} relative rounded-full overflow-hidden`}
           style={{ imageRendering: "pixelated" }}
         >
           {/* Fill with dynamic glow */}
