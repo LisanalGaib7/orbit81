@@ -11,12 +11,12 @@ export function CoreGoalBlock({ subGoalProgress, subGoalLabels, coreProgress = 0
   const positions = [0, 1, 2, 3, -1, 4, 5, 6, 7];
 
   return (
-    <div className="goal-block goal-block-core p-1 aspect-square flex flex-col justify-center">
-      <div className="grid grid-cols-3 grid-rows-3 gap-0.5 w-full h-full">
+    <div className="goal-block goal-block-core p-2 aspect-square flex flex-col justify-center">
+      <div className="grid grid-cols-3 gap-2 sm:gap-1 w-full h-full">
         {positions.map((subIdx, gridIdx) => (
           <div
             key={gridIdx}
-            className="tile-cell aspect-square flex flex-col items-center justify-evenly gap-0 overflow-hidden px-0.5 py-1"
+            className="tile-cell aspect-square flex flex-col items-center justify-evenly overflow-hidden px-0.5"
           >
             {subIdx === -1 ? (
               <div className="flex flex-col items-center justify-center gap-1.5 w-full h-full">
