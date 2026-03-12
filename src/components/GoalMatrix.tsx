@@ -133,7 +133,7 @@ export function GoalMatrix() {
             globalProgress={globalProgress}
           />
         ) : (
-          <div className="goal-grid w-full aspect-square max-w-2xl" style={{ zIndex: 50 }}>
+          <div className="goal-grid w-full aspect-square max-w-lg sm:max-w-xl md:max-w-2xl mx-auto" style={{ zIndex: 50 }}>
             {GRID_POSITIONS.map((subIdx, gridIdx) => (
               <div key={gridIdx} className="aspect-square">
                 {subIdx === -1 ? (
