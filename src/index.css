@@ -135,8 +135,9 @@
 
 @layer components {
   .goal-grid {
-    @apply grid grid-cols-3 gap-1 p-1 rounded-xl;
+    @apply grid grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl;
     background: hsl(var(--grid-line));
+    box-sizing: border-box;
   }
 
   .goal-block {
