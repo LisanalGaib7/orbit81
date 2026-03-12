@@ -16,7 +16,7 @@ export function CoreGoalBlock({ subGoalProgress, subGoalLabels, coreProgress = 0
         {positions.map((subIdx, gridIdx) => (
           <div
             key={gridIdx}
-            className="tile-cell aspect-square flex flex-col items-center justify-center gap-0.5 overflow-hidden"
+            className="tile-cell aspect-square flex flex-col items-center justify-evenly gap-0 overflow-hidden px-0.5 py-1"
           >
             {subIdx === -1 ? (
               <div className="flex flex-col items-center justify-center gap-1.5 w-full h-full">
