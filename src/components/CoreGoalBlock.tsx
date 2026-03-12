@@ -11,8 +11,8 @@ export function CoreGoalBlock({ subGoalProgress, subGoalLabels, coreProgress = 0
   const positions = [0, 1, 2, 3, -1, 4, 5, 6, 7];
 
   return (
-    <div className="goal-block goal-block-core p-2">
-      <div className="grid grid-cols-3 gap-1">
+    <div className="goal-block goal-block-core p-2 h-full flex flex-col justify-center">
+      <div className="grid grid-cols-3 grid-rows-3 gap-1">
         {positions.map((subIdx, gridIdx) => (
           <div
             key={gridIdx}
