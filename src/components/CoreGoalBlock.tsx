@@ -27,10 +27,10 @@ export function CoreGoalBlock({ subGoalProgress, subGoalLabels, coreProgress = 0
               </div>
             ) : (
               <>
-                <span className="text-[8px] sm:text-[9px] text-muted-foreground text-center leading-tight line-clamp-2 px-0.5">
+                <span className="text-[9px] sm:text-[10px] font-semibold text-muted-foreground text-center leading-tight line-clamp-2 px-0.5">
                   {subGoalLabels[subIdx]}
                 </span>
-                <ProgressBar progress={subGoalProgress[subIdx]} className="w-3/4" showTicks={false} barHeight="h-2.5" />
+                <ProgressBar progress={subGoalProgress[subIdx]} className="w-3/4" showTicks={false} barHeight="h-3" />
                 <span className="text-[9px] sm:text-[10px] font-mono text-primary font-medium">
                   {Math.round(subGoalProgress[subIdx])}%
                 </span>
