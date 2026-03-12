@@ -11,10 +11,9 @@ interface ProgressBarProps {
   className?: string;
   showLabel?: boolean;
   showTicks?: boolean;
-  slim?: boolean;
 }
 
-export function ProgressBar({ progress, className, showLabel = false, showTicks = true, slim = false }: ProgressBarProps) {
+export function ProgressBar({ progress, className, showLabel = false, showTicks = true }: ProgressBarProps) {
   const clampedProgress = Math.min(100, Math.max(0, progress));
 
   // Glow intensity increases at each 10% mark
@@ -28,7 +27,7 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
       {/* Engineering Gauge Bar */}
       <div className="relative">
         <div
-          className={cn("progress-bar-3d relative", slim ? "h-1" : "h-5")}
+          className="progress-bar-3d h-5 relative"
           style={{ imageRendering: "pixelated" }}
         >
           {/* Fill with dynamic glow */}
@@ -37,13 +36,11 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
             style={{
               width: `${clampedProgress}%`,
               imageRendering: "pixelated",
-              boxShadow: slim
-                ? `0 0 4px hsl(38 100% 50% / ${glowIntensity * 0.5})`
-                : `
-                  inset 0 1px 0 hsl(45 100% 70% / 0.6),
-                  inset 0 -1px 2px hsl(25 100% 30% / 0.5),
-                  0 0 ${12 + glowIntensity * 20}px hsl(38 100% 50% / ${glowIntensity})
-                `,
+              boxShadow: `
+                inset 0 1px 0 hsl(45 100% 70% / 0.6),
+                inset 0 -1px 2px hsl(25 100% 30% / 0.5),
+                0 0 ${12 + glowIntensity * 20}px hsl(38 100% 50% / ${glowIntensity})
+              `,
             }}
           />
 

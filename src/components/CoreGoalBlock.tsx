@@ -26,15 +26,15 @@ export function CoreGoalBlock({ subGoalProgress, subGoalLabels, coreProgress = 0
                 </span>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-between w-full h-full py-1">
-                <span className="text-[8px] sm:text-[9px] text-muted-foreground text-center leading-tight line-clamp-2 px-0.5 flex-1 flex items-center">
+              <>
+                <span className="text-[8px] sm:text-[9px] text-muted-foreground text-center leading-tight line-clamp-2 px-0.5">
                   {subGoalLabels[subIdx]}
                 </span>
-                <span className="text-[9px] sm:text-[10px] font-mono text-primary font-medium mb-1">
+                <ProgressBar progress={subGoalProgress[subIdx]} className="w-full" showTicks={false} />
+                <span className="text-[9px] sm:text-[10px] font-mono text-primary font-medium">
                   {Math.round(subGoalProgress[subIdx])}%
                 </span>
-                <ProgressBar progress={subGoalProgress[subIdx]} className="w-[90%] mb-0.5" showTicks={false} slim />
-              </div>
+              </>
             )}
           </div>
         ))}
