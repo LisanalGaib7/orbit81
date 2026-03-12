@@ -141,7 +141,7 @@
   }
 
   .goal-block {
-    @apply rounded-lg transition-all duration-300;
+    @apply rounded-lg transition-all duration-300 border border-border box-border;
   }
 
   .goal-block-core {
