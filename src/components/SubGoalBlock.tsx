@@ -100,7 +100,7 @@ export function SubGoalBlock({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div
-                      className="relative w-full h-full flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-primary/10 rounded transition-colors"
+                      className="relative w-full h-full flex flex-col items-center justify-center gap-0.5 sm:gap-1.5 cursor-pointer hover:bg-primary/10 rounded transition-colors"
                       onClick={(e) => handleActionSlotClick(actionIdx, e)}
                     >
                       {/* Action ID badge */}
