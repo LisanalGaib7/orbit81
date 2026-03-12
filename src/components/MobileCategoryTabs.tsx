@@ -54,8 +54,8 @@ export function MobileCategoryTabs({
     <div className="w-full" style={{ zIndex: 50 }}>
       {/* Tab bar - horizontally scrollable */}
       <div 
-        className="flex gap-1.5 overflow-x-auto pb-2 mb-3 no-scrollbar"
-        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}
+        className="flex gap-1 overflow-x-auto pb-2 mb-3 no-scrollbar"
+        style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {tabs.map((tab) => {
           const isActive = selectedTab === tab.idx;
@@ -65,7 +65,7 @@ export function MobileCategoryTabs({
             <button
               key={tab.idx}
               onClick={() => setSelectedTab(tab.idx)}
-              className={`flex-shrink-0 px-3 py-2 rounded text-[10px] font-bold tracking-wider transition-all border whitespace-nowrap ${
+              className={`flex-shrink-0 px-2.5 py-1.5 rounded text-[10px] font-bold tracking-wider transition-all border ${
                 isActive 
                   ? "border-primary/60 bg-primary/15 shadow-[0_0_8px_rgba(234,179,8,0.2)]" 
                   : "border-border bg-secondary/50 hover:border-muted-foreground/30"
@@ -77,7 +77,6 @@ export function MobileCategoryTabs({
               }}
             >
               <span>{tab.prefix}</span>
-              <span className="ml-1">{tab.label}</span>
               {progress !== null && (
                 <span className="ml-1 text-[8px] opacity-60">{progress}%</span>
               )}
