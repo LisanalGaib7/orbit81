@@ -289,9 +289,14 @@ function CountdownDisplay({ phase }: { phase: LaunchPhase }) {
 // Checkbox ignition burst
 function CheckIgnitionBurst({ active }: { active: boolean }) {
   if (!active) return null;
+  const burstOffsetX = -3;
+
   return (
     <>
-      <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none" style={{ bottom: '-8px', zIndex: 5, imageRendering: 'pixelated' }}>
+      <div
+        className="absolute left-1/2 pointer-events-none"
+        style={{ bottom: '-8px', zIndex: 5, imageRendering: 'pixelated', transform: `translateX(calc(-50% + ${burstOffsetX}px))` }}
+      >
         {Array.from({ length: 10 }, (_, i) => (
           <motion.div
             key={`spark-${i}`}
@@ -307,8 +312,8 @@ function CheckIgnitionBurst({ active }: { active: boolean }) {
         ))}
       </div>
       <motion.div
-        className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{ bottom: '-10px', zIndex: 4, imageRendering: 'pixelated' }}
+        className="absolute left-1/2 pointer-events-none"
+        style={{ bottom: '-10px', zIndex: 4, imageRendering: 'pixelated', transform: `translateX(calc(-50% + ${burstOffsetX}px))` }}
         initial={{ opacity: 0, scale: 0.3 }}
         animate={{ opacity: [0, 1, 0.8, 0], scale: [0.3, 1.2, 1, 0.5] }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -319,7 +324,7 @@ function CheckIgnitionBurst({ active }: { active: boolean }) {
           boxShadow: '0 4px 12px hsl(30, 100%, 50% / 0.6)',
         }} />
       </motion.div>
-      <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none" style={{ bottom: '-6px', zIndex: 3, imageRendering: 'pixelated' }}>
+      <div className="absolute left-1/2 pointer-events-none" style={{ bottom: '-6px', zIndex: 3, imageRendering: 'pixelated', transform: `translateX(calc(-50% + ${burstOffsetX}px))` }}>
         {Array.from({ length: 8 }, (_, i) => (
           <motion.div
             key={`smoke-${i}`}
