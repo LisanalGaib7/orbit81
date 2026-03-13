@@ -542,10 +542,15 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                 {!isLaunching && <PreLaunchEffects stage={preLaunchStage} />}
                 <HighTensionFlicker active={preLaunchStage === "high-tension" && !isLaunching} />
                 
-                <AnimatePresence>
-                  {burstActive && <CheckIgnitionBurst active={burstActive} />}
-                </AnimatePresence>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        <AnimatePresence>
+          {burstActive && !isLaunching && <CheckIgnitionBurst active={burstActive} />}
+        </AnimatePresence>
+      </div>
             </motion.div>
           )}
         </AnimatePresence>
