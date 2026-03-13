@@ -550,6 +550,7 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
         <AnimatePresence>
           {burstActive && !isLaunching && <CheckIgnitionBurst active={burstActive} />}
         </AnimatePresence>
+      </div>
     </>
   );
 }
