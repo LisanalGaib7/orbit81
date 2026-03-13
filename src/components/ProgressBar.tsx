@@ -29,7 +29,6 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
       <div className="relative">
         <div
           className={`progress-bar-3d ${barHeight} relative rounded-full overflow-hidden`}
-          style={{ imageRendering: "pixelated" }}
         >
           {/* Fill with refined glow */}
           <div
