@@ -29,55 +29,37 @@ export function ProgressBar({ progress, className, showLabel = false, showTicks 
       <div className="relative">
         <div
           className={`progress-bar-3d ${barHeight} relative rounded-full overflow-hidden`}
-          style={{ imageRendering: "pixelated" }}
         >
-          {/* Fill with dynamic glow */}
+          {/* Fill with refined glow */}
           <div
             className="progress-fill-3d h-full"
             style={{
               width: `${clampedProgress}%`,
-              imageRendering: "pixelated",
               boxShadow: `
-                inset 0 1px 0 hsl(45 100% 70% / 0.6),
-                inset 0 -1px 2px hsl(25 100% 30% / 0.5),
-                0 0 ${12 + glowIntensity * 20}px hsl(38 100% 50% / ${glowIntensity})
+                inset 0 1px 0 hsl(48 100% 75% / 0.5),
+                inset 0 -1px 1px hsl(25 100% 25% / 0.4),
+                0 0 ${8 + glowIntensity * 14}px hsl(38 100% 55% / ${glowIntensity * 0.7})
               `,
             }}
           />
 
-          {/* 10% Tick Marks */}
+          {/* Subtle tick marks */}
           {showTicks && Array.from({ length: 9 }, (_, i) => {
             const pct = (i + 1) * 10;
             const isReached = clampedProgress >= pct;
             return (
               <div
                 key={pct}
-                className="absolute top-0 bottom-0 w-px"
+                className="absolute top-[2px] bottom-[2px]"
                 style={{
                   left: `${pct}%`,
+                  width: "1px",
                   background: isReached
-                    ? "hsl(45 100% 50% / 0.5)"
-                    : "hsl(220 15% 30% / 0.6)",
+                    ? "hsl(45 100% 60% / 0.3)"
+                    : "hsl(220 15% 28% / 0.4)",
                   zIndex: 2,
                 }}
-              >
-                <div
-                  className="absolute -top-px w-px h-1.5"
-                  style={{
-                    background: isReached
-                      ? "hsl(45 100% 55%)"
-                      : "hsl(220 10% 35%)",
-                  }}
-                />
-                <div
-                  className="absolute -bottom-px w-px h-1.5"
-                  style={{
-                    background: isReached
-                      ? "hsl(45 100% 55%)"
-                      : "hsl(220 10% 35%)",
-                  }}
-                />
-              </div>
+              />
             );
           })}
         </div>
