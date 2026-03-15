@@ -228,8 +228,13 @@ function HighTensionFlicker({ active }: { active: boolean }) {
   if (!active) return null;
   return (
     <motion.div
-      className="absolute left-1/2 -translate-x-1/2"
-      style={{ bottom: '-6px', zIndex: 1, imageRendering: "pixelated" }}
+      className="absolute left-1/2"
+      style={{
+        bottom: '-6px',
+        zIndex: 1,
+        imageRendering: "pixelated",
+        transform: 'translateX(calc(-50% - 4px))',
+      }}
       animate={{
         opacity: [0.4, 1, 0.6, 1, 0.3, 0.9],
         scale: [0.8, 1.2, 0.9, 1.1, 0.85, 1],
