@@ -262,6 +262,49 @@ function HighTensionFlicker({ active }: { active: boolean }) {
   );
 }
 
+// Pixel-art Countdown display (3, 2, 1)
+function CountdownDisplay({ phase }: { phase: LaunchPhase }) {
+  const [count, setCount] = useState(3);
+
+  useEffect(() => {
+    if (phase === "countdown") {
+      setCount(3);
+      const interval = setInterval(() => {
+        setCount((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 800);
+      return () => clearInterval(interval);
+    }
+  }, [phase]);
+
+  if (phase !== "countdown" || count === 0) return null;
+
+  return (
+    <motion.div
+      className="absolute font-pixel text-2xl font-bold text-primary"
+      style={{
+        left: "-50px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        imageRendering: "pixelated",
+        textShadow: "0 0 12px hsl(var(--primary) / 0.7), 0 0 24px hsl(var(--primary) / 0.4)",
+        zIndex: 10,
+      }}
+      initial={{ scale: 0.5, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      key={count}
+      transition={{ type: "spring", stiffness: 400, damping: 15 }}
+    >
+      {count}
+    </motion.div>
+  );
+}
+
 // Checkbox ignition burst
 function CheckIgnitionBurst({ active }: { active: boolean }) {
   if (!active) return null;
