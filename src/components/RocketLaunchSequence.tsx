@@ -223,17 +223,21 @@ function FuelingGlow({ active }: { active: boolean }) {
   );
 }
 
+const ENGINE_EFFECT_OFFSET_X = -6;
+const ENGINE_EFFECT_TRANSFORM = `translateX(calc(-50% + ${ENGINE_EFFECT_OFFSET_X}px))`;
+
 // High tension flickering engine light
 function HighTensionFlicker({ active }: { active: boolean }) {
   if (!active) return null;
+
   return (
     <motion.div
-      className="absolute left-1/2"
+      className="absolute left-1/2 pointer-events-none"
       style={{
         bottom: '-6px',
         zIndex: 1,
         imageRendering: "pixelated",
-        transform: 'translateX(calc(-50% - 4px))',
+        transform: ENGINE_EFFECT_TRANSFORM,
       }}
       animate={{
         opacity: [0.4, 1, 0.6, 1, 0.3, 0.9],
@@ -294,13 +298,12 @@ function CountdownDisplay({ phase }: { phase: LaunchPhase }) {
 // Checkbox ignition burst
 function CheckIgnitionBurst({ active }: { active: boolean }) {
   if (!active) return null;
-  const burstOffsetX = -3;
 
   return (
     <>
       <div
         className="absolute left-1/2 pointer-events-none"
-        style={{ bottom: '-8px', zIndex: 5, imageRendering: 'pixelated', transform: `translateX(calc(-50% + ${burstOffsetX}px))` }}
+        style={{ bottom: '-8px', zIndex: 5, imageRendering: 'pixelated', transform: ENGINE_EFFECT_TRANSFORM }}
       >
         {Array.from({ length: 10 }, (_, i) => (
           <motion.div
@@ -318,7 +321,7 @@ function CheckIgnitionBurst({ active }: { active: boolean }) {
       </div>
       <motion.div
         className="absolute left-1/2 pointer-events-none"
-        style={{ bottom: '-10px', zIndex: 4, imageRendering: 'pixelated', transform: `translateX(calc(-50% + ${burstOffsetX}px))` }}
+        style={{ bottom: '-10px', zIndex: 4, imageRendering: 'pixelated', transform: ENGINE_EFFECT_TRANSFORM }}
         initial={{ opacity: 0, scale: 0.3 }}
         animate={{ opacity: [0, 1, 0.8, 0], scale: [0.3, 1.2, 1, 0.5] }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -329,7 +332,7 @@ function CheckIgnitionBurst({ active }: { active: boolean }) {
           boxShadow: '0 4px 12px hsl(30, 100%, 50% / 0.6)',
         }} />
       </motion.div>
-      <div className="absolute left-1/2 pointer-events-none" style={{ bottom: '-6px', zIndex: 3, imageRendering: 'pixelated', transform: `translateX(calc(-50% + ${burstOffsetX}px))` }}>
+      <div className="absolute left-1/2 pointer-events-none" style={{ bottom: '-6px', zIndex: 3, imageRendering: 'pixelated', transform: ENGINE_EFFECT_TRANSFORM }}>
         {Array.from({ length: 8 }, (_, i) => (
           <motion.div
             key={`smoke-${i}`}
