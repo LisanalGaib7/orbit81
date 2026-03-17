@@ -261,7 +261,7 @@ function HighTensionFlicker({ active }: { active: boolean }) {
     </div>
   );
 }
-...
+
 // Checkbox ignition burst
 function CheckIgnitionBurst({ active }: { active: boolean }) {
   if (!active) return null;
