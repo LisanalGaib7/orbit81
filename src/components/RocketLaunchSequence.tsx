@@ -12,6 +12,11 @@ import { useMemo, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, animate } from "framer-motion";
 import { PixelRocketBody } from "./PixelRocketBody";
 import { GroundSmoke, AscendingSmoke } from "./VolumetricSmoke";
+import {
+  ROCKET_BODY_HEIGHT,
+  ROCKET_BODY_WIDTH,
+  ROCKET_NOZZLE_ANCHOR_STYLE,
+} from "./rocketEngineGeometry";
 import { getPreLaunchStage, type PreLaunchStage, type LaunchPhase } from "@/constants/missionData";
 
 interface RocketLaunchSequenceProps {
