@@ -541,6 +541,10 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                       showExhaust={preLaunchStage === "engine-test" || preLaunchStage === "power-up"}
                       exhaustIntensity={preLaunchStage === "power-up" ? 0.3 : preLaunchStage === "engine-test" ? 0.15 : 0}
                     />
+                    <HighTensionFlicker active={preLaunchStage === "high-tension"} />
+                    <AnimatePresence>
+                      {burstActive && <CheckIgnitionBurst active={burstActive} />}
+                    </AnimatePresence>
                   </motion.div>
                 ) : (
                   <div className="relative" style={{ zIndex: 2 }}>
@@ -549,19 +553,18 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                       showExhaust={preLaunchStage === "engine-test" || preLaunchStage === "power-up"}
                       exhaustIntensity={preLaunchStage === "power-up" ? 0.3 : preLaunchStage === "engine-test" ? 0.15 : 0}
                     />
+                    <HighTensionFlicker active={preLaunchStage === "high-tension"} />
+                    <AnimatePresence>
+                      {burstActive && <CheckIgnitionBurst active={burstActive} />}
+                    </AnimatePresence>
                   </div>
                 )}
                 
                 {!isLaunching && <PreLaunchEffects stage={preLaunchStage} />}
-                <HighTensionFlicker active={preLaunchStage === "high-tension" && !isLaunching} />
                 
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
-        
-        <AnimatePresence>
-          {burstActive && !isLaunching && <CheckIgnitionBurst active={burstActive} />}
         </AnimatePresence>
       </div>
     </>
