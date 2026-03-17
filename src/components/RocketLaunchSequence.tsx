@@ -12,6 +12,11 @@ import { useMemo, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, animate } from "framer-motion";
 import { PixelRocketBody } from "./PixelRocketBody";
 import { GroundSmoke, AscendingSmoke } from "./VolumetricSmoke";
+import {
+  ROCKET_BODY_HEIGHT,
+  ROCKET_BODY_WIDTH,
+  ROCKET_NOZZLE_ANCHOR_STYLE,
+} from "./rocketEngineGeometry";
 import { getPreLaunchStage, type PreLaunchStage, type LaunchPhase } from "@/constants/missionData";
 
 interface RocketLaunchSequenceProps {
@@ -223,64 +228,69 @@ function FuelingGlow({ active }: { active: boolean }) {
   );
 }
 
-const ENGINE_EFFECT_OFFSET_X = -6;
-const ENGINE_EFFECT_TRANSFORM = `translateX(calc(-50% + ${ENGINE_EFFECT_OFFSET_X}px))`;
-
 // High tension flickering engine light
 function HighTensionFlicker({ active }: { active: boolean }) {
   if (!active) return null;
 
   return (
-    <motion.div
-      className="absolute left-1/2 pointer-events-none"
+    <div
+      className="absolute pointer-events-none"
       style={{
-        bottom: '-6px',
+        ...ROCKET_NOZZLE_ANCHOR_STYLE,
         zIndex: 1,
         imageRendering: "pixelated",
-        transform: ENGINE_EFFECT_TRANSFORM,
       }}
-      animate={{
-        opacity: [0.4, 1, 0.6, 1, 0.3, 0.9],
-        scale: [0.8, 1.2, 0.9, 1.1, 0.85, 1],
-      }}
-      transition={{ duration: 0.15, repeat: Infinity }}
     >
-      <div 
-        className="w-4 h-5"
+      <motion.div
         style={{
-          borderRadius: "50%",
+          width: "4px",
+          height: "6px",
+          marginLeft: "-2px",
+          borderRadius: "999px 999px 55% 55%",
+          transformOrigin: "top center",
           background: "linear-gradient(to bottom, hsl(45, 100%, 60%), hsl(25, 100%, 50%), hsl(0, 80%, 50%))",
           boxShadow: "0 4px 16px hsl(30, 100%, 50% / 0.8)",
         }}
+        animate={{
+          opacity: [0.45, 1, 0.65, 1, 0.35, 0.9],
+          scaleX: [0.9, 1.1, 0.95, 1.05, 0.9, 1],
+          scaleY: [0.85, 1.25, 0.95, 1.15, 0.9, 1.05],
+        }}
+        transition={{ duration: 0.15, repeat: Infinity }}
       />
-    </motion.div>
+    </div>
   );
 }
 
 // Pixel-art Countdown display (3, 2, 1)
 function CountdownDisplay({ phase }: { phase: LaunchPhase }) {
   const [count, setCount] = useState(3);
-  
+
   useEffect(() => {
     if (phase === "countdown") {
       setCount(3);
       const interval = setInterval(() => {
         setCount((prev) => {
-          if (prev <= 1) { clearInterval(interval); return 0; }
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
           return prev - 1;
         });
       }, 800);
       return () => clearInterval(interval);
     }
   }, [phase]);
-  
+
   if (phase !== "countdown" || count === 0) return null;
-  
+
   return (
-    <motion.div 
+    <motion.div
       className="absolute font-pixel text-2xl font-bold text-primary"
-      style={{ 
-        left: '-50px', top: '50%', transform: 'translateY(-50%)',
+      style={{
+        left: "-50px",
+        top: "50%",
+        transform: "translateY(-50%)",
         imageRendering: "pixelated",
         textShadow: "0 0 12px hsl(var(--primary) / 0.7), 0 0 24px hsl(var(--primary) / 0.4)",
         zIndex: 10,
@@ -300,54 +310,91 @@ function CheckIgnitionBurst({ active }: { active: boolean }) {
   if (!active) return null;
 
   return (
-    <>
-      <div
-        className="absolute left-1/2 pointer-events-none"
-        style={{ bottom: '-8px', zIndex: 5, imageRendering: 'pixelated', transform: ENGINE_EFFECT_TRANSFORM }}
-      >
-        {Array.from({ length: 10 }, (_, i) => (
-          <motion.div
-            key={`spark-${i}`}
-            className="absolute"
-            style={{
-              width: '3px', height: '3px', borderRadius: '50%',
-              background: i % 2 === 0 ? 'hsl(30, 100%, 55%)' : 'hsl(45, 100%, 65%)',
-            }}
-            initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-            animate={{ x: (Math.random() - 0.5) * 40, y: [0, 8 + Math.random() * 16], opacity: [1, 0.8, 0], scale: [1, 0.6, 0.2] }}
-            transition={{ duration: 0.4 + Math.random() * 0.3, delay: Math.random() * 0.15, ease: 'easeOut' }}
-          />
-        ))}
-      </div>
+    <div
+      className="absolute pointer-events-none"
+      style={{
+        ...ROCKET_NOZZLE_ANCHOR_STYLE,
+        zIndex: 5,
+        imageRendering: "pixelated",
+      }}
+    >
+      {Array.from({ length: 10 }, (_, i) => (
+        <motion.div
+          key={`spark-${i}`}
+          className="absolute"
+          style={{
+            left: 0,
+            top: 0,
+            width: "3px",
+            height: "3px",
+            marginLeft: "-1.5px",
+            borderRadius: "50%",
+            background: i % 2 === 0 ? "hsl(30, 100%, 55%)" : "hsl(45, 100%, 65%)",
+            zIndex: 3,
+          }}
+          initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+          animate={{
+            x: (Math.random() - 0.5) * 40,
+            y: [0, 8 + Math.random() * 16],
+            opacity: [1, 0.8, 0],
+            scale: [1, 0.6, 0.2],
+          }}
+          transition={{ duration: 0.4 + Math.random() * 0.3, delay: Math.random() * 0.15, ease: "easeOut" }}
+        />
+      ))}
+
       <motion.div
-        className="absolute left-1/2 pointer-events-none"
-        style={{ bottom: '-10px', zIndex: 4, imageRendering: 'pixelated', transform: ENGINE_EFFECT_TRANSFORM }}
-        initial={{ opacity: 0, scale: 0.3 }}
-        animate={{ opacity: [0, 1, 0.8, 0], scale: [0.3, 1.2, 1, 0.5] }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-      >
-        <div style={{
-          width: '14px', height: '20px', borderRadius: '50% 50% 40% 40%',
-          background: 'linear-gradient(to bottom, hsl(45, 100%, 70%), hsl(30, 100%, 55%), hsl(15, 90%, 45%))',
-          boxShadow: '0 4px 12px hsl(30, 100%, 50% / 0.6)',
-        }} />
-      </motion.div>
-      <div className="absolute left-1/2 pointer-events-none" style={{ bottom: '-6px', zIndex: 3, imageRendering: 'pixelated', transform: ENGINE_EFFECT_TRANSFORM }}>
-        {Array.from({ length: 8 }, (_, i) => (
+        className="absolute"
+        style={{
+          left: 0,
+          top: 0,
+          width: "14px",
+          height: "18px",
+          marginLeft: "-7px",
+          borderRadius: "50% 50% 40% 40%",
+          transformOrigin: "top center",
+          background: "linear-gradient(to bottom, hsl(45, 100%, 70%), hsl(30, 100%, 55%), hsl(15, 90%, 45%))",
+          boxShadow: "0 4px 12px hsl(30, 100%, 50% / 0.6)",
+          zIndex: 2,
+        }}
+        initial={{ opacity: 0, scaleX: 0.45, scaleY: 0.35 }}
+        animate={{
+          opacity: [0, 1, 0.8, 0],
+          scaleX: [0.45, 1.15, 1, 0.55],
+          scaleY: [0.35, 1.2, 1.05, 0.6],
+        }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      />
+
+      {Array.from({ length: 8 }, (_, i) => {
+        const size = 6 + Math.random() * 6;
+
+        return (
           <motion.div
             key={`smoke-${i}`}
             className="absolute"
             style={{
-              width: `${6 + Math.random() * 6}px`, height: `${6 + Math.random() * 6}px`,
-              borderRadius: '50%', backgroundColor: `hsl(var(--muted-foreground) / 0.35)`,
+              left: 0,
+              top: "2px",
+              width: `${size}px`,
+              height: `${size}px`,
+              marginLeft: `${-size / 2}px`,
+              borderRadius: "50%",
+              backgroundColor: "hsl(var(--muted-foreground) / 0.35)",
+              zIndex: 1,
             }}
             initial={{ x: 0, y: 0, opacity: 0, scale: 0.5 }}
-            animate={{ x: (Math.random() - 0.5) * 50, y: [0, 5 + Math.random() * 15], opacity: [0, 0.4, 0.2, 0], scale: [0.5, 1.3, 1.8] }}
-            transition={{ duration: 0.8 + Math.random() * 0.4, delay: 0.15 + Math.random() * 0.2, ease: 'easeOut' }}
+            animate={{
+              x: (Math.random() - 0.5) * 50,
+              y: [0, 5 + Math.random() * 15],
+              opacity: [0, 0.4, 0.2, 0],
+              scale: [0.5, 1.3, 1.8],
+            }}
+            transition={{ duration: 0.8 + Math.random() * 0.4, delay: 0.15 + Math.random() * 0.2, ease: "easeOut" }}
           />
-        ))}
-      </div>
-    </>
+        );
+      })}
+    </div>
   );
 }
 
@@ -502,9 +549,16 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
               className="absolute"
               style={{ y: rocketY, bottom: '16px', left: '50%', x: '-50%', zIndex: 10 }}
             >
-              <div className="relative" style={{ imageRendering: "pixelated" }}>
+              <div
+                className="relative"
+                style={{
+                  width: `${ROCKET_BODY_WIDTH}px`,
+                  height: `${ROCKET_BODY_HEIGHT}px`,
+                  imageRendering: "pixelated",
+                }}
+              >
                 <motion.div 
-                  className="relative" style={{ zIndex: 2 }}
+                  className="relative w-full h-full" style={{ zIndex: 2 }}
                   animate={{ x: [-0.5, 0.5, -0.3, 0.3, 0], y: [-0.3, 0.3, -0.2, 0.2, 0] }}
                   transition={{ duration: 0.04, repeat: Infinity }}
                 >
@@ -518,13 +572,20 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
               className="absolute"
               style={{ y: rocketY, bottom: '16px', left: '50%', x: '-50%', zIndex: 10 }}
             >
-              <div className="relative" style={{ imageRendering: "pixelated" }}>
+              <div
+                className="relative"
+                style={{
+                  width: `${ROCKET_BODY_WIDTH}px`,
+                  height: `${ROCKET_BODY_HEIGHT}px`,
+                  imageRendering: "pixelated",
+                }}
+              >
                 <CountdownDisplay phase={launchPhase} />
                 <FuelingGlow active={preLaunchStage === "fueling" && !isLaunching} />
                 
                 {(launchPhase === "ignition" || launchPhase === "liftoff") ? (
                   <motion.div
-                    className="relative" style={{ zIndex: 2 }}
+                    className="relative w-full h-full" style={{ zIndex: 2 }}
                     animate={{ x: [-0.8, 0.8, -0.5, 0.5, 0], y: [-0.4, 0.4, -0.3, 0.3, 0] }}
                     transition={{ duration: 0.025, repeat: Infinity }}
                   >
@@ -532,7 +593,7 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                   </motion.div>
                 ) : burstShake ? (
                   <motion.div
-                    className="relative" style={{ zIndex: 2 }}
+                    className="relative w-full h-full" style={{ zIndex: 2 }}
                     animate={{ x: [-1, 1, -0.6, 0.6, 0], y: [-0.5, 0.5, -0.3, 0.3, 0] }}
                     transition={{ duration: 0.05, repeat: Infinity }}
                   >
@@ -547,7 +608,7 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                     </AnimatePresence>
                   </motion.div>
                 ) : (
-                  <div className="relative" style={{ zIndex: 2 }}>
+                  <div className="relative w-full h-full" style={{ zIndex: 2 }}>
                     <PixelRocketBody 
                       stage="idle" 
                       showExhaust={preLaunchStage === "engine-test" || preLaunchStage === "power-up"}
