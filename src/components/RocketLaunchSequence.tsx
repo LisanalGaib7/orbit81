@@ -506,9 +506,16 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
               className="absolute"
               style={{ y: rocketY, bottom: '16px', left: '50%', x: '-50%', zIndex: 10 }}
             >
-              <div className="relative" style={{ imageRendering: "pixelated" }}>
+              <div
+                className="relative"
+                style={{
+                  width: `${ROCKET_BODY_WIDTH}px`,
+                  height: `${ROCKET_BODY_HEIGHT}px`,
+                  imageRendering: "pixelated",
+                }}
+              >
                 <motion.div 
-                  className="relative" style={{ zIndex: 2 }}
+                  className="relative w-full h-full" style={{ zIndex: 2 }}
                   animate={{ x: [-0.5, 0.5, -0.3, 0.3, 0], y: [-0.3, 0.3, -0.2, 0.2, 0] }}
                   transition={{ duration: 0.04, repeat: Infinity }}
                 >
@@ -522,13 +529,20 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
               className="absolute"
               style={{ y: rocketY, bottom: '16px', left: '50%', x: '-50%', zIndex: 10 }}
             >
-              <div className="relative" style={{ imageRendering: "pixelated" }}>
+              <div
+                className="relative"
+                style={{
+                  width: `${ROCKET_BODY_WIDTH}px`,
+                  height: `${ROCKET_BODY_HEIGHT}px`,
+                  imageRendering: "pixelated",
+                }}
+              >
                 <CountdownDisplay phase={launchPhase} />
                 <FuelingGlow active={preLaunchStage === "fueling" && !isLaunching} />
                 
                 {(launchPhase === "ignition" || launchPhase === "liftoff") ? (
                   <motion.div
-                    className="relative" style={{ zIndex: 2 }}
+                    className="relative w-full h-full" style={{ zIndex: 2 }}
                     animate={{ x: [-0.8, 0.8, -0.5, 0.5, 0], y: [-0.4, 0.4, -0.3, 0.3, 0] }}
                     transition={{ duration: 0.025, repeat: Infinity }}
                   >
@@ -536,7 +550,7 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                   </motion.div>
                 ) : burstShake ? (
                   <motion.div
-                    className="relative" style={{ zIndex: 2 }}
+                    className="relative w-full h-full" style={{ zIndex: 2 }}
                     animate={{ x: [-1, 1, -0.6, 0.6, 0], y: [-0.5, 0.5, -0.3, 0.3, 0] }}
                     transition={{ duration: 0.05, repeat: Infinity }}
                   >
@@ -551,7 +565,7 @@ export function RocketLaunchSequence({ progress, onLaunchStart, ignitionBurst = 
                     </AnimatePresence>
                   </motion.div>
                 ) : (
-                  <div className="relative" style={{ zIndex: 2 }}>
+                  <div className="relative w-full h-full" style={{ zIndex: 2 }}>
                     <PixelRocketBody 
                       stage="idle" 
                       showExhaust={preLaunchStage === "engine-test" || preLaunchStage === "power-up"}
