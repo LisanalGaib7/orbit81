@@ -435,17 +435,26 @@ const Login = () => {
       <div className="relative z-10 flex flex-col items-center gap-6 sm:gap-8 px-4 w-full max-w-md">
 
         {/* Title */}
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-3">
           <div style={{
+            fontFamily: 'var(--font-data)',
+            fontSize: 'clamp(7px, 1.5vw, 9px)',
+            color: '#00BCD4',
+            letterSpacing: '0.4em',
+            opacity: 0.6,
+          }}>
+            MISSION CONTROL // ACCESS GRANTED
+          </div>
+          <div className="animate-pulse-glow" style={{
             fontFamily: 'var(--font-header)',
-            fontSize: 'clamp(13px, 3.5vw, 20px)',
+            fontSize: 'clamp(22px, 5.5vw, 36px)',
             color: '#FFD700',
-            textShadow: '2px 2px 0px #000, 0 0 20px rgba(255,215,0,0.35)',
+            textShadow: '3px 3px 0px #000, -1px -1px 0px #000, 0 0 30px rgba(255,215,0,0.4), 0 0 60px rgba(255,215,0,0.15)',
             imageRendering: 'pixelated',
-            letterSpacing: '0.08em',
+            letterSpacing: '0.12em',
             textAlign: 'center',
           }}>
-            PILOT ENROLLMENT
+            [ ORBIT 81 ]
           </div>
           <div style={{
             fontFamily: 'var(--font-data)',
@@ -453,9 +462,9 @@ const Login = () => {
             color: 'hsl(var(--muted-foreground))',
             letterSpacing: '0.35em',
           }}>
-            ORBIT 81 COMMAND
+            DEPLOYING MISSION ORBIT 81
           </div>
-          <div className="w-32 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/30 to-transparent mt-1" />
+          <div className="w-40 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/40 to-transparent mt-1" />
         </div>
 
         {/* ── Google Auth Button ── */}
