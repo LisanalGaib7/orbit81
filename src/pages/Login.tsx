@@ -52,8 +52,8 @@ function CornerBracket({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
         {/* Horizontal arm */}
         <div className="absolute" style={{
           height: t, width: size,
-          backgroundColor: '#FFD700',
-          boxShadow: '0 0 4px #FFD70060',
+          backgroundColor: '#FF8C00',
+          boxShadow: '0 0 4px #FF8C0060',
           top: isTop ? 0 : size - t,
           left: 0,
           opacity: 0.5,
@@ -61,8 +61,8 @@ function CornerBracket({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
         {/* Vertical arm */}
         <div className="absolute" style={{
           width: t, height: size,
-          backgroundColor: '#FFD700',
-          boxShadow: '0 0 4px #FFD70060',
+          backgroundColor: '#FF8C00',
+          boxShadow: '0 0 4px #FF8C0060',
           left: isLeft ? 0 : size - t,
           top: 0,
           opacity: 0.5,
@@ -117,71 +117,71 @@ function CircuitNetwork() {
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.18]" preserveAspectRatio="none" viewBox="0 0 1000 700" fill="none">
       {/* Left vertical bus */}
-      <line x1="80" y1="0" x2="80" y2="700" stroke="#FFD700" strokeWidth="0.5" />
-      <line x1="120" y1="0" x2="120" y2="700" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
-      <line x1="50" y1="0" x2="50" y2="700" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
+      <line x1="80" y1="0" x2="80" y2="700" stroke="#FF8C00" strokeWidth="0.5" />
+      <line x1="120" y1="0" x2="120" y2="700" stroke="#FF8C00" strokeWidth="0.3" opacity="0.4" />
+      <line x1="50" y1="0" x2="50" y2="700" stroke="#FF8C00" strokeWidth="0.25" opacity="0.2" />
       {/* Right vertical bus */}
-      <line x1="920" y1="0" x2="920" y2="700" stroke="#FFD700" strokeWidth="0.5" />
-      <line x1="880" y1="0" x2="880" y2="700" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
-      <line x1="950" y1="0" x2="950" y2="700" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
+      <line x1="920" y1="0" x2="920" y2="700" stroke="#FF8C00" strokeWidth="0.5" />
+      <line x1="880" y1="0" x2="880" y2="700" stroke="#FF8C00" strokeWidth="0.3" opacity="0.4" />
+      <line x1="950" y1="0" x2="950" y2="700" stroke="#FF8C00" strokeWidth="0.25" opacity="0.2" />
       {/* Top horizontal */}
-      <line x1="0" y1="60" x2="1000" y2="60" stroke="#00BCD4" strokeWidth="0.3" opacity="0.3" />
-      <line x1="0" y1="30" x2="1000" y2="30" stroke="#00BCD4" strokeWidth="0.2" opacity="0.15" />
+      <line x1="0" y1="60" x2="1000" y2="60" stroke="#FF8C00" strokeWidth="0.3" opacity="0.3" />
+      <line x1="0" y1="30" x2="1000" y2="30" stroke="#FF8C00" strokeWidth="0.2" opacity="0.15" />
       {/* Bottom horizontal */}
-      <line x1="0" y1="640" x2="1000" y2="640" stroke="#00BCD4" strokeWidth="0.3" opacity="0.3" />
-      <line x1="0" y1="670" x2="1000" y2="670" stroke="#00BCD4" strokeWidth="0.2" opacity="0.15" />
+      <line x1="0" y1="640" x2="1000" y2="640" stroke="#FF8C00" strokeWidth="0.3" opacity="0.3" />
+      <line x1="0" y1="670" x2="1000" y2="670" stroke="#FF8C00" strokeWidth="0.2" opacity="0.15" />
       {/* Cross branches left */}
-      <line x1="80" y1="120" x2="200" y2="120" stroke="#FFD700" strokeWidth="0.5" />
-      <line x1="80" y1="180" x2="150" y2="180" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
-      <line x1="80" y1="250" x2="180" y2="250" stroke="#00BCD4" strokeWidth="0.4" />
-      <line x1="80" y1="320" x2="140" y2="320" stroke="#00BCD4" strokeWidth="0.3" opacity="0.25" />
-      <line x1="80" y1="400" x2="220" y2="400" stroke="#FFD700" strokeWidth="0.4" />
-      <line x1="220" y1="400" x2="220" y2="450" stroke="#FFD700" strokeWidth="0.4" />
-      <line x1="80" y1="550" x2="160" y2="550" stroke="#00BCD4" strokeWidth="0.4" />
-      <line x1="50" y1="200" x2="120" y2="200" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
-      <line x1="50" y1="480" x2="120" y2="480" stroke="#00BCD4" strokeWidth="0.25" opacity="0.2" />
+      <line x1="80" y1="120" x2="200" y2="120" stroke="#FF8C00" strokeWidth="0.5" />
+      <line x1="80" y1="180" x2="150" y2="180" stroke="#FF8C00" strokeWidth="0.3" opacity="0.3" />
+      <line x1="80" y1="250" x2="180" y2="250" stroke="#FF8C00" strokeWidth="0.4" />
+      <line x1="80" y1="320" x2="140" y2="320" stroke="#FF8C00" strokeWidth="0.3" opacity="0.25" />
+      <line x1="80" y1="400" x2="220" y2="400" stroke="#FF8C00" strokeWidth="0.4" />
+      <line x1="220" y1="400" x2="220" y2="450" stroke="#FF8C00" strokeWidth="0.4" />
+      <line x1="80" y1="550" x2="160" y2="550" stroke="#FF8C00" strokeWidth="0.4" />
+      <line x1="50" y1="200" x2="120" y2="200" stroke="#FF8C00" strokeWidth="0.25" opacity="0.2" />
+      <line x1="50" y1="480" x2="120" y2="480" stroke="#FF8C00" strokeWidth="0.25" opacity="0.2" />
       {/* Cross branches right */}
-      <line x1="920" y1="150" x2="800" y2="150" stroke="#FFD700" strokeWidth="0.5" />
-      <line x1="920" y1="220" x2="860" y2="220" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
-      <line x1="920" y1="300" x2="830" y2="300" stroke="#00BCD4" strokeWidth="0.4" />
-      <line x1="920" y1="380" x2="870" y2="380" stroke="#00BCD4" strokeWidth="0.3" opacity="0.25" />
-      <line x1="920" y1="480" x2="780" y2="480" stroke="#FFD700" strokeWidth="0.4" />
-      <line x1="780" y1="480" x2="780" y2="520" stroke="#FFD700" strokeWidth="0.4" />
-      <line x1="920" y1="600" x2="850" y2="600" stroke="#00BCD4" strokeWidth="0.4" />
-      <line x1="950" y1="260" x2="880" y2="260" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
-      <line x1="950" y1="540" x2="880" y2="540" stroke="#00BCD4" strokeWidth="0.25" opacity="0.2" />
+      <line x1="920" y1="150" x2="800" y2="150" stroke="#FF8C00" strokeWidth="0.5" />
+      <line x1="920" y1="220" x2="860" y2="220" stroke="#FF8C00" strokeWidth="0.3" opacity="0.3" />
+      <line x1="920" y1="300" x2="830" y2="300" stroke="#FF8C00" strokeWidth="0.4" />
+      <line x1="920" y1="380" x2="870" y2="380" stroke="#FF8C00" strokeWidth="0.3" opacity="0.25" />
+      <line x1="920" y1="480" x2="780" y2="480" stroke="#FF8C00" strokeWidth="0.4" />
+      <line x1="780" y1="480" x2="780" y2="520" stroke="#FF8C00" strokeWidth="0.4" />
+      <line x1="920" y1="600" x2="850" y2="600" stroke="#FF8C00" strokeWidth="0.4" />
+      <line x1="950" y1="260" x2="880" y2="260" stroke="#FF8C00" strokeWidth="0.25" opacity="0.2" />
+      <line x1="950" y1="540" x2="880" y2="540" stroke="#FF8C00" strokeWidth="0.25" opacity="0.2" />
       {/* Blinking nodes at intersections */}
-      <circle cx="200" cy="120" r="3" fill="#00BCD4" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite" /></circle>
-      <circle cx="180" cy="250" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2.5s" repeatCount="indefinite" begin="0.5s" /></circle>
-      <circle cx="220" cy="450" r="3" fill="#FFD700" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3s" repeatCount="indefinite" begin="1s" /></circle>
-      <circle cx="160" cy="550" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2s" repeatCount="indefinite" begin="1.5s" /></circle>
-      <circle cx="800" cy="150" r="3" fill="#FFD700" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.5s" repeatCount="indefinite" begin="0.3s" /></circle>
-      <circle cx="830" cy="300" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2s" repeatCount="indefinite" begin="0.8s" /></circle>
-      <circle cx="780" cy="520" r="3" fill="#FFD700" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3s" repeatCount="indefinite" begin="2s" /></circle>
-      <circle cx="850" cy="600" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2.5s" repeatCount="indefinite" begin="1.2s" /></circle>
-      <circle cx="150" cy="180" r="2" fill="#FFD700" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2s" repeatCount="indefinite" begin="0.7s" /></circle>
-      <circle cx="860" cy="220" r="2" fill="#FFD700" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.5s" repeatCount="indefinite" begin="1.8s" /></circle>
+      <circle cx="200" cy="120" r="3" fill="#FF8C00" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite" /></circle>
+      <circle cx="180" cy="250" r="2.5" fill="#FF8C00" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2.5s" repeatCount="indefinite" begin="0.5s" /></circle>
+      <circle cx="220" cy="450" r="3" fill="#FF8C00" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3s" repeatCount="indefinite" begin="1s" /></circle>
+      <circle cx="160" cy="550" r="2.5" fill="#FF8C00" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2s" repeatCount="indefinite" begin="1.5s" /></circle>
+      <circle cx="800" cy="150" r="3" fill="#FF8C00" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.5s" repeatCount="indefinite" begin="0.3s" /></circle>
+      <circle cx="830" cy="300" r="2.5" fill="#FF8C00" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2s" repeatCount="indefinite" begin="0.8s" /></circle>
+      <circle cx="780" cy="520" r="3" fill="#FF8C00" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3s" repeatCount="indefinite" begin="2s" /></circle>
+      <circle cx="850" cy="600" r="2.5" fill="#FF8C00" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2.5s" repeatCount="indefinite" begin="1.2s" /></circle>
+      <circle cx="150" cy="180" r="2" fill="#FF8C00" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2s" repeatCount="indefinite" begin="0.7s" /></circle>
+      <circle cx="860" cy="220" r="2" fill="#FF8C00" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.5s" repeatCount="indefinite" begin="1.8s" /></circle>
       {/* Diagonal accents */}
-      <line x1="120" y1="80" x2="200" y2="50" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
-      <line x1="880" y1="620" x2="800" y2="650" stroke="#00BCD4" strokeWidth="0.3" opacity="0.4" />
-      <line x1="50" y1="100" x2="120" y2="60" stroke="#FFD700" strokeWidth="0.2" opacity="0.2" />
-      <line x1="950" y1="580" x2="880" y2="640" stroke="#00BCD4" strokeWidth="0.2" opacity="0.2" />
+      <line x1="120" y1="80" x2="200" y2="50" stroke="#FF8C00" strokeWidth="0.3" opacity="0.4" />
+      <line x1="880" y1="620" x2="800" y2="650" stroke="#FF8C00" strokeWidth="0.3" opacity="0.4" />
+      <line x1="50" y1="100" x2="120" y2="60" stroke="#FF8C00" strokeWidth="0.2" opacity="0.2" />
+      <line x1="950" y1="580" x2="880" y2="640" stroke="#FF8C00" strokeWidth="0.2" opacity="0.2" />
       {/* Connecting traces to center */}
-      <line x1="200" y1="350" x2="350" y2="350" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
-      <line x1="800" y1="350" x2="650" y2="350" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
-      <line x1="350" y1="350" x2="350" y2="300" stroke="#FFD700" strokeWidth="0.2" opacity="0.2" />
-      <line x1="650" y1="350" x2="650" y2="300" stroke="#FFD700" strokeWidth="0.2" opacity="0.2" />
+      <line x1="200" y1="350" x2="350" y2="350" stroke="#FF8C00" strokeWidth="0.3" opacity="0.3" />
+      <line x1="800" y1="350" x2="650" y2="350" stroke="#FF8C00" strokeWidth="0.3" opacity="0.3" />
+      <line x1="350" y1="350" x2="350" y2="300" stroke="#FF8C00" strokeWidth="0.2" opacity="0.2" />
+      <line x1="650" y1="350" x2="650" y2="300" stroke="#FF8C00" strokeWidth="0.2" opacity="0.2" />
       {/* Data stream gradients */}
       <defs>
         <linearGradient id="stream-gold" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#FFD700" stopOpacity="0" />
-          <stop offset="50%" stopColor="#FFD700" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#FFD700" stopOpacity="0" />
+          <stop offset="0%" stopColor="#FF8C00" stopOpacity="0" />
+          <stop offset="50%" stopColor="#FF8C00" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#FF8C00" stopOpacity="0" />
         </linearGradient>
         <linearGradient id="stream-cyan" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#00BCD4" stopOpacity="0" />
-          <stop offset="50%" stopColor="#00BCD4" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#00BCD4" stopOpacity="0" />
+          <stop offset="0%" stopColor="#FF8C00" stopOpacity="0" />
+          <stop offset="50%" stopColor="#FF8C00" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#FF8C00" stopOpacity="0" />
         </linearGradient>
       </defs>
       {/* Horizontal data streams */}
@@ -232,8 +232,8 @@ function HexPattern() {
     <svg className="absolute inset-0 w-full h-full opacity-[0.03] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <pattern id="hex-login" x="0" y="0" width="24" height="42" patternUnits="userSpaceOnUse">
-          <path d="M12 0 L24 7 L24 21 L12 28 L0 21 L0 7 Z" fill="none" stroke="#FFD700" strokeWidth="0.5" />
-          <path d="M12 14 L24 21 L24 35 L12 42 L0 35 L0 21 Z" fill="none" stroke="#FFD700" strokeWidth="0.5" />
+          <path d="M12 0 L24 7 L24 21 L12 28 L0 21 L0 7 Z" fill="none" stroke="#FF8C00" strokeWidth="0.5" />
+          <path d="M12 14 L24 21 L24 35 L12 42 L0 35 L0 21 Z" fill="none" stroke="#FF8C00" strokeWidth="0.5" />
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill="url(#hex-login)" />
@@ -281,7 +281,7 @@ function DataStream({ side }: { side: 'left' | 'right' }) {
       className="absolute hidden sm:flex flex-col gap-0.5 opacity-[0.08] pointer-events-none"
       style={{
         [side]: '6rem', top: '20%',
-        color: side === 'left' ? '#FFD700' : '#00BCD4',
+        color: side === 'left' ? '#FF8C00' : '#FF8C00',
         fontFamily: 'var(--font-data)', fontSize: 7,
         imageRendering: 'pixelated',
       }}
@@ -336,10 +336,10 @@ function BootSequence({ onComplete }: { onComplete: () => void }) {
             <div key={i} style={{
               fontFamily: 'var(--font-data)',
               fontSize: 10,
-              color: line.startsWith('[OK]') ? '#34A853' : line.startsWith('━') ? '#FFD700' : '#00BCD4',
+              color: line.startsWith('[OK]') ? '#34A853' : line.startsWith('━') ? '#FF8C00' : '#FF8C00',
               letterSpacing: '0.05em',
               opacity: line.startsWith('WELCOME') ? 1 : 0.7,
-              textShadow: line.startsWith('WELCOME') ? '0 0 10px #FFD70060' : undefined,
+              textShadow: line.startsWith('WELCOME') ? '0 0 10px #FF8C0060' : undefined,
             }}>
               {line}
             </div>
@@ -347,7 +347,7 @@ function BootSequence({ onComplete }: { onComplete: () => void }) {
           {!done && (
             <div className="mt-2 flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span style={{ fontFamily: 'var(--font-data)', fontSize: 9, color: '#FFD700', opacity: 0.5 }}>
+              <span style={{ fontFamily: 'var(--font-data)', fontSize: 9, color: '#FF8C00', opacity: 0.5 }}>
                 LOADING...
               </span>
             </div>
@@ -444,7 +444,7 @@ const Login = () => {
       {/* Ignition gold flash */}
       {ignitionFlash && (
         <div className="fixed inset-0 z-[60] pointer-events-none" style={{
-          background: 'radial-gradient(circle at center, rgba(255,215,0,0.25) 0%, transparent 70%)',
+          background: 'radial-gradient(circle at center, rgba(255,140,0,0.25) 0%, transparent 70%)',
           animation: 'fade-out 0.5s ease-out forwards',
         }} />
       )}
@@ -472,10 +472,10 @@ const Login = () => {
       <CircuitNetwork />
 
       {/* Data pulses traveling along circuits */}
-      <DataPulse path="M80,0 L80,120 L200,120" color="#FFD700" delay={0} duration={4} />
-      <DataPulse path="M920,0 L920,150 L800,150" color="#FFD700" delay={2} duration={5} />
-      <DataPulse path="M80,700 L80,550 L160,550" color="#00BCD4" delay={1} duration={4.5} />
-      <DataPulse path="M920,700 L920,600 L850,600" color="#00BCD4" delay={3} duration={5} />
+      <DataPulse path="M80,0 L80,120 L200,120" color="#FF8C00" delay={0} duration={4} />
+      <DataPulse path="M920,0 L920,150 L800,150" color="#FF8C00" delay={2} duration={5} />
+      <DataPulse path="M80,700 L80,550 L160,550" color="#FF8C00" delay={1} duration={4.5} />
+      <DataPulse path="M920,700 L920,600 L850,600" color="#FF8C00" delay={3} duration={5} />
 
       {/* Data streams */}
       <DataStream side="left" />
@@ -489,15 +489,15 @@ const Login = () => {
 
       {/* Flickering status labels */}
       <StatusLabel text="[STORAGE_LINK: ACTIVE]" position="top:70px left:60px" color="#34A853" delay={0} />
-      <StatusLabel text="[CPU_CORE: 98%]" position="top:70px right:60px" color="#FFD700" delay={1.5} />
-      <StatusLabel text="[MISSION_LOG: READY]" position="bottom:70px left:60px" color="#00BCD4" delay={0.8} />
+      <StatusLabel text="[CPU_CORE: 98%]" position="top:70px right:60px" color="#FF8C00" delay={1.5} />
+      <StatusLabel text="[MISSION_LOG: READY]" position="bottom:70px left:60px" color="#FF8C00" delay={0.8} />
       <StatusLabel text="[NAV_MATRIX: SYNCED]" position="bottom:70px right:60px" color="#34A853" delay={2.2} />
 
       {/* LEDs */}
-      <LED color="#FFD700" delay={0} className="top-[18%] left-[12%]" />
-      <LED color="#00BCD4" delay={1.2} className="top-[28%] right-[14%]" />
-      <LED color="#FFD700" delay={0.7} className="bottom-[22%] left-[9%]" />
-      <LED color="#00BCD4" delay={2} className="bottom-[32%] right-[16%]" />
+      <LED color="#FF8C00" delay={0} className="top-[18%] left-[12%]" />
+      <LED color="#FF8C00" delay={1.2} className="top-[28%] right-[14%]" />
+      <LED color="#FF8C00" delay={0.7} className="bottom-[22%] left-[9%]" />
+      <LED color="#FF8C00" delay={2} className="bottom-[32%] right-[16%]" />
 
       {/* ─── Main content ───────────────────────────────────────── */}
       <div className="relative z-10 flex flex-col items-center gap-6 sm:gap-8 px-4 w-full max-w-md">
@@ -507,7 +507,7 @@ const Login = () => {
           <div style={{
             fontFamily: 'var(--font-data)',
             fontSize: 'clamp(7px, 1.5vw, 9px)',
-            color: '#00BCD4',
+            color: '#FF8C00',
             letterSpacing: '0.4em',
             opacity: 0.6,
           }}>
@@ -516,8 +516,8 @@ const Login = () => {
           <div className="animate-pulse-glow" style={{
             fontFamily: 'var(--font-header)',
             fontSize: 'clamp(22px, 5.5vw, 36px)',
-            color: '#FFD700',
-            textShadow: '3px 3px 0px #000, -1px -1px 0px #000, 0 0 30px rgba(255,215,0,0.4), 0 0 60px rgba(255,215,0,0.15)',
+            color: '#FF8C00',
+            textShadow: '3px 3px 0px #000, -1px -1px 0px #000, 0 0 30px rgba(255,140,0,0.4), 0 0 60px rgba(255,140,0,0.15)',
             imageRendering: 'pixelated',
             letterSpacing: '0.12em',
             textAlign: 'center',
@@ -532,7 +532,7 @@ const Login = () => {
           }}>
             DEPLOYING MISSION ORBIT 81
           </div>
-          <div className="w-40 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/40 to-transparent mt-1" />
+          <div className="w-40 h-[1px] bg-gradient-to-r from-transparent via-[#FF8C00]/40 to-transparent mt-1" />
         </div>
 
         {/* ── Google Auth Button ── */}
@@ -545,10 +545,10 @@ const Login = () => {
           style={{ height: 64 }}
         >
           <div className={`absolute -inset-[2px] rounded-lg transition-shadow duration-700 ${googlePressed
-            ? 'shadow-[inset_0_2px_10px_rgba(255,215,0,0.3)]'
-            : 'shadow-[0_0_15px_rgba(255,215,0,0.1),0_0_40px_rgba(255,215,0,0.03)] group-hover:shadow-[0_0_25px_rgba(255,215,0,0.2),0_0_60px_rgba(255,215,0,0.06)]'
+            ? 'shadow-[inset_0_2px_10px_rgba(255,140,0,0.3)]'
+            : 'shadow-[0_0_15px_rgba(255,140,0,0.1),0_0_40px_rgba(255,140,0,0.03)] group-hover:shadow-[0_0_25px_rgba(255,140,0,0.2),0_0_60px_rgba(255,140,0,0.06)]'
           }`} />
-          <div className={`relative w-full h-full rounded-lg overflow-hidden border-2 transition-all duration-700 ${googlePressed ? 'border-[#B8960F]' : 'border-[#FFD700]/60 group-hover:border-[#FFD700]'}`}
+          <div className={`relative w-full h-full rounded-lg overflow-hidden border-2 transition-all duration-700 ${googlePressed ? 'border-[#CC6600]' : 'border-[#FF8C00]/60 group-hover:border-[#FF8C00]'}`}
             style={{
               background: googlePressed
                 ? 'linear-gradient(180deg, #111 0%, #0a0a0a 100%)'
@@ -559,7 +559,7 @@ const Login = () => {
             {/* Hex overlay */}
             <svg className="absolute inset-0 w-full h-full opacity-[0.04] pointer-events-none">
               <defs><pattern id="hex-gbtn" x="0" y="0" width="18" height="31" patternUnits="userSpaceOnUse">
-                <path d="M9 0 L18 5 L18 15 L9 20 L0 15 L0 5 Z" fill="none" stroke="#FFD700" strokeWidth="0.3" />
+                <path d="M9 0 L18 5 L18 15 L9 20 L0 15 L0 5 Z" fill="none" stroke="#FF8C00" strokeWidth="0.3" />
               </pattern></defs>
               <rect width="100%" height="100%" fill="url(#hex-gbtn)" />
             </svg>
@@ -571,35 +571,35 @@ const Login = () => {
               <div className="p-1.5 rounded border border-zinc-700/60 bg-zinc-900/60 relative overflow-hidden shrink-0" style={{ imageRendering: 'pixelated' }}>
                 <PixelGoogleG size={24} />
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#FFD700]/40 to-transparent" style={{ animation: 'scanner 2.5s linear infinite' }} />
+                  <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF8C00]/40 to-transparent" style={{ animation: 'scanner 2.5s linear infinite' }} />
                 </div>
               </div>
               <div className="flex flex-col items-start gap-0.5">
                 <span style={{
                   fontFamily: 'var(--font-header)', fontSize: 'clamp(7px, 2vw, 10px)',
-                  color: '#FFD700', textShadow: '1px 1px 0px #000',
+                  color: '#FF8C00', textShadow: '1px 1px 0px #000',
                   letterSpacing: '0.12em', imageRendering: 'pixelated',
                 }}>SIGN IN WITH GOOGLE</span>
                 <span style={{
                   fontFamily: 'var(--font-data)', fontSize: 'clamp(6px, 1.2vw, 8px)',
-                  color: '#00BCD4', opacity: 0.5, letterSpacing: '0.2em',
+                  color: '#FF8C00', opacity: 0.5, letterSpacing: '0.2em',
                 }}>OAUTH SECURE CHANNEL</span>
               </div>
             </div>
             {/* Scanner */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-lg">
-              <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/10 to-transparent" style={{ animation: 'scanner-full 4s linear infinite' }} />
+              <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FF8C00]/10 to-transparent" style={{ animation: 'scanner-full 4s linear infinite' }} />
             </div>
           </div>
         </button>
 
         {/* ── Divider ── */}
         <div className="w-full flex items-center gap-3">
-          <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/20 to-[#FFD700]/20" />
-          <span style={{ fontFamily: 'var(--font-data)', fontSize: 8, color: '#FFD700', opacity: 0.4, letterSpacing: '0.3em' }}>
+          <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#FF8C00]/20 to-[#FF8C00]/20" />
+          <span style={{ fontFamily: 'var(--font-data)', fontSize: 8, color: '#FF8C00', opacity: 0.4, letterSpacing: '0.3em' }}>
             OR
           </span>
-          <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-[#FFD700]/20 to-[#FFD700]/20" />
+          <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-[#FF8C00]/20 to-[#FF8C00]/20" />
         </div>
 
         {/* ── Email/Password Fields ── */}
@@ -607,7 +607,7 @@ const Login = () => {
           {/* Email field */}
           <div className="relative">
             <label style={{
-              fontFamily: 'var(--font-data)', fontSize: 8, color: '#FFD700',
+              fontFamily: 'var(--font-data)', fontSize: 8, color: '#FF8C00',
               opacity: 0.6, letterSpacing: '0.25em', marginBottom: 4, display: 'block',
             }}>
               PILOT ID (EMAIL)
@@ -617,25 +617,25 @@ const Login = () => {
               value={email}
               onChange={e => { setEmail(e.target.value); setEmailError(null); }}
               placeholder="pilot@orbit81.com"
-              className="w-full px-3 py-2.5 rounded border outline-none transition-all duration-300 focus:shadow-[0_0_12px_rgba(255,215,0,0.15)]"
+              className="w-full px-3 py-2.5 rounded border outline-none transition-all duration-300 focus:shadow-[0_0_12px_rgba(255,140,0,0.15)]"
               style={{
                 background: 'rgba(10,10,10,0.8)',
-                borderColor: 'rgba(255,215,0,0.3)',
-                color: '#FFD700',
+                borderColor: 'rgba(255,140,0,0.3)',
+                color: '#FF8C00',
                 fontFamily: 'var(--font-data)',
                 fontSize: 12,
                 letterSpacing: '0.1em',
-                caretColor: '#FFD700',
+                caretColor: '#FF8C00',
               }}
-              onFocus={e => e.target.style.borderColor = 'rgba(255,215,0,0.7)'}
-              onBlur={e => e.target.style.borderColor = 'rgba(255,215,0,0.3)'}
+              onFocus={e => e.target.style.borderColor = 'rgba(255,140,0,0.7)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,140,0,0.3)'}
             />
           </div>
 
           {/* Password field */}
           <div className="relative">
             <label style={{
-              fontFamily: 'var(--font-data)', fontSize: 8, color: '#FFD700',
+              fontFamily: 'var(--font-data)', fontSize: 8, color: '#FF8C00',
               opacity: 0.6, letterSpacing: '0.25em', marginBottom: 4, display: 'block',
             }}>
               ACCESS CODE (PASSWORD)
@@ -645,18 +645,18 @@ const Login = () => {
               value={password}
               onChange={e => { setPassword(e.target.value); setEmailError(null); }}
               placeholder="••••••••"
-              className="w-full px-3 py-2.5 rounded border outline-none transition-all duration-300 focus:shadow-[0_0_12px_rgba(255,215,0,0.15)]"
+              className="w-full px-3 py-2.5 rounded border outline-none transition-all duration-300 focus:shadow-[0_0_12px_rgba(255,140,0,0.15)]"
               style={{
                 background: 'rgba(10,10,10,0.8)',
-                borderColor: 'rgba(255,215,0,0.3)',
-                color: '#FFD700',
+                borderColor: 'rgba(255,140,0,0.3)',
+                color: '#FF8C00',
                 fontFamily: 'var(--font-data)',
                 fontSize: 12,
                 letterSpacing: '0.2em',
-                caretColor: '#FFD700',
+                caretColor: '#FF8C00',
               }}
-              onFocus={e => e.target.style.borderColor = 'rgba(255,215,0,0.7)'}
-              onBlur={e => e.target.style.borderColor = 'rgba(255,215,0,0.3)'}
+              onFocus={e => e.target.style.borderColor = 'rgba(255,140,0,0.7)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,140,0,0.3)'}
               onKeyDown={e => e.key === 'Enter' && handleEmailSubmit()}
             />
           </div>
@@ -679,8 +679,8 @@ const Login = () => {
             className={`group relative w-full cursor-pointer transition-transform duration-100 ${emailLoading ? 'opacity-60 pointer-events-none' : 'active:scale-[0.97] hover:scale-[1.01]'}`}
             style={{ height: 48 }}
           >
-            <div className="absolute -inset-[1px] rounded transition-shadow duration-500 shadow-[0_0_10px_rgba(255,215,0,0.08)] group-hover:shadow-[0_0_20px_rgba(255,215,0,0.15)]" />
-            <div className="relative w-full h-full rounded overflow-hidden border transition-all duration-500 border-[#FFD700]/40 group-hover:border-[#FFD700]/80"
+            <div className="absolute -inset-[1px] rounded transition-shadow duration-500 shadow-[0_0_10px_rgba(255,140,0,0.08)] group-hover:shadow-[0_0_20px_rgba(255,140,0,0.15)]" />
+            <div className="relative w-full h-full rounded overflow-hidden border transition-all duration-500 border-[#FF8C00]/40 group-hover:border-[#FF8C00]/80"
               style={{ background: 'linear-gradient(180deg, #1c1c0a 0%, #0f0f05 50%, #181808 100%)' }}
             >
               <Rivet className="top-0.5 left-0.5" />
@@ -691,8 +691,8 @@ const Login = () => {
                 <span style={{
                   fontFamily: 'var(--font-header)',
                   fontSize: 'clamp(7px, 2vw, 10px)',
-                  color: '#FFD700',
-                  textShadow: '1px 1px 0px #000, 0 0 8px rgba(255,215,0,0.2)',
+                  color: '#FF8C00',
+                  textShadow: '1px 1px 0px #000, 0 0 8px rgba(255,140,0,0.2)',
                   letterSpacing: '0.15em',
                   imageRendering: 'pixelated',
                 }}>
@@ -701,7 +701,7 @@ const Login = () => {
               </div>
               {/* Scanner */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none rounded">
-                <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/10 to-transparent" style={{ animation: 'scanner-full 3s linear infinite' }} />
+                <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FF8C00]/10 to-transparent" style={{ animation: 'scanner-full 3s linear infinite' }} />
               </div>
             </div>
           </button>
@@ -712,7 +712,7 @@ const Login = () => {
             className="self-center"
             style={{
               fontFamily: 'var(--font-data)', fontSize: 9,
-              color: '#00BCD4', opacity: 0.5, letterSpacing: '0.15em',
+              color: '#FF8C00', opacity: 0.5, letterSpacing: '0.15em',
               background: 'none', border: 'none', cursor: 'pointer',
             }}
           >
@@ -728,7 +728,7 @@ const Login = () => {
               className="group self-center"
               style={{
                 fontFamily: 'var(--font-data)', fontSize: 9,
-                color: '#FFD700', opacity: 0.35, letterSpacing: '0.12em',
+                color: '#FF8C00', opacity: 0.35, letterSpacing: '0.12em',
                 background: 'none', border: 'none', cursor: 'pointer',
                 textDecoration: 'underline', textUnderlineOffset: '3px',
               }}
