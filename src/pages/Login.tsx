@@ -503,34 +503,17 @@ const Login = () => {
       <div className="relative z-10 flex flex-col items-center gap-6 sm:gap-8 px-4 w-full max-w-md">
 
         {/* Title */}
-        <div className="flex flex-col items-center gap-3">
-          <div style={{
-            fontFamily: 'var(--font-data)',
-            fontSize: 'clamp(7px, 1.5vw, 9px)',
-            color: '#FF8C00',
-            letterSpacing: '0.4em',
-            opacity: 0.6,
-          }}>
-            MISSION CONTROL // ACCESS GRANTED
-          </div>
+        <div className="flex flex-col items-center gap-2">
           <div className="animate-pulse-glow" style={{
             fontFamily: 'var(--font-header)',
-            fontSize: 'clamp(22px, 5.5vw, 36px)',
+            fontSize: 'clamp(26px, 6vw, 42px)',
             color: '#FF8C00',
-            textShadow: '3px 3px 0px #000, -1px -1px 0px #000, 0 0 30px rgba(255,140,0,0.4), 0 0 60px rgba(255,140,0,0.15)',
+            textShadow: '3px 3px 0px #000, -1px -1px 0px #000, 0 0 35px rgba(255,140,0,0.5), 0 0 70px rgba(255,140,0,0.2)',
             imageRendering: 'pixelated',
-            letterSpacing: '0.12em',
+            letterSpacing: '0.15em',
             textAlign: 'center',
           }}>
-            [ ORBIT 81 ]
-          </div>
-          <div style={{
-            fontFamily: 'var(--font-data)',
-            fontSize: 'clamp(8px, 1.8vw, 10px)',
-            color: 'hsl(var(--muted-foreground))',
-            letterSpacing: '0.35em',
-          }}>
-            DEPLOYING MISSION ORBIT 81
+            ORBIT 81
           </div>
           <div className="w-40 h-[1px] bg-gradient-to-r from-transparent via-[#FF8C00]/40 to-transparent mt-1" />
         </div>
