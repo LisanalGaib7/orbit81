@@ -8,7 +8,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Settings, BookOpen, Wrench, Power, RotateCcw, X } from "lucide-react";
+import { Settings, BookOpen, Wrench, Power, RotateCcw, Undo2, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -201,9 +201,11 @@ function TemplatePanel({
 interface HeaderBarProps {
   onApplyTemplate: (labels: string[]) => void;
   onReset: () => void;
+  canRevert?: boolean;
+  onRevert?: () => void;
 }
 
-export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
+export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: HeaderBarProps) {
   const { signOut } = useAuth();
   const [hubOpen, setHubOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
@@ -331,6 +333,16 @@ export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
               isActive={confirmReset}
               index={2}
             />
+
+            {canRevert && (
+              <SubIcon
+                icon={Undo2}
+                label="Revert"
+                onClick={() => { onRevert?.(); setHubOpen(false); }}
+                isActive={true}
+                index={2.5}
+              />
+            )}
 
             <SubIcon
               icon={Power}

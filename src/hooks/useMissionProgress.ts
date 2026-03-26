@@ -82,6 +82,7 @@ export function useMissionProgress() {
   const prevCompletedRef = useRef<Set<number>>(new Set());
   const missionTriggeredRef = useRef(false);
   const [ignitionBurst, setIgnitionBurst] = useState(0);
+  const [canRevert, setCanRevert] = useState(false);
 
   // --- Sidebar / focus state ---
   const [activeBlockIndex, setActiveBlockIndex] = useState<number | null>(null);
@@ -142,11 +143,26 @@ export function useMissionProgress() {
   }, []);
 
   const resetSession = useCallback(() => {
+    // Backup current state before resetting
+    localStorage.setItem('orbit81_backup_actions', JSON.stringify(actions));
+    localStorage.setItem('orbit81_backup_labels', JSON.stringify(subGoalLabels));
+    localStorage.setItem('orbit81_backup_actionLabels', JSON.stringify(actionLabels));
     setActions(make2D(false));
     setSubGoalLabels([...DEFAULT_SUBGOALS]);
     setActionLabels(make2D(""));
     setActiveBlockIndex(null);
     setFocusActionIndex(null);
+    setCanRevert(true);
+  }, [actions, subGoalLabels, actionLabels]);
+
+  const revertReset = useCallback(() => {
+    const backupActions = localStorage.getItem('orbit81_backup_actions');
+    const backupLabels = localStorage.getItem('orbit81_backup_labels');
+    const backupActionLabels = localStorage.getItem('orbit81_backup_actionLabels');
+    if (backupActions) setActions(JSON.parse(backupActions));
+    if (backupLabels) setSubGoalLabels(JSON.parse(backupLabels));
+    if (backupActionLabels) setActionLabels(JSON.parse(backupActionLabels));
+    setCanRevert(false);
   }, []);
 
   const handleActionSlotClick = useCallback((blockIndex: number, actionIndex: number) => {
@@ -205,6 +221,7 @@ export function useMissionProgress() {
     activeBlockIndex,
     focusActionIndex,
     ignitionBurst,
+    canRevert,
 
     // Derived
     subGoalProgress,
@@ -224,6 +241,7 @@ export function useMissionProgress() {
     updateActionLabel,
     applyTemplate,
     resetSession,
+    revertReset,
     handleActionSlotClick,
     clearConfetti,
     handleLaunchComplete,
