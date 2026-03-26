@@ -371,6 +371,7 @@ const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
   const [showBoot, setShowBoot] = useState(false);
+  const [ignitionFlash, setIgnitionFlash] = useState(false);
 
   const [stars] = useState(() =>
     Array.from({ length: 50 }, () => ({
