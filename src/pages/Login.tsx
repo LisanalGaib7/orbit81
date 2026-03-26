@@ -395,6 +395,14 @@ const Login = () => {
     return () => clearInterval(id);
   }, [loading]);
 
+  const triggerIgnition = useCallback((action: () => Promise<void>) => {
+    setIgnitionFlash(true);
+    setTimeout(async () => {
+      await action();
+      setIgnitionFlash(false);
+    }, 500);
+  }, []);
+
   const handleEmailSubmit = useCallback(async () => {
     if (!email.trim() || !password.trim()) {
       setEmailError("ALL FIELDS REQUIRED");
@@ -402,15 +410,17 @@ const Login = () => {
     }
     setEmailError(null);
     setEmailLoading(true);
-    const fn = isSignUp ? signUpWithEmail : signInWithEmail;
-    const { error } = await fn(email, password);
-    setEmailLoading(false);
-    if (error) {
-      setEmailError(error.toUpperCase());
-    } else if (isSignUp) {
-      setEmailError("VERIFICATION LINK TRANSMITTED. CHECK INBOX.");
-    }
-  }, [email, password, isSignUp, signInWithEmail, signUpWithEmail]);
+    triggerIgnition(async () => {
+      const fn = isSignUp ? signUpWithEmail : signInWithEmail;
+      const { error } = await fn(email, password);
+      setEmailLoading(false);
+      if (error) {
+        setEmailError(error.toUpperCase());
+      } else if (isSignUp) {
+        setEmailError("VERIFICATION LINK TRANSMITTED. CHECK INBOX.");
+      }
+    });
+  }, [email, password, isSignUp, signInWithEmail, signUpWithEmail, triggerIgnition]);
 
   if (loading) {
     return (
