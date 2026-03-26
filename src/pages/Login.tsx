@@ -650,6 +650,33 @@ const Login = () => {
           >
             {isSignUp ? '← EXISTING PILOT? SIGN IN' : 'NEW PILOT? REGISTER →'}
           </button>
+
+          {/* Guest mode */}
+          <div className="flex flex-col items-center gap-1 mt-2">
+            <button
+              onClick={() => {
+                window.location.href = '/';
+              }}
+              className="group self-center"
+              style={{
+                fontFamily: 'var(--font-data)', fontSize: 9,
+                color: '#FFD700', opacity: 0.35, letterSpacing: '0.12em',
+                background: 'none', border: 'none', cursor: 'pointer',
+                textDecoration: 'underline', textUnderlineOffset: '3px',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.opacity = '0.7'; }}
+              onMouseLeave={e => { e.currentTarget.style.opacity = '0.35'; }}
+            >
+              PROCEED AS GUEST (OFFLINE MODE)
+            </button>
+            <span style={{
+              fontFamily: 'var(--font-data)', fontSize: 7,
+              color: 'hsl(var(--muted-foreground))', opacity: 0.3,
+              letterSpacing: '0.15em', fontStyle: 'italic',
+            }}>
+              *Data will be saved locally only.*
+            </span>
+          </div>
         </div>
 
         {/* ── Status footer ── */}
