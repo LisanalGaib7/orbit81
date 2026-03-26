@@ -115,43 +115,89 @@ function parsePosition(pos: string): Record<string, string> {
 /* ─── Dense circuit network SVG ────────────────────────────────── */
 function CircuitNetwork() {
   return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.15]" preserveAspectRatio="none" viewBox="0 0 1000 700" fill="none">
+    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.18]" preserveAspectRatio="none" viewBox="0 0 1000 700" fill="none">
       {/* Left vertical bus */}
       <line x1="80" y1="0" x2="80" y2="700" stroke="#FFD700" strokeWidth="0.5" />
       <line x1="120" y1="0" x2="120" y2="700" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
+      <line x1="50" y1="0" x2="50" y2="700" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
       {/* Right vertical bus */}
       <line x1="920" y1="0" x2="920" y2="700" stroke="#FFD700" strokeWidth="0.5" />
       <line x1="880" y1="0" x2="880" y2="700" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
+      <line x1="950" y1="0" x2="950" y2="700" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
       {/* Top horizontal */}
       <line x1="0" y1="60" x2="1000" y2="60" stroke="#00BCD4" strokeWidth="0.3" opacity="0.3" />
+      <line x1="0" y1="30" x2="1000" y2="30" stroke="#00BCD4" strokeWidth="0.2" opacity="0.15" />
       {/* Bottom horizontal */}
       <line x1="0" y1="640" x2="1000" y2="640" stroke="#00BCD4" strokeWidth="0.3" opacity="0.3" />
+      <line x1="0" y1="670" x2="1000" y2="670" stroke="#00BCD4" strokeWidth="0.2" opacity="0.15" />
       {/* Cross branches left */}
       <line x1="80" y1="120" x2="200" y2="120" stroke="#FFD700" strokeWidth="0.5" />
-      <circle cx="200" cy="120" r="2.5" fill="#FFD700" />
+      <line x1="80" y1="180" x2="150" y2="180" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
       <line x1="80" y1="250" x2="180" y2="250" stroke="#00BCD4" strokeWidth="0.4" />
-      <circle cx="180" cy="250" r="2" fill="#00BCD4" />
+      <line x1="80" y1="320" x2="140" y2="320" stroke="#00BCD4" strokeWidth="0.3" opacity="0.25" />
       <line x1="80" y1="400" x2="220" y2="400" stroke="#FFD700" strokeWidth="0.4" />
       <line x1="220" y1="400" x2="220" y2="450" stroke="#FFD700" strokeWidth="0.4" />
-      <circle cx="220" cy="450" r="2.5" fill="#FFD700" />
       <line x1="80" y1="550" x2="160" y2="550" stroke="#00BCD4" strokeWidth="0.4" />
-      <circle cx="160" cy="550" r="2" fill="#00BCD4" />
+      <line x1="50" y1="200" x2="120" y2="200" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
+      <line x1="50" y1="480" x2="120" y2="480" stroke="#00BCD4" strokeWidth="0.25" opacity="0.2" />
       {/* Cross branches right */}
       <line x1="920" y1="150" x2="800" y2="150" stroke="#FFD700" strokeWidth="0.5" />
-      <circle cx="800" cy="150" r="2.5" fill="#FFD700" />
+      <line x1="920" y1="220" x2="860" y2="220" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
       <line x1="920" y1="300" x2="830" y2="300" stroke="#00BCD4" strokeWidth="0.4" />
-      <circle cx="830" cy="300" r="2" fill="#00BCD4" />
+      <line x1="920" y1="380" x2="870" y2="380" stroke="#00BCD4" strokeWidth="0.3" opacity="0.25" />
       <line x1="920" y1="480" x2="780" y2="480" stroke="#FFD700" strokeWidth="0.4" />
       <line x1="780" y1="480" x2="780" y2="520" stroke="#FFD700" strokeWidth="0.4" />
-      <circle cx="780" cy="520" r="2.5" fill="#FFD700" />
       <line x1="920" y1="600" x2="850" y2="600" stroke="#00BCD4" strokeWidth="0.4" />
-      <circle cx="850" cy="600" r="2" fill="#00BCD4" />
+      <line x1="950" y1="260" x2="880" y2="260" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
+      <line x1="950" y1="540" x2="880" y2="540" stroke="#00BCD4" strokeWidth="0.25" opacity="0.2" />
+      {/* Blinking nodes at intersections */}
+      <circle cx="200" cy="120" r="3" fill="#00BCD4" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite" /></circle>
+      <circle cx="180" cy="250" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2.5s" repeatCount="indefinite" begin="0.5s" /></circle>
+      <circle cx="220" cy="450" r="3" fill="#FFD700" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3s" repeatCount="indefinite" begin="1s" /></circle>
+      <circle cx="160" cy="550" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2s" repeatCount="indefinite" begin="1.5s" /></circle>
+      <circle cx="800" cy="150" r="3" fill="#FFD700" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.5s" repeatCount="indefinite" begin="0.3s" /></circle>
+      <circle cx="830" cy="300" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2s" repeatCount="indefinite" begin="0.8s" /></circle>
+      <circle cx="780" cy="520" r="3" fill="#FFD700" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3s" repeatCount="indefinite" begin="2s" /></circle>
+      <circle cx="850" cy="600" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2.5s" repeatCount="indefinite" begin="1.2s" /></circle>
+      <circle cx="150" cy="180" r="2" fill="#FFD700" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2s" repeatCount="indefinite" begin="0.7s" /></circle>
+      <circle cx="860" cy="220" r="2" fill="#FFD700" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.5s" repeatCount="indefinite" begin="1.8s" /></circle>
       {/* Diagonal accents */}
       <line x1="120" y1="80" x2="200" y2="50" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
       <line x1="880" y1="620" x2="800" y2="650" stroke="#00BCD4" strokeWidth="0.3" opacity="0.4" />
+      <line x1="50" y1="100" x2="120" y2="60" stroke="#FFD700" strokeWidth="0.2" opacity="0.2" />
+      <line x1="950" y1="580" x2="880" y2="640" stroke="#00BCD4" strokeWidth="0.2" opacity="0.2" />
       {/* Connecting traces to center */}
       <line x1="200" y1="350" x2="350" y2="350" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
       <line x1="800" y1="350" x2="650" y2="350" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
+      <line x1="350" y1="350" x2="350" y2="300" stroke="#FFD700" strokeWidth="0.2" opacity="0.2" />
+      <line x1="650" y1="350" x2="650" y2="300" stroke="#FFD700" strokeWidth="0.2" opacity="0.2" />
+      {/* Data stream gradients */}
+      <defs>
+        <linearGradient id="stream-gold" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#FFD700" stopOpacity="0" />
+          <stop offset="50%" stopColor="#FFD700" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#FFD700" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="stream-cyan" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#00BCD4" stopOpacity="0" />
+          <stop offset="50%" stopColor="#00BCD4" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#00BCD4" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {/* Horizontal data streams */}
+      <rect x="0" y="119" width="60" height="2" fill="url(#stream-gold)" opacity="0.4">
+        <animateTransform attributeName="transform" type="translate" values="-60,0;200,0" dur="3s" repeatCount="indefinite" />
+      </rect>
+      <rect x="1000" y="299" width="60" height="2" fill="url(#stream-gold)" opacity="0.3">
+        <animateTransform attributeName="transform" type="translate" values="60,0;-200,0" dur="4s" repeatCount="indefinite" begin="1s" />
+      </rect>
+      {/* Vertical data streams */}
+      <rect x="79" y="0" width="2" height="40" fill="url(#stream-cyan)" opacity="0.3">
+        <animateTransform attributeName="transform" type="translate" values="0,-40;0,700" dur="5s" repeatCount="indefinite" />
+      </rect>
+      <rect x="919" y="700" width="2" height="40" fill="url(#stream-cyan)" opacity="0.3">
+        <animateTransform attributeName="transform" type="translate" values="0,40;0,-700" dur="6s" repeatCount="indefinite" begin="2s" />
+      </rect>
     </svg>
   );
 }
