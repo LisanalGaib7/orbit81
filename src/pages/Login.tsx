@@ -440,7 +440,14 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden select-none">
+    <div className={`min-h-screen bg-background flex items-center justify-center relative overflow-hidden select-none ${ignitionFlash ? 'animate-screen-shake' : ''}`}>
+      {/* Ignition gold flash */}
+      {ignitionFlash && (
+        <div className="fixed inset-0 z-[60] pointer-events-none" style={{
+          background: 'radial-gradient(circle at center, rgba(255,215,0,0.25) 0%, transparent 70%)',
+          animation: 'fade-out 0.5s ease-out forwards',
+        }} />
+      )}
       {/* Heavy vignette */}
       <div className="absolute inset-0 pointer-events-none z-[5]" style={{
         background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.85) 100%)',
