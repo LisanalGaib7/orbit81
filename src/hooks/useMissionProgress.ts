@@ -221,6 +221,7 @@ export function useMissionProgress() {
     activeBlockIndex,
     focusActionIndex,
     ignitionBurst,
+    canRevert,
 
     // Derived
     subGoalProgress,
