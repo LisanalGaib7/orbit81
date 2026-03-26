@@ -241,6 +241,7 @@ export function useMissionProgress() {
     updateActionLabel,
     applyTemplate,
     resetSession,
+    revertReset,
     handleActionSlotClick,
     clearConfetti,
     handleLaunchComplete,
