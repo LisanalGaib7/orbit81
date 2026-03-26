@@ -8,7 +8,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Settings, BookOpen, Wrench, Power, X } from "lucide-react";
+import { Settings, BookOpen, Wrench, Power, RotateCcw, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Tooltip,
@@ -203,20 +204,21 @@ interface HeaderBarProps {
 }
 
 export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
+  const { signOut } = useAuth();
   const [hubOpen, setHubOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
   const [mounted, setMounted] = useState(false);
   const hubRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Close hub when clicking outside (but not when clicking portaled panels)
   useEffect(() => {
     if (!hubOpen) return;
     const handler = (e: MouseEvent) => {
-      if (manualOpen || templateOpen) return; // sub-panel is open, let its own handler manage
+      if (manualOpen || templateOpen) return;
       if (hubRef.current && !hubRef.current.contains(e.target as Node)) {
         setHubOpen(false);
       }
@@ -233,6 +235,17 @@ export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
     } else {
       setConfirmReset(true);
       setTimeout(() => setConfirmReset(false), 3000);
+    }
+  };
+
+  const handleLogout = () => {
+    if (confirmLogout) {
+      signOut();
+      setConfirmLogout(false);
+      setHubOpen(false);
+    } else {
+      setConfirmLogout(true);
+      setTimeout(() => setConfirmLogout(false), 3000);
     }
   };
 
@@ -312,11 +325,19 @@ export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
             <div className="w-6 h-px bg-primary/20 my-0.5" />
 
             <SubIcon
-              icon={Power}
+              icon={RotateCcw}
               label={confirmReset ? "Confirm?" : "Reset"}
               onClick={handleReset}
               isActive={confirmReset}
               index={2}
+            />
+
+            <SubIcon
+              icon={Power}
+              label={confirmLogout ? "Confirm?" : "Logout"}
+              onClick={handleLogout}
+              isActive={confirmLogout}
+              index={3}
             />
           </motion.div>
         )}
