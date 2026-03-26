@@ -628,7 +628,7 @@ const Login = () => {
                   letterSpacing: '0.15em',
                   imageRendering: 'pixelated',
                 }}>
-                  {emailLoading ? 'INITIALIZING...' : isSignUp ? 'REGISTER PILOT' : 'INITIALIZE DIVE'}
+                  {emailLoading ? 'IGNITING...' : isSignUp ? 'REGISTER PILOT' : 'IGNITE MISSION'}
                 </span>
               </div>
               {/* Scanner */}
