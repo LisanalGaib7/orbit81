@@ -1,97 +1,189 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+
+/* ═══════════════════════════════════════════════════════════════════
+   DECORATIVE SUB-COMPONENTS
+   ═══════════════════════════════════════════════════════════════════ */
 
 /* ─── Pixel Google "G" ─────────────────────────────────────────── */
 const PIXEL_G: [number, number, string][] = [
-  // Row 0-1: top of G (blue)
   [0,2,'#4285F4'],[0,3,'#4285F4'],[0,4,'#4285F4'],[0,5,'#4285F4'],
   [1,1,'#EA4335'],[1,6,'#4285F4'],
-  // Row 2-3: left side (red) + right gap
   [2,0,'#EA4335'],[2,7,'#4285F4'],
   [3,0,'#EA4335'],
-  // Row 4: left (yellow) + middle bar (blue)
   [4,0,'#FBBC05'],[4,4,'#4285F4'],[4,5,'#4285F4'],[4,6,'#4285F4'],[4,7,'#4285F4'],
-  // Row 5-6: left (yellow/green) + right (blue)
   [5,0,'#FBBC05'],[5,7,'#4285F4'],
   [6,0,'#34A853'],[6,7,'#34A853'],
-  // Row 7-8: bottom (green)
   [7,1,'#34A853'],[7,6,'#34A853'],
   [8,2,'#34A853'],[8,3,'#34A853'],[8,4,'#34A853'],[8,5,'#34A853'],
 ];
 
-function PixelGoogleG({ size = 36 }: { size?: number }) {
+function PixelGoogleG({ size = 32 }: { size?: number }) {
   const px = size / 9;
   return (
     <div className="relative" style={{ width: size, height: size, imageRendering: 'pixelated' }}>
       {PIXEL_G.map(([row, col, color], i) => (
-        <div
-          key={i}
-          className="absolute"
-          style={{
-            width: px, height: px,
-            top: row * px, left: col * px,
-            backgroundColor: color,
-            boxShadow: `0 0 ${px}px ${color}40`,
-          }}
-        />
+        <div key={i} className="absolute" style={{
+          width: px, height: px, top: row * px, left: col * px,
+          backgroundColor: color, boxShadow: `0 0 ${px}px ${color}40`,
+        }} />
       ))}
     </div>
   );
 }
 
-/* ─── Blinking LED indicator ───────────────────────────────────── */
-function LED({ color, delay, className }: { color: string; delay: number; className?: string }) {
+/* ─── L-Shaped corner bracket ──────────────────────────────────── */
+function CornerBracket({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
+  const size = 40;
+  const t = 2;
+  const isTop = position.startsWith('t');
+  const isLeft = position.endsWith('l');
+
   return (
-    <div className={`absolute ${className}`}>
-      <div
-        className="rounded-full animate-pulse"
-        style={{
-          width: 4, height: 4,
-          backgroundColor: color,
-          boxShadow: `0 0 6px ${color}, 0 0 12px ${color}50`,
-          animationDelay: `${delay}s`,
-          animationDuration: '2.5s',
-        }}
-      />
+    <div className="absolute pointer-events-none" style={{
+      top: isTop ? 12 : undefined,
+      bottom: !isTop ? 12 : undefined,
+      left: isLeft ? 12 : undefined,
+      right: !isLeft ? 12 : undefined,
+    }}>
+      {/* L shape */}
+      <div className="relative" style={{ width: size, height: size }}>
+        {/* Horizontal arm */}
+        <div className="absolute" style={{
+          height: t, width: size,
+          backgroundColor: '#FFD700',
+          boxShadow: '0 0 4px #FFD70060',
+          top: isTop ? 0 : size - t,
+          left: 0,
+          opacity: 0.5,
+        }} />
+        {/* Vertical arm */}
+        <div className="absolute" style={{
+          width: t, height: size,
+          backgroundColor: '#FFD700',
+          boxShadow: '0 0 4px #FFD70060',
+          left: isLeft ? 0 : size - t,
+          top: 0,
+          opacity: 0.5,
+        }} />
+        {/* Corner rivet */}
+        <div className="absolute" style={{
+          width: 5, height: 5,
+          top: isTop ? -1 : size - 4,
+          left: isLeft ? -1 : size - 4,
+        }}>
+          <div className="w-full h-full rounded-full bg-zinc-600 border border-zinc-500" />
+        </div>
+      </div>
     </div>
   );
 }
 
-/* ─── Circuit trace lines (SVG) ────────────────────────────────── */
-function CircuitLines({ side }: { side: 'left' | 'right' }) {
-  const mirror = side === 'right';
+/* ─── Status label (flickering corner HUD text) ────────────────── */
+function StatusLabel({ text, position, color, delay }: {
+  text: string; position: string; color: string; delay: number;
+}) {
   return (
-    <svg
-      className="absolute top-0 h-full w-16 sm:w-24 opacity-20 pointer-events-none"
-      style={{ [side]: 0, transform: mirror ? 'scaleX(-1)' : undefined }}
-      viewBox="0 0 80 400"
-      preserveAspectRatio="none"
-      fill="none"
+    <div
+      className="absolute pointer-events-none animate-pulse hidden sm:block"
+      style={{
+        ...parsePosition(position),
+        fontFamily: 'var(--font-data)',
+        fontSize: 8,
+        color,
+        opacity: 0.35,
+        letterSpacing: '0.15em',
+        animationDelay: `${delay}s`,
+        animationDuration: '3s',
+      }}
     >
-      {/* Vertical main bus */}
-      <line x1="20" y1="0" x2="20" y2="400" stroke="#FFD700" strokeWidth="0.5" />
-      {/* Horizontal branches */}
-      <line x1="20" y1="80" x2="60" y2="80" stroke="#FFD700" strokeWidth="0.5" />
-      <circle cx="60" cy="80" r="2" fill="#FFD700" />
-      <line x1="20" y1="160" x2="50" y2="160" stroke="#00BCD4" strokeWidth="0.5" />
-      <circle cx="50" cy="160" r="2" fill="#00BCD4" />
-      <line x1="20" y1="240" x2="65" y2="240" stroke="#FFD700" strokeWidth="0.5" />
-      <line x1="65" y1="240" x2="65" y2="280" stroke="#FFD700" strokeWidth="0.5" />
-      <circle cx="65" cy="280" r="2" fill="#FFD700" />
-      <line x1="20" y1="320" x2="45" y2="320" stroke="#00BCD4" strokeWidth="0.5" />
-      <circle cx="45" cy="320" r="2" fill="#00BCD4" />
-      {/* Diagonal */}
-      <line x1="20" y1="50" x2="40" y2="30" stroke="#FFD700" strokeWidth="0.3" opacity="0.5" />
-      <line x1="20" y1="370" x2="55" y2="350" stroke="#00BCD4" strokeWidth="0.3" opacity="0.5" />
+      {text}
+    </div>
+  );
+}
+
+function parsePosition(pos: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  pos.split(' ').forEach(p => {
+    const [k, v] = p.split(':');
+    result[k] = v;
+  });
+  return result;
+}
+
+/* ─── Dense circuit network SVG ────────────────────────────────── */
+function CircuitNetwork() {
+  return (
+    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.15]" preserveAspectRatio="none" viewBox="0 0 1000 700" fill="none">
+      {/* Left vertical bus */}
+      <line x1="80" y1="0" x2="80" y2="700" stroke="#FFD700" strokeWidth="0.5" />
+      <line x1="120" y1="0" x2="120" y2="700" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
+      {/* Right vertical bus */}
+      <line x1="920" y1="0" x2="920" y2="700" stroke="#FFD700" strokeWidth="0.5" />
+      <line x1="880" y1="0" x2="880" y2="700" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
+      {/* Top horizontal */}
+      <line x1="0" y1="60" x2="1000" y2="60" stroke="#00BCD4" strokeWidth="0.3" opacity="0.3" />
+      {/* Bottom horizontal */}
+      <line x1="0" y1="640" x2="1000" y2="640" stroke="#00BCD4" strokeWidth="0.3" opacity="0.3" />
+      {/* Cross branches left */}
+      <line x1="80" y1="120" x2="200" y2="120" stroke="#FFD700" strokeWidth="0.5" />
+      <circle cx="200" cy="120" r="2.5" fill="#FFD700" />
+      <line x1="80" y1="250" x2="180" y2="250" stroke="#00BCD4" strokeWidth="0.4" />
+      <circle cx="180" cy="250" r="2" fill="#00BCD4" />
+      <line x1="80" y1="400" x2="220" y2="400" stroke="#FFD700" strokeWidth="0.4" />
+      <line x1="220" y1="400" x2="220" y2="450" stroke="#FFD700" strokeWidth="0.4" />
+      <circle cx="220" cy="450" r="2.5" fill="#FFD700" />
+      <line x1="80" y1="550" x2="160" y2="550" stroke="#00BCD4" strokeWidth="0.4" />
+      <circle cx="160" cy="550" r="2" fill="#00BCD4" />
+      {/* Cross branches right */}
+      <line x1="920" y1="150" x2="800" y2="150" stroke="#FFD700" strokeWidth="0.5" />
+      <circle cx="800" cy="150" r="2.5" fill="#FFD700" />
+      <line x1="920" y1="300" x2="830" y2="300" stroke="#00BCD4" strokeWidth="0.4" />
+      <circle cx="830" cy="300" r="2" fill="#00BCD4" />
+      <line x1="920" y1="480" x2="780" y2="480" stroke="#FFD700" strokeWidth="0.4" />
+      <line x1="780" y1="480" x2="780" y2="520" stroke="#FFD700" strokeWidth="0.4" />
+      <circle cx="780" cy="520" r="2.5" fill="#FFD700" />
+      <line x1="920" y1="600" x2="850" y2="600" stroke="#00BCD4" strokeWidth="0.4" />
+      <circle cx="850" cy="600" r="2" fill="#00BCD4" />
+      {/* Diagonal accents */}
+      <line x1="120" y1="80" x2="200" y2="50" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
+      <line x1="880" y1="620" x2="800" y2="650" stroke="#00BCD4" strokeWidth="0.3" opacity="0.4" />
+      {/* Connecting traces to center */}
+      <line x1="200" y1="350" x2="350" y2="350" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
+      <line x1="800" y1="350" x2="650" y2="350" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
     </svg>
   );
 }
 
-/* ─── Hex pattern overlay ──────────────────────────────────────── */
+/* ─── Data pulse traveling along circuit ───────────────────────── */
+function DataPulse({ path, color, delay, duration }: {
+  path: string; color: string; delay: number; duration: number;
+}) {
+  return (
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1000 700" preserveAspectRatio="none">
+      <defs>
+        <filter id={`glow-${delay}`}>
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+      </defs>
+      <circle r="3" fill={color} filter={`url(#glow-${delay})`}>
+        <animateMotion
+          path={path}
+          dur={`${duration}s`}
+          repeatCount="indefinite"
+          begin={`${delay}s`}
+        />
+      </circle>
+    </svg>
+  );
+}
+
+/* ─── Hex pattern ──────────────────────────────────────────────── */
 function HexPattern() {
   return (
-    <svg className="absolute inset-0 w-full h-full opacity-[0.04] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+    <svg className="absolute inset-0 w-full h-full opacity-[0.03] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <pattern id="hex-login" x="0" y="0" width="24" height="42" patternUnits="userSpaceOnUse">
           <path d="M12 0 L24 7 L24 21 L12 28 L0 21 L0 7 Z" fill="none" stroke="#FFD700" strokeWidth="0.5" />
@@ -103,16 +195,29 @@ function HexPattern() {
   );
 }
 
-/* ─── Corner rivets ────────────────────────────────────────────── */
+/* ─── LED ───────────────────────────────────────────────────────── */
+function LED({ color, delay, className }: { color: string; delay: number; className?: string }) {
+  return (
+    <div className={`absolute ${className}`}>
+      <div className="rounded-full animate-pulse" style={{
+        width: 3, height: 3, backgroundColor: color,
+        boxShadow: `0 0 6px ${color}, 0 0 10px ${color}40`,
+        animationDelay: `${delay}s`, animationDuration: '2.5s',
+      }} />
+    </div>
+  );
+}
+
+/* ─── Rivet ─────────────────────────────────────────────────────── */
 function Rivet({ className }: { className: string }) {
   return (
     <div className={`absolute ${className}`} style={{ imageRendering: 'pixelated' }}>
-      <div className="w-2.5 h-2.5 rounded-full bg-zinc-700 border border-zinc-600 relative">
+      <div className="w-2 h-2 rounded-full bg-zinc-700 border border-zinc-600 relative">
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-[1px] h-full bg-zinc-500/40 absolute" />
-          <div className="h-[1px] w-full bg-zinc-500/40 absolute" />
+          <div className="w-[1px] h-full bg-zinc-500/30 absolute" />
+          <div className="h-[1px] w-full bg-zinc-500/30 absolute" />
         </div>
-        <div className="absolute inset-[2px] rounded-full bg-zinc-800" />
+        <div className="absolute inset-[1.5px] rounded-full bg-zinc-800" />
       </div>
     </div>
   );
@@ -121,23 +226,22 @@ function Rivet({ className }: { className: string }) {
 /* ─── Holographic data stream ──────────────────────────────────── */
 function DataStream({ side }: { side: 'left' | 'right' }) {
   const chars = useMemo(() =>
-    Array.from({ length: 12 }, () =>
-      Array.from({ length: 4 }, () => Math.random() > 0.5 ? '1' : '0').join('')
+    Array.from({ length: 14 }, () =>
+      Array.from({ length: 6 }, () => Math.random() > 0.5 ? '1' : '0').join('')
     ), []
   );
-
   return (
     <div
-      className="absolute top-1/4 hidden sm:flex flex-col gap-1 opacity-[0.12] pointer-events-none font-mono text-[8px]"
+      className="absolute hidden sm:flex flex-col gap-0.5 opacity-[0.08] pointer-events-none"
       style={{
-        [side]: side === 'left' ? '2rem' : '2rem',
+        [side]: '6rem', top: '20%',
         color: side === 'left' ? '#FFD700' : '#00BCD4',
+        fontFamily: 'var(--font-data)', fontSize: 7,
         imageRendering: 'pixelated',
-        fontFamily: 'var(--font-data)',
       }}
     >
       {chars.map((line, i) => (
-        <div key={i} className="animate-pulse" style={{ animationDelay: `${i * 0.3}s` }}>
+        <div key={i} className="animate-pulse" style={{ animationDelay: `${i * 0.25}s` }}>
           {line}
         </div>
       ))}
@@ -145,25 +249,83 @@ function DataStream({ side }: { side: 'left' | 'right' }) {
   );
 }
 
-/* ─── Scanner line on button ───────────────────────────────────── */
-function ScannerLine() {
+/* ─── Boot sequence overlay ────────────────────────────────────── */
+const BOOT_LINES = [
+  "[INIT] ORBIT 81 GROUND CONTROL v1.0",
+  "[OK] Core systems ................ ONLINE",
+  "[OK] Navigation matrix ........... LOADED",
+  "[OK] Mission database ............ SYNCED",
+  "[OK] Pilot auth module ........... READY",
+  "[OK] Telemetry link .............. ACTIVE",
+  "[OK] Storage subsystem ........... MOUNTED",
+  "[OK] CPU Core allocation ......... 98%",
+  "[OK] Display adapter ............. PIXELATED",
+  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+  "WELCOME, PILOT. MISSION CONTROL ONLINE.",
+];
+
+function BootSequence({ onComplete }: { onComplete: () => void }) {
+  const [lines, setLines] = useState<string[]>([]);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    let i = 0;
+    const id = setInterval(() => {
+      if (i < BOOT_LINES.length) {
+        setLines(prev => [...prev, BOOT_LINES[i]]);
+        i++;
+      } else {
+        clearInterval(id);
+        setTimeout(() => { setDone(true); setTimeout(onComplete, 400); }, 600);
+      }
+    }, 120);
+    return () => clearInterval(id);
+  }, [onComplete]);
+
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-lg">
-      <div
-        className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/15 to-transparent"
-        style={{ animation: 'scanner-full 4s linear infinite' }}
-      />
+    <div className={`fixed inset-0 z-50 bg-background flex items-center justify-center transition-opacity duration-400 ${done ? 'opacity-0' : 'opacity-100'}`}>
+      <div className="w-full max-w-md px-6">
+        <div className="flex flex-col gap-1">
+          {lines.map((line, i) => (
+            <div key={i} style={{
+              fontFamily: 'var(--font-data)',
+              fontSize: 10,
+              color: line.startsWith('[OK]') ? '#34A853' : line.startsWith('━') ? '#FFD700' : '#00BCD4',
+              letterSpacing: '0.05em',
+              opacity: line.startsWith('WELCOME') ? 1 : 0.7,
+              textShadow: line.startsWith('WELCOME') ? '0 0 10px #FFD70060' : undefined,
+            }}>
+              {line}
+            </div>
+          ))}
+          {!done && (
+            <div className="mt-2 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              <span style={{ fontFamily: 'var(--font-data)', fontSize: 9, color: '#FFD700', opacity: 0.5 }}>
+                LOADING...
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════ */
-/*  LOGIN PAGE                                                     */
-/* ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   MAIN LOGIN COMPONENT
+   ═══════════════════════════════════════════════════════════════════ */
 
 const Login = () => {
-  const { user, loading, signInWithGoogle } = useAuth();
-  const [pressed, setPressed] = useState(false);
+  const { user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
+  const [googlePressed, setGooglePressed] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [showBoot, setShowBoot] = useState(false);
+
   const [stars] = useState(() =>
     Array.from({ length: 50 }, () => ({
       w: Math.random() * 2 + 1,
@@ -174,7 +336,6 @@ const Login = () => {
     }))
   );
 
-  // Typewriter effect for status text
   const statusText = "AWAITING PILOT AUTHENTICATION...";
   const [typed, setTyped] = useState("");
   useEffect(() => {
@@ -187,239 +348,312 @@ const Login = () => {
     return () => clearInterval(id);
   }, [loading]);
 
+  const handleEmailSubmit = useCallback(async () => {
+    if (!email.trim() || !password.trim()) {
+      setEmailError("ALL FIELDS REQUIRED");
+      return;
+    }
+    setEmailError(null);
+    setEmailLoading(true);
+    const fn = isSignUp ? signUpWithEmail : signInWithEmail;
+    const { error } = await fn(email, password);
+    setEmailLoading(false);
+    if (error) {
+      setEmailError(error.toUpperCase());
+    } else if (isSignUp) {
+      setEmailError("VERIFICATION LINK TRANSMITTED. CHECK INBOX.");
+    }
+  }, [email, password, isSignUp, signInWithEmail, signUpWithEmail]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-primary animate-pulse tracking-widest" style={{ fontFamily: 'var(--font-header)', fontSize: 12, imageRendering: 'pixelated' }}>
+        <div className="text-primary animate-pulse tracking-widest" style={{
+          fontFamily: 'var(--font-header)', fontSize: 12, imageRendering: 'pixelated',
+        }}>
           SYSTEM BOOT...
         </div>
       </div>
     );
   }
 
-  if (user) return <Navigate to="/" replace />;
+  if (user) {
+    if (showBoot) return <BootSequence onComplete={() => {}} />;
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden select-none">
-      {/* Deep space stars */}
+      {/* Boot sequence overlay */}
+      {showBoot && <BootSequence onComplete={() => {}} />}
+
+      {/* Stars */}
       <div className="absolute inset-0 pointer-events-none">
         {stars.map((s, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-foreground/15 animate-pulse"
-            style={{
-              width: s.w, height: s.w,
-              top: `${s.top}%`, left: `${s.left}%`,
-              animationDuration: `${s.dur}s`,
-              animationDelay: `${s.delay}s`,
-            }}
-          />
+          <div key={i} className="absolute rounded-full bg-foreground/10 animate-pulse" style={{
+            width: s.w, height: s.w, top: `${s.top}%`, left: `${s.left}%`,
+            animationDuration: `${s.dur}s`, animationDelay: `${s.delay}s`,
+          }} />
         ))}
       </div>
 
       {/* Hex pattern */}
       <HexPattern />
 
-      {/* Circuit traces */}
-      <CircuitLines side="left" />
-      <CircuitLines side="right" />
+      {/* Dense circuit network */}
+      <CircuitNetwork />
 
-      {/* Holographic data streams */}
+      {/* Data pulses traveling along circuits */}
+      <DataPulse path="M80,0 L80,120 L200,120" color="#FFD700" delay={0} duration={4} />
+      <DataPulse path="M920,0 L920,150 L800,150" color="#FFD700" delay={2} duration={5} />
+      <DataPulse path="M80,700 L80,550 L160,550" color="#00BCD4" delay={1} duration={4.5} />
+      <DataPulse path="M920,700 L920,600 L850,600" color="#00BCD4" delay={3} duration={5} />
+
+      {/* Data streams */}
       <DataStream side="left" />
       <DataStream side="right" />
 
-      {/* Blinking LEDs scattered */}
-      <LED color="#FFD700" delay={0} className="top-[15%] left-[10%]" />
-      <LED color="#00BCD4" delay={1.2} className="top-[25%] right-[12%]" />
-      <LED color="#FFD700" delay={0.7} className="bottom-[20%] left-[8%]" />
-      <LED color="#00BCD4" delay={2} className="bottom-[30%] right-[15%]" />
-      <LED color="#FFD700" delay={1.5} className="top-[60%] left-[5%]" />
-      <LED color="#00BCD4" delay={0.3} className="top-[45%] right-[6%]" />
+      {/* Corner brackets */}
+      <CornerBracket position="tl" />
+      <CornerBracket position="tr" />
+      <CornerBracket position="bl" />
+      <CornerBracket position="br" />
 
-      {/* ─── Main content ─────────────────────────────────────── */}
-      <div className="relative z-10 flex flex-col items-center gap-8 sm:gap-10 px-4 w-full max-w-lg">
+      {/* Flickering status labels */}
+      <StatusLabel text="[STORAGE_LINK: ACTIVE]" position="top:70px left:60px" color="#34A853" delay={0} />
+      <StatusLabel text="[CPU_CORE: 98%]" position="top:70px right:60px" color="#FFD700" delay={1.5} />
+      <StatusLabel text="[MISSION_LOG: READY]" position="bottom:70px left:60px" color="#00BCD4" delay={0.8} />
+      <StatusLabel text="[NAV_MATRIX: SYNCED]" position="bottom:70px right:60px" color="#34A853" delay={2.2} />
 
-        {/* ── Title block ── */}
-        <div className="flex flex-col items-center gap-3">
-          <div
-            className="text-center leading-tight"
-            style={{
-              fontFamily: 'var(--font-header)',
-              fontSize: 'clamp(14px, 3.5vw, 22px)',
-              color: '#FFD700',
-              textShadow: '2px 2px 0px #000, 0 0 20px rgba(255,215,0,0.35)',
-              imageRendering: 'pixelated',
-              letterSpacing: '0.08em',
-            }}
-          >
+      {/* LEDs */}
+      <LED color="#FFD700" delay={0} className="top-[18%] left-[12%]" />
+      <LED color="#00BCD4" delay={1.2} className="top-[28%] right-[14%]" />
+      <LED color="#FFD700" delay={0.7} className="bottom-[22%] left-[9%]" />
+      <LED color="#00BCD4" delay={2} className="bottom-[32%] right-[16%]" />
+
+      {/* ─── Main content ───────────────────────────────────────── */}
+      <div className="relative z-10 flex flex-col items-center gap-6 sm:gap-8 px-4 w-full max-w-md">
+
+        {/* Title */}
+        <div className="flex flex-col items-center gap-2">
+          <div style={{
+            fontFamily: 'var(--font-header)',
+            fontSize: 'clamp(13px, 3.5vw, 20px)',
+            color: '#FFD700',
+            textShadow: '2px 2px 0px #000, 0 0 20px rgba(255,215,0,0.35)',
+            imageRendering: 'pixelated',
+            letterSpacing: '0.08em',
+            textAlign: 'center',
+          }}>
             PILOT ENROLLMENT
           </div>
-          <div
-            className="text-center"
-            style={{
-              fontFamily: 'var(--font-data)',
-              fontSize: 'clamp(9px, 2vw, 11px)',
-              color: 'hsl(var(--muted-foreground))',
-              letterSpacing: '0.35em',
-            }}
-          >
+          <div style={{
+            fontFamily: 'var(--font-data)',
+            fontSize: 'clamp(8px, 1.8vw, 10px)',
+            color: 'hsl(var(--muted-foreground))',
+            letterSpacing: '0.35em',
+          }}>
             ORBIT 81 COMMAND
           </div>
-          <div className="w-40 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/30 to-transparent mt-1" />
+          <div className="w-32 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/30 to-transparent mt-1" />
         </div>
 
-        {/* ── Main cockpit button ── */}
+        {/* ── Google Auth Button ── */}
         <button
           onClick={signInWithGoogle}
-          onPointerDown={() => setPressed(true)}
-          onPointerUp={() => setPressed(false)}
-          onPointerLeave={() => setPressed(false)}
-          className={`
-            group relative w-full cursor-pointer
-            transition-transform duration-100 ease-out
-            ${pressed ? 'scale-[0.97]' : 'hover:scale-[1.01]'}
-          `}
-          style={{ aspectRatio: '16 / 5.5' }}
+          onPointerDown={() => setGooglePressed(true)}
+          onPointerUp={() => setGooglePressed(false)}
+          onPointerLeave={() => setGooglePressed(false)}
+          className={`group relative w-full cursor-pointer transition-transform duration-100 ease-out ${googlePressed ? 'scale-[0.97]' : 'hover:scale-[1.01]'}`}
+          style={{ height: 64 }}
         >
-          {/* Outer glow */}
-          <div className={`
-            absolute -inset-[2px] rounded-lg transition-shadow duration-700
-            ${pressed
-              ? 'shadow-[inset_0_2px_10px_rgba(255,215,0,0.3)]'
-              : 'shadow-[0_0_20px_rgba(255,215,0,0.12),0_0_50px_rgba(255,215,0,0.04)] group-hover:shadow-[0_0_30px_rgba(255,215,0,0.22),0_0_70px_rgba(255,215,0,0.08)]'
-            }
-          `} />
-
-          {/* Metal plate */}
-          <div
-            className={`
-              relative w-full h-full rounded-lg overflow-hidden
-              border-2 transition-all duration-700
-              ${pressed
-                ? 'border-[#B8960F]'
-                : 'border-[#FFD700]/70 group-hover:border-[#FFD700]'
-              }
-            `}
+          <div className={`absolute -inset-[2px] rounded-lg transition-shadow duration-700 ${googlePressed
+            ? 'shadow-[inset_0_2px_10px_rgba(255,215,0,0.3)]'
+            : 'shadow-[0_0_15px_rgba(255,215,0,0.1),0_0_40px_rgba(255,215,0,0.03)] group-hover:shadow-[0_0_25px_rgba(255,215,0,0.2),0_0_60px_rgba(255,215,0,0.06)]'
+          }`} />
+          <div className={`relative w-full h-full rounded-lg overflow-hidden border-2 transition-all duration-700 ${googlePressed ? 'border-[#B8960F]' : 'border-[#FFD700]/60 group-hover:border-[#FFD700]'}`}
             style={{
-              background: pressed
+              background: googlePressed
                 ? 'linear-gradient(180deg, #111 0%, #0a0a0a 100%)'
                 : 'linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 50%, #141414 100%)',
-              animation: pressed ? 'none' : 'border-breathe 3s ease-in-out infinite',
+              animation: googlePressed ? 'none' : 'border-breathe 3s ease-in-out infinite',
             }}
           >
-            {/* Hex overlay on button */}
-            <svg className="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none">
-              <defs>
-                <pattern id="hex-btn" x="0" y="0" width="20" height="35" patternUnits="userSpaceOnUse">
-                  <path d="M10 0 L20 6 L20 17 L10 23 L0 17 L0 6 Z" fill="none" stroke="#FFD700" strokeWidth="0.4" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#hex-btn)" />
+            {/* Hex overlay */}
+            <svg className="absolute inset-0 w-full h-full opacity-[0.04] pointer-events-none">
+              <defs><pattern id="hex-gbtn" x="0" y="0" width="18" height="31" patternUnits="userSpaceOnUse">
+                <path d="M9 0 L18 5 L18 15 L9 20 L0 15 L0 5 Z" fill="none" stroke="#FFD700" strokeWidth="0.3" />
+              </pattern></defs>
+              <rect width="100%" height="100%" fill="url(#hex-gbtn)" />
             </svg>
-
-            {/* Corner rivets */}
-            <Rivet className="top-1.5 left-1.5" />
-            <Rivet className="top-1.5 right-1.5" />
-            <Rivet className="bottom-1.5 left-1.5" />
-            <Rivet className="bottom-1.5 right-1.5" />
-
-            {/* Content */}
-            <div className="absolute inset-0 flex items-center justify-center gap-4 sm:gap-5 px-6">
-              {/* Pixel Google G in frame */}
-              <div className="relative shrink-0">
-                <div
-                  className="p-2 rounded border border-zinc-700/80 bg-zinc-900/80 relative overflow-hidden"
-                  style={{ imageRendering: 'pixelated' }}
-                >
-                  <PixelGoogleG size={32} />
-                  {/* Scanner on G */}
-                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div
-                      className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#FFD700]/50 to-transparent"
-                      style={{ animation: 'scanner 2.5s linear infinite' }}
-                    />
-                  </div>
+            <Rivet className="top-1 left-1" />
+            <Rivet className="top-1 right-1" />
+            <Rivet className="bottom-1 left-1" />
+            <Rivet className="bottom-1 right-1" />
+            <div className="absolute inset-0 flex items-center justify-center gap-3 px-4">
+              <div className="p-1.5 rounded border border-zinc-700/60 bg-zinc-900/60 relative overflow-hidden shrink-0" style={{ imageRendering: 'pixelated' }}>
+                <PixelGoogleG size={24} />
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#FFD700]/40 to-transparent" style={{ animation: 'scanner 2.5s linear infinite' }} />
                 </div>
               </div>
-
-              {/* Text stack */}
-              <div className="flex flex-col items-start gap-1.5">
-                <span
-                  style={{
-                    fontFamily: 'var(--font-header)',
-                    fontSize: 'clamp(8px, 2.2vw, 12px)',
-                    color: '#FFD700',
-                    textShadow: '1px 1px 0px #000, 0 0 10px rgba(255,215,0,0.2)',
-                    letterSpacing: '0.15em',
-                    imageRendering: 'pixelated',
-                  }}
-                >
-                  SIGN IN WITH GOOGLE
-                </span>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-data)',
-                    fontSize: 'clamp(7px, 1.5vw, 9px)',
-                    color: '#00BCD4',
-                    opacity: 0.6,
-                    letterSpacing: '0.2em',
-                  }}
-                >
-                  DEPLOYING MISSION ORBIT 81
-                </span>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-data)',
-                    fontSize: 'clamp(6px, 1.2vw, 8px)',
-                    color: '#00BCD4',
-                    opacity: 0.35,
-                    letterSpacing: '0.25em',
-                  }}
-                >
-                  ORBIT 81 PROJECT
-                </span>
+              <div className="flex flex-col items-start gap-0.5">
+                <span style={{
+                  fontFamily: 'var(--font-header)', fontSize: 'clamp(7px, 2vw, 10px)',
+                  color: '#FFD700', textShadow: '1px 1px 0px #000',
+                  letterSpacing: '0.12em', imageRendering: 'pixelated',
+                }}>SIGN IN WITH GOOGLE</span>
+                <span style={{
+                  fontFamily: 'var(--font-data)', fontSize: 'clamp(6px, 1.2vw, 8px)',
+                  color: '#00BCD4', opacity: 0.5, letterSpacing: '0.2em',
+                }}>OAUTH SECURE CHANNEL</span>
               </div>
             </div>
-
-            {/* Full-width scanner */}
-            <ScannerLine />
+            {/* Scanner */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-lg">
+              <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/10 to-transparent" style={{ animation: 'scanner-full 4s linear infinite' }} />
+            </div>
           </div>
         </button>
 
-        {/* ── Status footer ── */}
-        <div className="flex flex-col items-center gap-3">
-          {/* Typewriter status */}
-          <div className="flex items-center gap-2">
-            <div
-              className="w-1.5 h-1.5 rounded-full animate-pulse"
-              style={{ backgroundColor: '#34A853', boxShadow: '0 0 6px #34A853' }}
-            />
-            <span
-              className="text-muted-foreground/50"
+        {/* ── Divider ── */}
+        <div className="w-full flex items-center gap-3">
+          <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/20 to-[#FFD700]/20" />
+          <span style={{ fontFamily: 'var(--font-data)', fontSize: 8, color: '#FFD700', opacity: 0.4, letterSpacing: '0.3em' }}>
+            OR
+          </span>
+          <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-[#FFD700]/20 to-[#FFD700]/20" />
+        </div>
+
+        {/* ── Email/Password Fields ── */}
+        <div className="w-full flex flex-col gap-3">
+          {/* Email field */}
+          <div className="relative">
+            <label style={{
+              fontFamily: 'var(--font-data)', fontSize: 8, color: '#FFD700',
+              opacity: 0.6, letterSpacing: '0.25em', marginBottom: 4, display: 'block',
+            }}>
+              PILOT ID (EMAIL)
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => { setEmail(e.target.value); setEmailError(null); }}
+              placeholder="pilot@orbit81.com"
+              className="w-full px-3 py-2.5 rounded border outline-none transition-all duration-300 focus:shadow-[0_0_12px_rgba(255,215,0,0.15)]"
               style={{
+                background: 'rgba(10,10,10,0.8)',
+                borderColor: 'rgba(255,215,0,0.3)',
+                color: '#FFD700',
                 fontFamily: 'var(--font-data)',
-                fontSize: 9,
-                letterSpacing: '0.25em',
+                fontSize: 12,
+                letterSpacing: '0.1em',
+                caretColor: '#FFD700',
               }}
-            >
-              {typed}
-              <span className="animate-pulse">_</span>
-            </span>
+              onFocus={e => e.target.style.borderColor = 'rgba(255,215,0,0.7)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,215,0,0.3)'}
+            />
           </div>
 
-          {/* Separator */}
-          <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+          {/* Password field */}
+          <div className="relative">
+            <label style={{
+              fontFamily: 'var(--font-data)', fontSize: 8, color: '#FFD700',
+              opacity: 0.6, letterSpacing: '0.25em', marginBottom: 4, display: 'block',
+            }}>
+              ACCESS CODE (PASSWORD)
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => { setPassword(e.target.value); setEmailError(null); }}
+              placeholder="••••••••"
+              className="w-full px-3 py-2.5 rounded border outline-none transition-all duration-300 focus:shadow-[0_0_12px_rgba(255,215,0,0.15)]"
+              style={{
+                background: 'rgba(10,10,10,0.8)',
+                borderColor: 'rgba(255,215,0,0.3)',
+                color: '#FFD700',
+                fontFamily: 'var(--font-data)',
+                fontSize: 12,
+                letterSpacing: '0.2em',
+                caretColor: '#FFD700',
+              }}
+              onFocus={e => e.target.style.borderColor = 'rgba(255,215,0,0.7)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,215,0,0.3)'}
+              onKeyDown={e => e.key === 'Enter' && handleEmailSubmit()}
+            />
+          </div>
 
-          {/* Version */}
-          <div
-            className="text-muted-foreground/25"
+          {/* Error / info message */}
+          {emailError && (
+            <div style={{
+              fontFamily: 'var(--font-data)', fontSize: 9,
+              color: emailError.includes('VERIFICATION') ? '#34A853' : '#EA4335',
+              letterSpacing: '0.1em', opacity: 0.8,
+            }}>
+              ⚠ {emailError}
+            </div>
+          )}
+
+          {/* INITIALIZE DIVE button */}
+          <button
+            onClick={handleEmailSubmit}
+            disabled={emailLoading}
+            className={`group relative w-full cursor-pointer transition-transform duration-100 ${emailLoading ? 'opacity-60 pointer-events-none' : 'active:scale-[0.97] hover:scale-[1.01]'}`}
+            style={{ height: 48 }}
+          >
+            <div className="absolute -inset-[1px] rounded transition-shadow duration-500 shadow-[0_0_10px_rgba(255,215,0,0.08)] group-hover:shadow-[0_0_20px_rgba(255,215,0,0.15)]" />
+            <div className="relative w-full h-full rounded overflow-hidden border transition-all duration-500 border-[#FFD700]/40 group-hover:border-[#FFD700]/80"
+              style={{ background: 'linear-gradient(180deg, #1c1c0a 0%, #0f0f05 50%, #181808 100%)' }}
+            >
+              <Rivet className="top-0.5 left-0.5" />
+              <Rivet className="top-0.5 right-0.5" />
+              <Rivet className="bottom-0.5 left-0.5" />
+              <Rivet className="bottom-0.5 right-0.5" />
+              <div className="absolute inset-0 flex items-center justify-center gap-2">
+                <span style={{
+                  fontFamily: 'var(--font-header)',
+                  fontSize: 'clamp(7px, 2vw, 10px)',
+                  color: '#FFD700',
+                  textShadow: '1px 1px 0px #000, 0 0 8px rgba(255,215,0,0.2)',
+                  letterSpacing: '0.15em',
+                  imageRendering: 'pixelated',
+                }}>
+                  {emailLoading ? 'INITIALIZING...' : isSignUp ? 'REGISTER PILOT' : 'INITIALIZE DIVE'}
+                </span>
+              </div>
+              {/* Scanner */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none rounded">
+                <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/10 to-transparent" style={{ animation: 'scanner-full 3s linear infinite' }} />
+              </div>
+            </div>
+          </button>
+
+          {/* Toggle sign up / sign in */}
+          <button
+            onClick={() => { setIsSignUp(!isSignUp); setEmailError(null); }}
+            className="self-center"
             style={{
-              fontFamily: 'var(--font-data)',
-              fontSize: 8,
-              letterSpacing: '0.3em',
+              fontFamily: 'var(--font-data)', fontSize: 9,
+              color: '#00BCD4', opacity: 0.5, letterSpacing: '0.15em',
+              background: 'none', border: 'none', cursor: 'pointer',
             }}
           >
-            SYS v1.0 · GROUND CONTROL
+            {isSignUp ? '← EXISTING PILOT? SIGN IN' : 'NEW PILOT? REGISTER →'}
+          </button>
+        </div>
+
+        {/* ── Status footer ── */}
+        <div className="flex flex-col items-center gap-2 mt-2">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#34A853', boxShadow: '0 0 6px #34A853' }} />
+            <span className="text-muted-foreground/40" style={{ fontFamily: 'var(--font-data)', fontSize: 8, letterSpacing: '0.2em' }}>
+              {typed}<span className="animate-pulse">_</span>
+            </span>
+          </div>
+          <div className="w-20 h-[1px] bg-gradient-to-r from-transparent via-primary/15 to-transparent" />
+          <div className="text-muted-foreground/20" style={{ fontFamily: 'var(--font-data)', fontSize: 7, letterSpacing: '0.3em' }}>
+            SYS v1.0 · GROUND CONTROL · ORBIT 81 PROJECT
           </div>
         </div>
       </div>
