@@ -8,7 +8,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Settings, BookOpen, Wrench, Power, X } from "lucide-react";
+import { Settings, BookOpen, Wrench, Power, RotateCcw, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Tooltip,
