@@ -115,43 +115,89 @@ function parsePosition(pos: string): Record<string, string> {
 /* ─── Dense circuit network SVG ────────────────────────────────── */
 function CircuitNetwork() {
   return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.15]" preserveAspectRatio="none" viewBox="0 0 1000 700" fill="none">
+    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.18]" preserveAspectRatio="none" viewBox="0 0 1000 700" fill="none">
       {/* Left vertical bus */}
       <line x1="80" y1="0" x2="80" y2="700" stroke="#FFD700" strokeWidth="0.5" />
       <line x1="120" y1="0" x2="120" y2="700" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
+      <line x1="50" y1="0" x2="50" y2="700" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
       {/* Right vertical bus */}
       <line x1="920" y1="0" x2="920" y2="700" stroke="#FFD700" strokeWidth="0.5" />
       <line x1="880" y1="0" x2="880" y2="700" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
+      <line x1="950" y1="0" x2="950" y2="700" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
       {/* Top horizontal */}
       <line x1="0" y1="60" x2="1000" y2="60" stroke="#00BCD4" strokeWidth="0.3" opacity="0.3" />
+      <line x1="0" y1="30" x2="1000" y2="30" stroke="#00BCD4" strokeWidth="0.2" opacity="0.15" />
       {/* Bottom horizontal */}
       <line x1="0" y1="640" x2="1000" y2="640" stroke="#00BCD4" strokeWidth="0.3" opacity="0.3" />
+      <line x1="0" y1="670" x2="1000" y2="670" stroke="#00BCD4" strokeWidth="0.2" opacity="0.15" />
       {/* Cross branches left */}
       <line x1="80" y1="120" x2="200" y2="120" stroke="#FFD700" strokeWidth="0.5" />
-      <circle cx="200" cy="120" r="2.5" fill="#FFD700" />
+      <line x1="80" y1="180" x2="150" y2="180" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
       <line x1="80" y1="250" x2="180" y2="250" stroke="#00BCD4" strokeWidth="0.4" />
-      <circle cx="180" cy="250" r="2" fill="#00BCD4" />
+      <line x1="80" y1="320" x2="140" y2="320" stroke="#00BCD4" strokeWidth="0.3" opacity="0.25" />
       <line x1="80" y1="400" x2="220" y2="400" stroke="#FFD700" strokeWidth="0.4" />
       <line x1="220" y1="400" x2="220" y2="450" stroke="#FFD700" strokeWidth="0.4" />
-      <circle cx="220" cy="450" r="2.5" fill="#FFD700" />
       <line x1="80" y1="550" x2="160" y2="550" stroke="#00BCD4" strokeWidth="0.4" />
-      <circle cx="160" cy="550" r="2" fill="#00BCD4" />
+      <line x1="50" y1="200" x2="120" y2="200" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
+      <line x1="50" y1="480" x2="120" y2="480" stroke="#00BCD4" strokeWidth="0.25" opacity="0.2" />
       {/* Cross branches right */}
       <line x1="920" y1="150" x2="800" y2="150" stroke="#FFD700" strokeWidth="0.5" />
-      <circle cx="800" cy="150" r="2.5" fill="#FFD700" />
+      <line x1="920" y1="220" x2="860" y2="220" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
       <line x1="920" y1="300" x2="830" y2="300" stroke="#00BCD4" strokeWidth="0.4" />
-      <circle cx="830" cy="300" r="2" fill="#00BCD4" />
+      <line x1="920" y1="380" x2="870" y2="380" stroke="#00BCD4" strokeWidth="0.3" opacity="0.25" />
       <line x1="920" y1="480" x2="780" y2="480" stroke="#FFD700" strokeWidth="0.4" />
       <line x1="780" y1="480" x2="780" y2="520" stroke="#FFD700" strokeWidth="0.4" />
-      <circle cx="780" cy="520" r="2.5" fill="#FFD700" />
       <line x1="920" y1="600" x2="850" y2="600" stroke="#00BCD4" strokeWidth="0.4" />
-      <circle cx="850" cy="600" r="2" fill="#00BCD4" />
+      <line x1="950" y1="260" x2="880" y2="260" stroke="#FFD700" strokeWidth="0.25" opacity="0.2" />
+      <line x1="950" y1="540" x2="880" y2="540" stroke="#00BCD4" strokeWidth="0.25" opacity="0.2" />
+      {/* Blinking nodes at intersections */}
+      <circle cx="200" cy="120" r="3" fill="#00BCD4" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite" /></circle>
+      <circle cx="180" cy="250" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2.5s" repeatCount="indefinite" begin="0.5s" /></circle>
+      <circle cx="220" cy="450" r="3" fill="#FFD700" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3s" repeatCount="indefinite" begin="1s" /></circle>
+      <circle cx="160" cy="550" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2s" repeatCount="indefinite" begin="1.5s" /></circle>
+      <circle cx="800" cy="150" r="3" fill="#FFD700" opacity="0.8"><animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.5s" repeatCount="indefinite" begin="0.3s" /></circle>
+      <circle cx="830" cy="300" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2s" repeatCount="indefinite" begin="0.8s" /></circle>
+      <circle cx="780" cy="520" r="3" fill="#FFD700" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="3s" repeatCount="indefinite" begin="2s" /></circle>
+      <circle cx="850" cy="600" r="2.5" fill="#00BCD4" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="2.5s" repeatCount="indefinite" begin="1.2s" /></circle>
+      <circle cx="150" cy="180" r="2" fill="#FFD700" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2s" repeatCount="indefinite" begin="0.7s" /></circle>
+      <circle cx="860" cy="220" r="2" fill="#FFD700" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.5s" repeatCount="indefinite" begin="1.8s" /></circle>
       {/* Diagonal accents */}
       <line x1="120" y1="80" x2="200" y2="50" stroke="#FFD700" strokeWidth="0.3" opacity="0.4" />
       <line x1="880" y1="620" x2="800" y2="650" stroke="#00BCD4" strokeWidth="0.3" opacity="0.4" />
+      <line x1="50" y1="100" x2="120" y2="60" stroke="#FFD700" strokeWidth="0.2" opacity="0.2" />
+      <line x1="950" y1="580" x2="880" y2="640" stroke="#00BCD4" strokeWidth="0.2" opacity="0.2" />
       {/* Connecting traces to center */}
       <line x1="200" y1="350" x2="350" y2="350" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
       <line x1="800" y1="350" x2="650" y2="350" stroke="#FFD700" strokeWidth="0.3" opacity="0.3" />
+      <line x1="350" y1="350" x2="350" y2="300" stroke="#FFD700" strokeWidth="0.2" opacity="0.2" />
+      <line x1="650" y1="350" x2="650" y2="300" stroke="#FFD700" strokeWidth="0.2" opacity="0.2" />
+      {/* Data stream gradients */}
+      <defs>
+        <linearGradient id="stream-gold" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#FFD700" stopOpacity="0" />
+          <stop offset="50%" stopColor="#FFD700" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#FFD700" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="stream-cyan" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#00BCD4" stopOpacity="0" />
+          <stop offset="50%" stopColor="#00BCD4" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#00BCD4" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {/* Horizontal data streams */}
+      <rect x="0" y="119" width="60" height="2" fill="url(#stream-gold)" opacity="0.4">
+        <animateTransform attributeName="transform" type="translate" values="-60,0;200,0" dur="3s" repeatCount="indefinite" />
+      </rect>
+      <rect x="1000" y="299" width="60" height="2" fill="url(#stream-gold)" opacity="0.3">
+        <animateTransform attributeName="transform" type="translate" values="60,0;-200,0" dur="4s" repeatCount="indefinite" begin="1s" />
+      </rect>
+      {/* Vertical data streams */}
+      <rect x="79" y="0" width="2" height="40" fill="url(#stream-cyan)" opacity="0.3">
+        <animateTransform attributeName="transform" type="translate" values="0,-40;0,700" dur="5s" repeatCount="indefinite" />
+      </rect>
+      <rect x="919" y="700" width="2" height="40" fill="url(#stream-cyan)" opacity="0.3">
+        <animateTransform attributeName="transform" type="translate" values="0,40;0,-700" dur="6s" repeatCount="indefinite" begin="2s" />
+      </rect>
     </svg>
   );
 }
@@ -325,6 +371,7 @@ const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
   const [showBoot, setShowBoot] = useState(false);
+  const [ignitionFlash, setIgnitionFlash] = useState(false);
 
   const [stars] = useState(() =>
     Array.from({ length: 50 }, () => ({
@@ -348,6 +395,14 @@ const Login = () => {
     return () => clearInterval(id);
   }, [loading]);
 
+  const triggerIgnition = useCallback((action: () => Promise<void>) => {
+    setIgnitionFlash(true);
+    setTimeout(async () => {
+      await action();
+      setIgnitionFlash(false);
+    }, 500);
+  }, []);
+
   const handleEmailSubmit = useCallback(async () => {
     if (!email.trim() || !password.trim()) {
       setEmailError("ALL FIELDS REQUIRED");
@@ -355,15 +410,17 @@ const Login = () => {
     }
     setEmailError(null);
     setEmailLoading(true);
-    const fn = isSignUp ? signUpWithEmail : signInWithEmail;
-    const { error } = await fn(email, password);
-    setEmailLoading(false);
-    if (error) {
-      setEmailError(error.toUpperCase());
-    } else if (isSignUp) {
-      setEmailError("VERIFICATION LINK TRANSMITTED. CHECK INBOX.");
-    }
-  }, [email, password, isSignUp, signInWithEmail, signUpWithEmail]);
+    triggerIgnition(async () => {
+      const fn = isSignUp ? signUpWithEmail : signInWithEmail;
+      const { error } = await fn(email, password);
+      setEmailLoading(false);
+      if (error) {
+        setEmailError(error.toUpperCase());
+      } else if (isSignUp) {
+        setEmailError("VERIFICATION LINK TRANSMITTED. CHECK INBOX.");
+      }
+    });
+  }, [email, password, isSignUp, signInWithEmail, signUpWithEmail, triggerIgnition]);
 
   if (loading) {
     return (
@@ -383,7 +440,18 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden select-none">
+    <div className={`min-h-screen bg-background flex items-center justify-center relative overflow-hidden select-none ${ignitionFlash ? 'animate-screen-shake' : ''}`}>
+      {/* Ignition gold flash */}
+      {ignitionFlash && (
+        <div className="fixed inset-0 z-[60] pointer-events-none" style={{
+          background: 'radial-gradient(circle at center, rgba(255,215,0,0.25) 0%, transparent 70%)',
+          animation: 'fade-out 0.5s ease-out forwards',
+        }} />
+      )}
+      {/* Heavy vignette */}
+      <div className="absolute inset-0 pointer-events-none z-[5]" style={{
+        background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.85) 100%)',
+      }} />
       {/* Boot sequence overlay */}
       {showBoot && <BootSequence onComplete={() => {}} />}
 
@@ -435,17 +503,26 @@ const Login = () => {
       <div className="relative z-10 flex flex-col items-center gap-6 sm:gap-8 px-4 w-full max-w-md">
 
         {/* Title */}
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-3">
           <div style={{
+            fontFamily: 'var(--font-data)',
+            fontSize: 'clamp(7px, 1.5vw, 9px)',
+            color: '#00BCD4',
+            letterSpacing: '0.4em',
+            opacity: 0.6,
+          }}>
+            MISSION CONTROL // ACCESS GRANTED
+          </div>
+          <div className="animate-pulse-glow" style={{
             fontFamily: 'var(--font-header)',
-            fontSize: 'clamp(13px, 3.5vw, 20px)',
+            fontSize: 'clamp(22px, 5.5vw, 36px)',
             color: '#FFD700',
-            textShadow: '2px 2px 0px #000, 0 0 20px rgba(255,215,0,0.35)',
+            textShadow: '3px 3px 0px #000, -1px -1px 0px #000, 0 0 30px rgba(255,215,0,0.4), 0 0 60px rgba(255,215,0,0.15)',
             imageRendering: 'pixelated',
-            letterSpacing: '0.08em',
+            letterSpacing: '0.12em',
             textAlign: 'center',
           }}>
-            PILOT ENROLLMENT
+            [ ORBIT 81 ]
           </div>
           <div style={{
             fontFamily: 'var(--font-data)',
@@ -453,9 +530,9 @@ const Login = () => {
             color: 'hsl(var(--muted-foreground))',
             letterSpacing: '0.35em',
           }}>
-            ORBIT 81 COMMAND
+            DEPLOYING MISSION ORBIT 81
           </div>
-          <div className="w-32 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/30 to-transparent mt-1" />
+          <div className="w-40 h-[1px] bg-gradient-to-r from-transparent via-[#FFD700]/40 to-transparent mt-1" />
         </div>
 
         {/* ── Google Auth Button ── */}
@@ -619,7 +696,7 @@ const Login = () => {
                   letterSpacing: '0.15em',
                   imageRendering: 'pixelated',
                 }}>
-                  {emailLoading ? 'INITIALIZING...' : isSignUp ? 'REGISTER PILOT' : 'INITIALIZE DIVE'}
+                  {emailLoading ? 'IGNITING...' : isSignUp ? 'REGISTER PILOT' : 'IGNITE MISSION'}
                 </span>
               </div>
               {/* Scanner */}
@@ -641,6 +718,33 @@ const Login = () => {
           >
             {isSignUp ? '← EXISTING PILOT? SIGN IN' : 'NEW PILOT? REGISTER →'}
           </button>
+
+          {/* Guest mode */}
+          <div className="flex flex-col items-center gap-1 mt-2">
+            <button
+              onClick={() => {
+                window.location.href = '/';
+              }}
+              className="group self-center"
+              style={{
+                fontFamily: 'var(--font-data)', fontSize: 9,
+                color: '#FFD700', opacity: 0.35, letterSpacing: '0.12em',
+                background: 'none', border: 'none', cursor: 'pointer',
+                textDecoration: 'underline', textUnderlineOffset: '3px',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.opacity = '0.7'; }}
+              onMouseLeave={e => { e.currentTarget.style.opacity = '0.35'; }}
+            >
+              PROCEED AS GUEST (OFFLINE MODE)
+            </button>
+            <span style={{
+              fontFamily: 'var(--font-data)', fontSize: 7,
+              color: 'hsl(var(--muted-foreground))', opacity: 0.3,
+              letterSpacing: '0.15em', fontStyle: 'italic',
+            }}>
+              *Data will be saved locally only.*
+            </span>
+          </div>
         </div>
 
         {/* ── Status footer ── */}
