@@ -709,7 +709,6 @@ const Login = () => {
                 localStorage.setItem('orbit81_guest_mode', 'true');
                 window.location.href = '/';
               }}
-              }}
               className="group self-center"
               style={{
                 fontFamily: 'var(--font-data)', fontSize: 9,
