@@ -789,6 +789,6 @@
 }
 
 @keyframes border-breathe {
-  0%, 100% { border-color: #FFD700; }
-  50% { border-color: #B8960F; }
+  0%, 100% { border-color: #FF8C00; }
+  50% { border-color: #994400; }
 }
