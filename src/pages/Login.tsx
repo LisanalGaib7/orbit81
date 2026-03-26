@@ -706,7 +706,9 @@ const Login = () => {
           <div className="flex flex-col items-center gap-1 mt-2">
             <button
               onClick={() => {
+                localStorage.setItem('orbit81_guest_mode', 'true');
                 window.location.href = '/';
+              }}
               }}
               className="group self-center"
               style={{
