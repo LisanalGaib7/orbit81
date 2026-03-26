@@ -334,6 +334,16 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
               index={2}
             />
 
+            {canRevert && (
+              <SubIcon
+                icon={Undo2}
+                label="Revert"
+                onClick={() => { onRevert?.(); setHubOpen(false); }}
+                isActive={true}
+                index={2.5}
+              />
+            )}
+
             <SubIcon
               icon={Power}
               label={confirmLogout ? "Confirm?" : "Logout"}
