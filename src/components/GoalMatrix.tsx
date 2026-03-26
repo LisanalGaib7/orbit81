@@ -40,6 +40,8 @@ export function GoalMatrix() {
     updateActionLabel,
     applyTemplate,
     resetSession,
+    revertReset,
+    canRevert,
     handleActionSlotClick,
     clearConfetti,
     handleLaunchComplete,
