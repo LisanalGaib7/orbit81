@@ -82,6 +82,7 @@ export function useMissionProgress() {
   const prevCompletedRef = useRef<Set<number>>(new Set());
   const missionTriggeredRef = useRef(false);
   const [ignitionBurst, setIgnitionBurst] = useState(0);
+  const [canRevert, setCanRevert] = useState(false);
 
   // --- Sidebar / focus state ---
   const [activeBlockIndex, setActiveBlockIndex] = useState<number | null>(null);
