@@ -776,3 +776,19 @@
     scrollbar-width: none;
   }
 }
+
+/* Cockpit login button animations */
+@keyframes scanner {
+  0% { top: -2px; }
+  100% { top: calc(100% + 2px); }
+}
+
+@keyframes scanner-full {
+  0% { top: -1px; }
+  100% { top: calc(100% + 1px); }
+}
+
+@keyframes border-breathe {
+  0%, 100% { border-color: #FFD700; }
+  50% { border-color: #B8960F; }
+}
