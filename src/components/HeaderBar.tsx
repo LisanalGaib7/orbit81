@@ -201,9 +201,11 @@ function TemplatePanel({
 interface HeaderBarProps {
   onApplyTemplate: (labels: string[]) => void;
   onReset: () => void;
+  canRevert?: boolean;
+  onRevert?: () => void;
 }
 
-export function HeaderBar({ onApplyTemplate, onReset }: HeaderBarProps) {
+export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: HeaderBarProps) {
   const { signOut } = useAuth();
   const [hubOpen, setHubOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
