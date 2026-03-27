@@ -524,8 +524,8 @@ const Login = () => {
           onPointerDown={() => setGooglePressed(true)}
           onPointerUp={() => setGooglePressed(false)}
           onPointerLeave={() => setGooglePressed(false)}
-          className={`group relative w-full cursor-pointer transition-transform duration-100 ease-out ${googlePressed ? 'scale-[0.97]' : 'hover:scale-[1.01]'}`}
-          style={{ height: 64 }}
+          className={`group relative w-full cursor-pointer transition-transform duration-100 ease-out ${googlePressed ? 'scale-95' : 'hover:scale-[1.02]'}`}
+          style={{ height: 72 }}
         >
           <div className={`absolute -inset-[2px] rounded-lg transition-shadow duration-700 ${googlePressed
             ? 'shadow-[inset_0_2px_10px_rgba(255,157,0,0.4)]'
