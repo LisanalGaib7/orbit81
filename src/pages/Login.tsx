@@ -528,8 +528,8 @@ const Login = () => {
           style={{ height: 64 }}
         >
           <div className={`absolute -inset-[2px] rounded-lg transition-shadow duration-700 ${googlePressed
-            ? 'shadow-[inset_0_2px_10px_rgba(255,157,0,0.3)]'
-            : 'shadow-[0_0_15px_rgba(255,157,0,0.1),0_0_40px_rgba(255,157,0,0.03)] group-hover:shadow-[0_0_25px_rgba(255,157,0,0.2),0_0_60px_rgba(255,157,0,0.06)]'
+            ? 'shadow-[inset_0_2px_10px_rgba(255,157,0,0.4)]'
+            : 'shadow-[0_0_15px_rgba(255,157,0,0.15),0_0_40px_rgba(255,157,0,0.05)] group-hover:shadow-[0_0_30px_rgba(255,157,0,0.35),0_0_60px_rgba(255,157,0,0.12)]'
           }`} />
           <div className={`relative w-full h-full rounded-lg overflow-hidden border-2 transition-all duration-700 ${googlePressed ? 'border-[#B87300]' : 'border-[#FF9D00]/60 group-hover:border-[#FF9D00]'}`}
             style={{
