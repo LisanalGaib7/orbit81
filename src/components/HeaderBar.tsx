@@ -260,37 +260,39 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
       ref={hubRef}
       className="!fixed top-8 right-8 z-[9999] max-md:top-4 max-md:right-4"
     >
-      {/* Cog master toggle */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <motion.button
-            onClick={() => { setHubOpen(!hubOpen); if (hubOpen) closeSubPanels(); }}
-            className="relative p-2.5 rounded-xl text-primary transition-colors"
-            style={{
-              background: hubOpen ? "hsl(var(--background) / 0.6)" : "transparent",
-              backdropFilter: hubOpen ? "blur(8px)" : undefined,
-            }}
-            animate={{ rotate: hubOpen ? 90 : 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            aria-label="Command Settings"
-          >
-            <Settings className="w-5 h-5" strokeWidth={1.5} />
-          </motion.button>
-        </TooltipTrigger>
-        {!hubOpen && (
-          <TooltipContent
-            side="left"
-            className="text-[10px] font-bold border-primary/30 text-primary"
-            style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0px #000000" }}
-          >
-            Settings
-          </TooltipContent>
-        )}
-      </Tooltip>
+      {/* Cog master toggle — hide when modal is open */}
+      {!manualOpen && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <motion.button
+              onClick={() => { setHubOpen(!hubOpen); if (hubOpen) closeSubPanels(); }}
+              className="relative p-2.5 rounded-xl text-primary transition-colors"
+              style={{
+                background: hubOpen ? "hsl(var(--background) / 0.6)" : "transparent",
+                backdropFilter: hubOpen ? "blur(8px)" : undefined,
+              }}
+              animate={{ rotate: hubOpen ? 90 : 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              aria-label="Command Settings"
+            >
+              <Settings className="w-5 h-5" strokeWidth={1.5} />
+            </motion.button>
+          </TooltipTrigger>
+          {!hubOpen && (
+            <TooltipContent
+              side="left"
+              className="text-[10px] font-bold border-primary/30 text-primary"
+              style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0px #000000" }}
+            >
+              Settings
+            </TooltipContent>
+          )}
+        </Tooltip>
+      )}
 
       {/* Sub-menu fly-out */}
       <AnimatePresence>
-        {hubOpen && (
+        {hubOpen && !manualOpen && (
           <motion.div
             className="absolute right-0 top-full mt-2 flex flex-col items-center gap-1 rounded-xl py-2 px-1"
             style={{
