@@ -653,8 +653,8 @@ const Login = () => {
           <button
             onClick={handleEmailSubmit}
             disabled={emailLoading}
-            className={`group relative w-full cursor-pointer transition-transform duration-100 ${emailLoading ? 'opacity-60 pointer-events-none' : 'active:scale-[0.97] hover:scale-[1.01]'}`}
-            style={{ height: 48 }}
+            className={`group relative w-full cursor-pointer transition-transform duration-100 ${emailLoading ? 'opacity-60 pointer-events-none' : 'active:scale-95 hover:scale-[1.02]'}`}
+            style={{ height: 56 }}
           >
             <div className="absolute -inset-[1px] rounded transition-shadow duration-500 shadow-[0_0_10px_rgba(255,157,0,0.1)] group-hover:shadow-[0_0_25px_rgba(255,157,0,0.3),0_0_50px_rgba(255,157,0,0.1)]" />
             <div className="relative w-full h-full rounded overflow-hidden border transition-all duration-500 border-[#FF9D00]/40 group-hover:border-[#FF9D00]/80"
