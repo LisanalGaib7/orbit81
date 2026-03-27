@@ -550,24 +550,18 @@ const Login = () => {
             <Rivet className="top-1 right-1" />
             <Rivet className="bottom-1 left-1" />
             <Rivet className="bottom-1 right-1" />
-            <div className="absolute inset-0 flex items-center justify-center gap-3 px-4">
+              <div className="absolute inset-0 flex items-center justify-center gap-3 px-4">
               <div className="p-1.5 rounded border border-zinc-700/60 bg-zinc-900/60 relative overflow-hidden shrink-0" style={{ imageRendering: 'pixelated' }}>
-                <PixelGoogleG size={24} />
+                <PixelGoogleG size={28} />
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                   <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF9D00]/40 to-transparent" style={{ animation: 'scanner 2.5s linear infinite' }} />
                 </div>
               </div>
-              <div className="flex flex-col items-start gap-0.5">
-                <span style={{
-                  fontFamily: 'var(--font-header)', fontSize: 'clamp(7px, 2vw, 10px)',
-                  color: '#FF9D00', textShadow: '1px 1px 0px #000',
-                  letterSpacing: '0.12em', imageRendering: 'pixelated',
-                }}>SIGN IN WITH GOOGLE</span>
-                <span style={{
-                  fontFamily: 'var(--font-data)', fontSize: 'clamp(6px, 1.2vw, 8px)',
-                  color: '#FF9D00', opacity: 0.5, letterSpacing: '0.2em',
-                }}>OAUTH SECURE CHANNEL</span>
-              </div>
+              <span style={{
+                fontFamily: 'var(--font-header)', fontSize: 'clamp(10px, 3vw, 15px)',
+                color: '#FF9D00', textShadow: '1px 1px 0px #000, 0 0 12px rgba(255,157,0,0.3)',
+                letterSpacing: '0.12em', imageRendering: 'pixelated',
+              }}>SIGN IN WITH GOOGLE</span>
             </div>
             {/* Scanner */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-lg">
