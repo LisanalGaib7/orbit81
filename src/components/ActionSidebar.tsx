@@ -6,7 +6,7 @@
  * support both mobile (bottom) and desktop (right) placement.
  */
 
-import { useEffect, useRef, useState, useCallback, memo } from "react";
+import { useEffect, useRef, useState, useCallback, memo, useMemo } from "react";
 import { GoalCheckbox } from "./GoalCheckbox";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { generateActionId, getPrefix } from "@/lib/goalIds";
@@ -129,6 +129,22 @@ export function ActionSidebar({
   const isMobile = useIsMobile();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const prefix = getPrefix(label);
+
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
