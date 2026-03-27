@@ -524,12 +524,12 @@ const Login = () => {
           onPointerDown={() => setGooglePressed(true)}
           onPointerUp={() => setGooglePressed(false)}
           onPointerLeave={() => setGooglePressed(false)}
-          className={`group relative w-full cursor-pointer transition-transform duration-100 ease-out ${googlePressed ? 'scale-[0.97]' : 'hover:scale-[1.01]'}`}
-          style={{ height: 64 }}
+          className={`group relative w-full cursor-pointer transition-transform duration-100 ease-out ${googlePressed ? 'scale-95' : 'hover:scale-[1.02]'}`}
+          style={{ height: 72 }}
         >
           <div className={`absolute -inset-[2px] rounded-lg transition-shadow duration-700 ${googlePressed
-            ? 'shadow-[inset_0_2px_10px_rgba(255,157,0,0.3)]'
-            : 'shadow-[0_0_15px_rgba(255,157,0,0.1),0_0_40px_rgba(255,157,0,0.03)] group-hover:shadow-[0_0_25px_rgba(255,157,0,0.2),0_0_60px_rgba(255,157,0,0.06)]'
+            ? 'shadow-[inset_0_2px_10px_rgba(255,157,0,0.4)]'
+            : 'shadow-[0_0_15px_rgba(255,157,0,0.15),0_0_40px_rgba(255,157,0,0.05)] group-hover:shadow-[0_0_30px_rgba(255,157,0,0.35),0_0_60px_rgba(255,157,0,0.12)]'
           }`} />
           <div className={`relative w-full h-full rounded-lg overflow-hidden border-2 transition-all duration-700 ${googlePressed ? 'border-[#B87300]' : 'border-[#FF9D00]/60 group-hover:border-[#FF9D00]'}`}
             style={{
@@ -550,24 +550,18 @@ const Login = () => {
             <Rivet className="top-1 right-1" />
             <Rivet className="bottom-1 left-1" />
             <Rivet className="bottom-1 right-1" />
-            <div className="absolute inset-0 flex items-center justify-center gap-3 px-4">
+              <div className="absolute inset-0 flex items-center justify-center gap-3 px-4">
               <div className="p-1.5 rounded border border-zinc-700/60 bg-zinc-900/60 relative overflow-hidden shrink-0" style={{ imageRendering: 'pixelated' }}>
-                <PixelGoogleG size={24} />
+                <PixelGoogleG size={28} />
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                   <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF9D00]/40 to-transparent" style={{ animation: 'scanner 2.5s linear infinite' }} />
                 </div>
               </div>
-              <div className="flex flex-col items-start gap-0.5">
-                <span style={{
-                  fontFamily: 'var(--font-header)', fontSize: 'clamp(7px, 2vw, 10px)',
-                  color: '#FF9D00', textShadow: '1px 1px 0px #000',
-                  letterSpacing: '0.12em', imageRendering: 'pixelated',
-                }}>SIGN IN WITH GOOGLE</span>
-                <span style={{
-                  fontFamily: 'var(--font-data)', fontSize: 'clamp(6px, 1.2vw, 8px)',
-                  color: '#FF9D00', opacity: 0.5, letterSpacing: '0.2em',
-                }}>OAUTH SECURE CHANNEL</span>
-              </div>
+              <span style={{
+                fontFamily: 'var(--font-header)', fontSize: 'clamp(10px, 3vw, 15px)',
+                color: '#FF9D00', textShadow: '1px 1px 0px #000, 0 0 12px rgba(255,157,0,0.3)',
+                letterSpacing: '0.12em', imageRendering: 'pixelated',
+              }}>SIGN IN WITH GOOGLE</span>
             </div>
             {/* Scanner */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-lg">
@@ -659,10 +653,10 @@ const Login = () => {
           <button
             onClick={handleEmailSubmit}
             disabled={emailLoading}
-            className={`group relative w-full cursor-pointer transition-transform duration-100 ${emailLoading ? 'opacity-60 pointer-events-none' : 'active:scale-[0.97] hover:scale-[1.01]'}`}
-            style={{ height: 48 }}
+            className={`group relative w-full cursor-pointer transition-transform duration-100 ${emailLoading ? 'opacity-60 pointer-events-none' : 'active:scale-95 hover:scale-[1.02]'}`}
+            style={{ height: 56 }}
           >
-            <div className="absolute -inset-[1px] rounded transition-shadow duration-500 shadow-[0_0_10px_rgba(255,157,0,0.08)] group-hover:shadow-[0_0_20px_rgba(255,157,0,0.15)]" />
+            <div className="absolute -inset-[1px] rounded transition-shadow duration-500 shadow-[0_0_10px_rgba(255,157,0,0.1)] group-hover:shadow-[0_0_25px_rgba(255,157,0,0.3),0_0_50px_rgba(255,157,0,0.1)]" />
             <div className="relative w-full h-full rounded overflow-hidden border transition-all duration-500 border-[#FF9D00]/40 group-hover:border-[#FF9D00]/80"
               style={{ background: 'linear-gradient(180deg, #1c1c0a 0%, #0f0f05 50%, #181808 100%)' }}
             >
@@ -673,9 +667,9 @@ const Login = () => {
               <div className="absolute inset-0 flex items-center justify-center gap-2">
                 <span style={{
                   fontFamily: 'var(--font-header)',
-                  fontSize: 'clamp(7px, 2vw, 10px)',
+                  fontSize: 'clamp(12px, 3.5vw, 18px)',
                   color: '#FF9D00',
-                  textShadow: '1px 1px 0px #000, 0 0 8px rgba(255,157,0,0.2)',
+                  textShadow: '2px 2px 0px #000, 0 0 15px rgba(255,157,0,0.4), 0 0 30px rgba(255,157,0,0.15)',
                   letterSpacing: '0.15em',
                   imageRendering: 'pixelated',
                 }}>
