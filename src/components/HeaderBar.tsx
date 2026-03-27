@@ -292,7 +292,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
 
       {/* Sub-menu fly-out */}
       <AnimatePresence>
-        {hubOpen && (
+        {hubOpen && !manualOpen && (
           <motion.div
             className="absolute right-0 top-full mt-2 flex flex-col items-center gap-1 rounded-xl py-2 px-1"
             style={{
