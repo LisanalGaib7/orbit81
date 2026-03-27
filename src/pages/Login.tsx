@@ -673,7 +673,7 @@ const Login = () => {
                   letterSpacing: '0.15em',
                   imageRendering: 'pixelated',
                 }}>
-                  {emailLoading ? 'IGNITING...' : isSignUp ? 'REGISTER PILOT' : 'IGNITE MISSION'}
+                  {emailLoading ? 'LAUNCHING...' : isSignUp ? 'REGISTER PILOT' : 'ENTER ORBIT'}
                 </span>
               </div>
               {/* Scanner */}
