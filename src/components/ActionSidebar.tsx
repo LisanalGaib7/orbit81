@@ -6,7 +6,7 @@
  * support both mobile (bottom) and desktop (right) placement.
  */
 
-import { useEffect, useRef, useState, useCallback, memo } from "react";
+import { useEffect, useRef, useState, useCallback, memo, useMemo } from "react";
 import { GoalCheckbox } from "./GoalCheckbox";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { generateActionId, getPrefix } from "@/lib/goalIds";
