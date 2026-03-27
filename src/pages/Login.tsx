@@ -667,9 +667,9 @@ const Login = () => {
               <div className="absolute inset-0 flex items-center justify-center gap-2">
                 <span style={{
                   fontFamily: 'var(--font-header)',
-                  fontSize: 'clamp(7px, 2vw, 10px)',
+                  fontSize: 'clamp(12px, 3.5vw, 18px)',
                   color: '#FF9D00',
-                  textShadow: '1px 1px 0px #000, 0 0 8px rgba(255,157,0,0.2)',
+                  textShadow: '2px 2px 0px #000, 0 0 15px rgba(255,157,0,0.4), 0 0 30px rgba(255,157,0,0.15)',
                   letterSpacing: '0.15em',
                   imageRendering: 'pixelated',
                 }}>
