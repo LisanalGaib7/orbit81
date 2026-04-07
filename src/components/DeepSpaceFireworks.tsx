@@ -1,124 +1,263 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-interface FireworkProps {
-  id: number;
+/* ── Single firework burst with ring expansion + trailing particles ── */
+
+interface BurstProps {
   x: number;
   y: number;
   delay: number;
   color: string;
+  accent: string;
   size: number;
 }
 
-function Firework({ x, y, delay, color, size }: Omit<FireworkProps, "id">) {
-  const particles = useMemo(() => 
-    Array.from({ length: 12 }, (_, i) => ({
-      id: i,
-      angle: (i / 12) * 360,
-      distance: size + Math.random() * size,
-    })), [size]);
+function CinematicBurst({ x, y, delay, color, accent, size }: BurstProps) {
+  const particleCount = 24;
+  const trailCount = 8;
+
+  const particles = useMemo(
+    () =>
+      Array.from({ length: particleCount }, (_, i) => {
+        const angle = (i / particleCount) * Math.PI * 2;
+        const dist = size * (0.7 + Math.random() * 0.6);
+        return {
+          id: i,
+          dx: Math.cos(angle) * dist,
+          dy: Math.sin(angle) * dist,
+          dur: 1.2 + Math.random() * 0.6,
+          s: 2 + Math.random() * 3,
+        };
+      }),
+    [size],
+  );
+
+  const trails = useMemo(
+    () =>
+      Array.from({ length: trailCount }, (_, i) => {
+        const angle = (i / trailCount) * Math.PI * 2 + Math.random() * 0.3;
+        const dist = size * (1.1 + Math.random() * 0.4);
+        return {
+          id: i,
+          dx: Math.cos(angle) * dist,
+          dy: Math.sin(angle) * dist,
+          dur: 1.6 + Math.random() * 0.5,
+        };
+      }),
+    [size],
+  );
 
   return (
-    <div 
+    <motion.div
       className="absolute"
-      style={{ 
-        left: `${x}%`, 
-        top: `${y}%`,
-        animation: `firework-burst 1.5s ease-out forwards`,
-        animationDelay: `${delay}s`,
-      }}
+      style={{ left: `${x}%`, top: `${y}%` }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay }}
     >
+      {/* Expanding ring */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          border: `1.5px solid ${color}`,
+          boxShadow: `0 0 20px ${color}, inset 0 0 20px ${color}`,
+          x: "-50%",
+          y: "-50%",
+        }}
+        initial={{ width: 0, height: 0, opacity: 0.9 }}
+        animate={{ width: size * 2.5, height: size * 2.5, opacity: 0 }}
+        transition={{ delay, duration: 1.4, ease: "easeOut" }}
+      />
+
+      {/* Core flash */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          background: `radial-gradient(circle, white 0%, ${color} 40%, transparent 70%)`,
+          x: "-50%",
+          y: "-50%",
+        }}
+        initial={{ width: 8, height: 8, opacity: 1 }}
+        animate={{ width: 30, height: 30, opacity: 0 }}
+        transition={{ delay, duration: 0.5, ease: "easeOut" }}
+      />
+
+      {/* Main particles */}
       {particles.map((p) => (
-        <div
+        <motion.div
           key={p.id}
-          className="absolute w-1.5 h-1.5 rounded-full"
+          className="absolute rounded-full"
           style={{
-            background: color,
-            boxShadow: `0 0 6px ${color}, 0 0 12px ${color}`,
-            transform: `rotate(${p.angle}deg) translateY(-${p.distance}px)`,
-            animation: `firework-particle 1.5s ease-out forwards`,
-            animationDelay: `${delay}s`,
+            width: p.s,
+            height: p.s,
+            background: p.id % 3 === 0 ? accent : color,
+            boxShadow: `0 0 ${p.s * 2}px ${color}`,
+          }}
+          initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+          animate={{ x: p.dx, y: p.dy, opacity: 0, scale: 0.2 }}
+          transition={{ delay, duration: p.dur, ease: "easeOut" }}
+        />
+      ))}
+
+      {/* Falling trails (gravity sparkles) */}
+      {trails.map((t) => (
+        <motion.div
+          key={`t-${t.id}`}
+          className="absolute rounded-full"
+          style={{
+            width: 2,
+            height: 2,
+            background: accent,
+            boxShadow: `0 0 6px ${accent}`,
+          }}
+          initial={{ x: 0, y: 0, opacity: 0.8 }}
+          animate={{
+            x: t.dx * 0.8,
+            y: [t.dy * 0.3, t.dy * 0.3 + 60],
+            opacity: [0.8, 0.4, 0],
+          }}
+          transition={{
+            delay: delay + 0.6,
+            duration: t.dur,
+            ease: "easeIn",
           }}
         />
       ))}
-      {/* Central burst */}
-      <div 
-        className="absolute w-4 h-4 rounded-full -translate-x-1/2 -translate-y-1/2"
-        style={{
-          background: `radial-gradient(circle, white, ${color}, transparent)`,
-          animation: `firework-core 0.5s ease-out forwards`,
-          animationDelay: `${delay}s`,
-        }}
-      />
-    </div>
+    </motion.div>
   );
 }
+
+/* ── Shooting star accent ── */
+
+function ShootingStar({ delay }: { delay: number }) {
+  const startX = Math.random() * 60 + 20;
+  const startY = Math.random() * 30;
+
+  return (
+    <motion.div
+      className="absolute rounded-full"
+      style={{
+        width: 3,
+        height: 3,
+        background: "hsl(45, 100%, 90%)",
+        boxShadow: "0 0 8px hsl(45, 100%, 80%), 0 0 20px hsl(45, 100%, 60%)",
+        left: `${startX}%`,
+        top: `${startY}%`,
+      }}
+      initial={{ opacity: 0, x: 0, y: 0 }}
+      animate={{ opacity: [0, 1, 0], x: 120, y: 80 }}
+      transition={{ delay, duration: 0.8, ease: "easeIn" }}
+    />
+  );
+}
+
+/* ── Main component ── */
 
 interface DeepSpaceFireworksProps {
   active: boolean;
 }
 
+const PALETTES: [string, string][] = [
+  ["hsl(38, 92%, 55%)", "hsl(45, 100%, 80%)"],    // gold
+  ["hsl(350, 75%, 55%)", "hsl(10, 90%, 75%)"],     // rose
+  ["hsl(200, 90%, 55%)", "hsl(190, 100%, 80%)"],   // cyan
+  ["hsl(270, 70%, 60%)", "hsl(290, 80%, 80%)"],    // violet
+  ["hsl(160, 70%, 50%)", "hsl(140, 80%, 75%)"],    // emerald
+  ["hsl(25, 95%, 55%)", "hsl(40, 100%, 75%)"],     // amber
+];
+
 export function DeepSpaceFireworks({ active }: DeepSpaceFireworksProps) {
-  const [fireworks, setFireworks] = useState<FireworkProps[]>([]);
+  const [bursts, setBursts] = useState<(BurstProps & { id: number })[]>([]);
+  const [stars, setStars] = useState<{ id: number; delay: number }[]>([]);
 
   useEffect(() => {
-    if (active) {
-      const colors = [
-        "hsl(38, 92%, 50%)", // gold
-        "hsl(0, 72%, 51%)",  // red
-        "hsl(200, 100%, 50%)", // blue
-        "hsl(280, 80%, 60%)", // purple
-        "hsl(120, 60%, 50%)", // green
-      ];
-
-      // Create staggered fireworks
-      const newFireworks: FireworkProps[] = [];
-      for (let i = 0; i < 15; i++) {
-        newFireworks.push({
-          id: i,
-          x: 10 + Math.random() * 80,
-          y: 10 + Math.random() * 60,
-          delay: i * 0.3,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          size: 30 + Math.random() * 40,
-        });
-      }
-      setFireworks(newFireworks);
-    } else {
-      setFireworks([]);
+    if (!active) {
+      setBursts([]);
+      setStars([]);
+      return;
     }
+
+    const newBursts = Array.from({ length: 18 }, (_, i) => {
+      const pal = PALETTES[Math.floor(Math.random() * PALETTES.length)];
+      return {
+        id: i,
+        x: 8 + Math.random() * 84,
+        y: 8 + Math.random() * 55,
+        delay: i * 0.35 + Math.random() * 0.15,
+        color: pal[0],
+        accent: pal[1],
+        size: 35 + Math.random() * 50,
+      };
+    });
+
+    const newStars = Array.from({ length: 5 }, (_, i) => ({
+      id: i,
+      delay: 1 + i * 1.2,
+    }));
+
+    setBursts(newBursts);
+    setStars(newStars);
   }, [active]);
 
   if (!active) return null;
 
   return (
     <div className="fixed inset-0 z-40 pointer-events-none overflow-hidden">
-      {/* Deep space gradient overlay */}
-      <div 
-        className="absolute inset-0 transition-opacity duration-1000"
+      {/* Deep space backdrop with cinematic vignette */}
+      <motion.div
+        className="absolute inset-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5 }}
         style={{
-          background: "radial-gradient(ellipse at center, hsl(260, 50%, 10%) 0%, hsl(220, 40%, 5%) 100%)",
-          opacity: 0.9,
+          background: `
+            radial-gradient(ellipse at 50% 40%, hsl(260, 40%, 8%) 0%, hsl(220, 50%, 3%) 60%, hsl(0, 0%, 0%) 100%)
+          `,
         }}
       />
-      
-      {/* Fireworks */}
-      {fireworks.map((fw) => (
-        <Firework
-          key={fw.id}
-          x={fw.x}
-          y={fw.y}
-          delay={fw.delay}
-          color={fw.color}
-          size={fw.size}
-        />
+
+      {/* Subtle nebula glow */}
+      <motion.div
+        className="absolute inset-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.15 }}
+        transition={{ delay: 0.5, duration: 2 }}
+        style={{
+          background: `
+            radial-gradient(circle at 30% 30%, hsl(270, 60%, 30% / 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 70% 60%, hsl(200, 70%, 30% / 0.2) 0%, transparent 50%)
+          `,
+        }}
+      />
+
+      {/* Firework bursts */}
+      <AnimatePresence>
+        {bursts.map((b) => (
+          <CinematicBurst
+            key={b.id}
+            x={b.x}
+            y={b.y}
+            delay={b.delay}
+            color={b.color}
+            accent={b.accent}
+            size={b.size}
+          />
+        ))}
+      </AnimatePresence>
+
+      {/* Shooting stars */}
+      {stars.map((s) => (
+        <ShootingStar key={s.id} delay={s.delay} />
       ))}
 
-      {/* Shimmer overlay */}
-      <div 
+      {/* Ambient light wash that pulses */}
+      <motion.div
         className="absolute inset-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 0.06, 0.02, 0.05, 0] }}
+        transition={{ delay: 1, duration: 6, ease: "easeInOut" }}
         style={{
-          background: "radial-gradient(circle at 50% 50%, transparent 0%, hsl(38, 92%, 50% / 0.05) 50%, transparent 100%)",
-          animation: "shimmer 3s ease-in-out infinite",
+          background: "radial-gradient(circle at 50% 50%, hsl(38, 92%, 50% / 0.12) 0%, transparent 60%)",
         }}
       />
     </div>
