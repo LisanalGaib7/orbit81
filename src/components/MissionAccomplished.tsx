@@ -9,16 +9,15 @@ interface MissionAccomplishedProps {
   showModal: boolean;
 }
 
-// Animated counter component
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const [count, setCount] = useState(0);
-  
+
   useEffect(() => {
     const duration = 1500;
-    const steps = 30;
+    const steps = 40;
     const increment = value / steps;
     let current = 0;
-    
+
     const timer = setInterval(() => {
       current += increment;
       if (current >= value) {
@@ -28,29 +27,51 @@ function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: strin
         setCount(Math.floor(current));
       }
     }, duration / steps);
-    
+
     return () => clearInterval(timer);
   }, [value]);
-  
+
   return <>{count}{suffix}</>;
 }
 
+/* Floating golden motes behind the modal */
+function GoldenMotes() {
+  const motes = Array.from({ length: 30 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    size: 1 + Math.random() * 2.5,
+    delay: Math.random() * 4,
+    dur: 4 + Math.random() * 4,
+  }));
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {motes.map((m) => (
+        <motion.div
+          key={m.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${m.x}%`,
+            width: m.size,
+            height: m.size,
+            background: "hsl(45, 100%, 70%)",
+            boxShadow: "0 0 6px hsl(45, 100%, 60%)",
+          }}
+          initial={{ y: "110%", opacity: 0 }}
+          animate={{ y: "-10%", opacity: [0, 0.8, 0.6, 0] }}
+          transition={{
+            delay: m.delay,
+            duration: m.dur,
+            ease: "linear",
+            repeat: Infinity,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function MissionAccomplished({ isOpen, onClose, showModal }: MissionAccomplishedProps) {
-  const [confetti, setConfetti] = useState<{ id: number; x: number; delay: number; color: string }[]>([]);
-
-  useEffect(() => {
-    if (showModal) {
-      setConfetti(
-        Array.from({ length: 60 }, (_, i) => ({
-          id: i,
-          x: Math.random() * 100,
-          delay: Math.random() * 2,
-          color: ["gold", "orange", "yellow"][Math.floor(Math.random() * 3)],
-        }))
-      );
-    }
-  }, [showModal]);
-
   const handleShare = () => {
     const text = "🚀 Mission Accomplished! I just completed all 64 goals in my Goal Matrix! #GoalMatrix #Productivity";
     if (navigator.share) {
@@ -65,55 +86,56 @@ export function MissionAccomplished({ isOpen, onClose, showModal }: MissionAccom
 
   return (
     <AnimatePresence>
-      <motion.div 
+      <motion.div
         className="fixed inset-0 z-50 flex items-center justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
       >
-        {/* Backdrop */}
-        <motion.div 
-          className="absolute inset-0 bg-background/80 backdrop-blur-md" 
+        {/* Cinematic backdrop */}
+        <motion.div
+          className="absolute inset-0"
           onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.8 }}
+          style={{
+            background: "radial-gradient(ellipse at 50% 40%, hsl(220, 30%, 8% / 0.92) 0%, hsl(220, 20%, 4% / 0.96) 100%)",
+            backdropFilter: "blur(16px) saturate(1.2)",
+          }}
         />
-        
-        {/* Golden confetti */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {confetti.map((c) => (
-            <div
-              key={c.id}
-              className="absolute w-2 h-2 rotate-45"
-              style={{
-                left: `${c.x}%`,
-                animation: `confetti-fall 4s ease-out infinite`,
-                animationDelay: `${c.delay}s`,
-                backgroundColor: c.color === "gold" 
-                  ? "hsl(45, 100%, 50%)" 
-                  : c.color === "orange" 
-                  ? "hsl(38, 92%, 50%)" 
-                  : "hsl(50, 100%, 60%)",
-                boxShadow: `0 0 4px hsl(45, 100%, 60%)`,
-              }}
-            />
-          ))}
-        </div>
+
+        {/* Golden motes */}
+        <GoldenMotes />
 
         {/* Modal */}
-        <motion.div 
-          className="relative bg-gradient-to-b from-card to-background border-2 border-primary/30 rounded-3xl p-8 max-w-lg w-full mx-4 shadow-2xl overflow-hidden"
-          initial={{ scale: 0.8, opacity: 0, y: 50 }}
+        <motion.div
+          className="relative rounded-3xl p-8 max-w-lg w-full mx-4 overflow-hidden"
+          style={{
+            background: "linear-gradient(170deg, hsl(220, 18%, 12%) 0%, hsl(220, 20%, 7%) 100%)",
+            border: "1px solid hsl(38, 60%, 30% / 0.4)",
+            boxShadow: `
+              0 0 80px hsl(38, 92%, 50% / 0.08),
+              0 25px 60px hsl(220, 30%, 4% / 0.7),
+              inset 0 1px 0 hsl(38, 60%, 50% / 0.15)
+            `,
+          }}
+          initial={{ scale: 0.85, opacity: 0, y: 40 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
         >
-          {/* Golden glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none" />
-          <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
-          
+          {/* Top highlight line */}
+          <motion.div
+            className="absolute top-0 left-[10%] right-[10%] h-px"
+            style={{
+              background: "linear-gradient(90deg, transparent, hsl(38, 92%, 50% / 0.5), transparent)",
+            }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+          />
+
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors z-10"
@@ -121,95 +143,122 @@ export function MissionAccomplished({ isOpen, onClose, showModal }: MissionAccom
             <X className="w-5 h-5" />
           </button>
 
-          <div className="relative text-center space-y-8">
-            {/* Trophy Icon */}
-            <motion.div 
+          <div className="relative text-center space-y-7">
+            {/* Trophy */}
+            <motion.div
               className="relative inline-flex items-center justify-center"
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ duration: 0.6, delay: 0.3, type: "spring" }}
+              transition={{ duration: 0.8, delay: 0.3, type: "spring", damping: 12 }}
             >
-              <div className="absolute inset-0 bg-primary/30 rounded-full blur-2xl animate-pulse scale-150" />
-              <div className="relative bg-gradient-to-br from-yellow-400 via-primary to-orange-500 p-5 rounded-full shadow-lg">
-                <Trophy className="w-14 h-14 text-primary-foreground drop-shadow-lg" />
-              </div>
-              {/* Orbiting stars */}
-              <div className="absolute inset-0 animate-spin" style={{ animationDuration: "8s" }}>
-                <div className="absolute -top-2 left-1/2 w-2 h-2 bg-yellow-300 rounded-full shadow-lg" />
-              </div>
-              <div className="absolute inset-0 animate-spin" style={{ animationDuration: "6s", animationDirection: "reverse" }}>
-                <div className="absolute top-1/2 -right-2 w-1.5 h-1.5 bg-primary rounded-full shadow-lg" />
+              {/* Pulsing halo */}
+              <motion.div
+                className="absolute rounded-full"
+                style={{
+                  width: 120,
+                  height: 120,
+                  background: "radial-gradient(circle, hsl(38, 92%, 50% / 0.15) 0%, transparent 70%)",
+                }}
+                animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.2, 0.5] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <div
+                className="relative p-5 rounded-full"
+                style={{
+                  background: "linear-gradient(135deg, hsl(45, 100%, 55%), hsl(38, 92%, 45%), hsl(25, 90%, 40%))",
+                  boxShadow: "0 4px 20px hsl(38, 92%, 50% / 0.4), inset 0 -2px 6px hsl(25, 80%, 30% / 0.3)",
+                }}
+              >
+                <Trophy className="w-12 h-12 text-primary-foreground drop-shadow-lg" />
               </div>
             </motion.div>
 
             {/* Title */}
-            <motion.div 
-              className="space-y-3"
-              initial={{ opacity: 0, y: 20 }}
+            <motion.div
+              className="space-y-2"
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.5 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
             >
               <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-                Mission <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-primary to-orange-400">Accomplished!</span>
-              </h2>
-              <div className="text-muted-foreground">
-                <p>You've completed all 64 goals.</p>
-                <p 
-                  className="text-foreground font-semibold mt-1 text-lg glow-text"
+                Mission{" "}
+                <span
+                  className="text-transparent bg-clip-text"
                   style={{
-                    textShadow: "0 0 20px hsl(38, 92%, 50% / 0.6), 0 0 40px hsl(38, 92%, 50% / 0.3)",
+                    backgroundImage: "linear-gradient(135deg, hsl(45, 100%, 65%), hsl(38, 92%, 50%), hsl(25, 90%, 50%))",
                   }}
                 >
-                  Incredible achievement!
-                </p>
-              </div>
+                  Accomplished!
+                </span>
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                You've completed all 64 goals.
+              </p>
+              <motion.p
+                className="text-foreground font-semibold text-lg"
+                style={{
+                  textShadow: "0 0 24px hsl(38, 92%, 50% / 0.5)",
+                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.6 }}
+              >
+                Incredible achievement!
+              </motion.p>
             </motion.div>
 
-            {/* Stats Cards */}
-            <motion.div 
+            {/* Stats */}
+            <motion.div
               className="flex justify-center gap-4"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.7 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
             >
-              {/* Goals Complete Card */}
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/40 to-primary/20 rounded-2xl blur-sm group-hover:blur-md transition-all" />
-                <div className="relative bg-card/80 backdrop-blur border-2 border-primary/40 rounded-2xl p-5 min-w-[130px]">
-                  <div className="flex items-center justify-center gap-1.5 mb-2">
-                    <Target className="w-4 h-4 text-primary" />
+              {[
+                { icon: Target, label: "Goals Complete", value: 64, suffix: "/64" },
+                { icon: Rocket, label: "Progress", value: 100, suffix: "%" },
+              ].map((stat, i) => (
+                <div key={i} className="relative group">
+                  <div
+                    className="relative rounded-2xl p-5 min-w-[130px]"
+                    style={{
+                      background: "hsl(220, 18%, 10%)",
+                      border: "1px solid hsl(38, 50%, 30% / 0.3)",
+                      boxShadow: "inset 0 1px 0 hsl(38, 50%, 50% / 0.08)",
+                    }}
+                  >
+                    <div className="flex items-center justify-center mb-2">
+                      <stat.icon className="w-4 h-4 text-primary/70" />
+                    </div>
+                    <div
+                      className="text-4xl sm:text-5xl font-black font-mono text-transparent bg-clip-text"
+                      style={{
+                        backgroundImage: "linear-gradient(180deg, hsl(45, 100%, 70%), hsl(38, 92%, 50%), hsl(25, 85%, 45%))",
+                      }}
+                    >
+                      <AnimatedCounter value={stat.value} />{stat.suffix}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-2 uppercase tracking-wider">
+                      {stat.label}
+                    </div>
                   </div>
-                  <div className="text-4xl sm:text-5xl font-black font-mono text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 via-primary to-orange-500 drop-shadow-lg">
-                    <AnimatedCounter value={64} />/64
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-2 uppercase tracking-wider">Goals Complete</div>
                 </div>
-              </div>
-
-              {/* Progress Card */}
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/40 to-primary/20 rounded-2xl blur-sm group-hover:blur-md transition-all" />
-                <div className="relative bg-card/80 backdrop-blur border-2 border-primary/40 rounded-2xl p-5 min-w-[130px]">
-                  <div className="flex items-center justify-center gap-1.5 mb-2">
-                    <Rocket className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="text-4xl sm:text-5xl font-black font-mono text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 via-primary to-orange-500 drop-shadow-lg">
-                    <AnimatedCounter value={100} suffix="%" />
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-2 uppercase tracking-wider">Progress</div>
-                </div>
-              </div>
+              ))}
             </motion.div>
 
             {/* Share Button */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.9 }}
+              transition={{ duration: 0.5, delay: 0.9 }}
             >
-              <Button 
-                onClick={handleShare} 
-                className="w-full gap-2 bg-gradient-to-r from-primary via-yellow-500 to-primary hover:from-yellow-500 hover:via-primary hover:to-yellow-500 text-primary-foreground font-semibold py-6 text-base transition-all duration-500"
+              <Button
+                onClick={handleShare}
+                className="w-full gap-2 text-primary-foreground font-semibold py-6 text-base transition-all duration-300"
+                style={{
+                  background: "linear-gradient(135deg, hsl(38, 92%, 50%), hsl(30, 90%, 45%))",
+                  boxShadow: "0 4px 20px hsl(38, 92%, 50% / 0.3)",
+                }}
               >
                 <Share2 className="w-5 h-5" />
                 Share Your Achievement
