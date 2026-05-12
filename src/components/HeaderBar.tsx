@@ -8,7 +8,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Settings, BookOpen, Wrench, Power, RotateCcw, Undo2, X } from "lucide-react";
+import { Settings, BookOpen, Wrench, Power, RotateCcw, Undo2, X, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -17,6 +17,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TEMPLATES } from "@/constants/missionData";
+import { usePilotProfile } from "@/hooks/usePilotProfile";
+import { PilotAvatar } from "./PilotAvatar";
+import { PilotProfilePanel } from "./PilotProfilePanel";
 
 // ─── Sub-icon button ─────────────────────────────────────────────
 
@@ -206,10 +209,12 @@ interface HeaderBarProps {
 }
 
 export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: HeaderBarProps) {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
+  const profile = usePilotProfile();
   const [hubOpen, setHubOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [mounted, setMounted] = useState(false);
