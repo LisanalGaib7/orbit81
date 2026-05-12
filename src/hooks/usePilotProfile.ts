@@ -63,7 +63,8 @@ export function usePilotProfile(): PilotProfile {
       };
       const { error } = await supabase
         .from("profiles")
-        .update({ call_sign, avatar_config: nextConfig as unknown as Record<string, unknown> })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .update({ call_sign, avatar_config: nextConfig as any })
         .eq("user_id", user.id);
 
       if (error) return { error: error.message };
