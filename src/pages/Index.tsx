@@ -21,8 +21,9 @@ const Index = () => {
 
   if (!user && !isGuest) return <Navigate to="/login" replace />;
 
-  // Onboarding gate: logged-in users without a chosen avatar get the registration screen.
-  if (user && !profile.loading && profile.needsOnboarding) {
+  // Onboarding gate: show registration screen on demand (currently forced so the
+  // user can preview the new pixel-art avatar selection).
+  if (user && !profile.loading) {
     return (
       <PilotOnboarding
         initialCallSign={profile.call_sign}
