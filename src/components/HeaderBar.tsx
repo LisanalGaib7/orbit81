@@ -261,10 +261,27 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
   if (!mounted) return null;
 
   return createPortal(
-    <div
-      ref={hubRef}
-      className="!fixed top-8 right-8 z-[9999] max-md:top-4 max-md:right-4"
-    >
+    <>
+      {/* Pilot identity chip — top-left */}
+      {user && profile.avatar_id && (
+        <div
+          className="!fixed top-8 left-8 z-[9999] flex items-center gap-2 rounded-md border border-primary/20 bg-background/40 px-2 py-1 backdrop-blur-md max-md:top-4 max-md:left-4"
+          style={{ boxShadow: "0 0 12px hsl(var(--primary) / 0.15)" }}
+        >
+          <PilotAvatar id={profile.avatar_id} size={28} />
+          <span
+            className="hidden sm:inline text-[10px] tracking-[0.25em] text-primary/90"
+            style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0 #000" }}
+          >
+            {profile.call_sign?.toUpperCase()}
+          </span>
+        </div>
+      )}
+
+      <div
+        ref={hubRef}
+        className="!fixed top-8 right-8 z-[9999] max-md:top-4 max-md:right-4"
+      >
       {/* Cog master toggle — hide when modal is open */}
       {!manualOpen && (
         <Tooltip>
@@ -371,7 +388,20 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
           </motion.div>
         )}
       </AnimatePresence>
-    </div>,
+      </div>
+
+      <PilotProfilePanel
+        isOpen={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        currentAvatarId={profile.avatar_id}
+        currentCallSign={profile.call_sign}
+        onSave={async (next) => {
+          const result = await profile.saveProfile(next);
+          if (!result.error) setHubOpen(false);
+          return result;
+        }}
+      />
+    </>,
     document.body,
   );
 }
