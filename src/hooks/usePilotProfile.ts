@@ -63,7 +63,7 @@ export function usePilotProfile(): PilotProfile {
       };
       const { error } = await supabase
         .from("profiles")
-        .update({ call_sign, avatar_config: nextConfig })
+        .update({ call_sign, avatar_config: nextConfig as unknown as Record<string, unknown> })
         .eq("user_id", user.id);
 
       if (error) return { error: error.message };
