@@ -115,7 +115,7 @@ export function PilotOnboarding({ initialCallSign, initialAvatarId, onComplete }
         </div>
 
         {/* Avatar grid */}
-        <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid w-full grid-cols-3 gap-3">
           {AVATARS.map((a) => {
             const active = a.id === selected;
             return (
