@@ -37,7 +37,7 @@ export const AVATARS: AvatarDef[] = [
   { id: "pixel",  name: "PIXEL",  tagline: "Minimal kit. Maximum range.",       src: pixel,  accent: "#E5E7EB" },
   { id: "aurora", name: "AURORA", tagline: "Glow-up in low orbit.",             src: aurora, accent: "#3CDCB0" },
   { id: "comet",  name: "COMET",  tagline: "Bright streak across the dark.",    src: comet,  accent: "#FF4D5E" },
-  { id: "corgi",  name: "CORGI",  tagline: "Good boy. Great pilot.",            src: corgi,  accent: "#F4A24C" },
+  { id: "corgi",  name: "SHIBA",  tagline: "Such pilot. Very orbit. Wow.",      src: corgi,  accent: "#F4A24C" },
 ];
 
 export const AVATAR_MAP: Record<AvatarId, AvatarDef> = AVATARS.reduce(
