@@ -225,14 +225,14 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
   useEffect(() => {
     if (!hubOpen) return;
     const handler = (e: MouseEvent) => {
-      if (manualOpen || templateOpen) return;
+      if (manualOpen || templateOpen || profileOpen) return;
       if (hubRef.current && !hubRef.current.contains(e.target as Node)) {
         setHubOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [hubOpen, manualOpen, templateOpen]);
+  }, [hubOpen, manualOpen, templateOpen, profileOpen]);
 
   const handleReset = () => {
     if (confirmReset) {
@@ -330,6 +330,16 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
               />
               <TemplatePanel isOpen={templateOpen} onClose={() => setTemplateOpen(false)} onSelect={onApplyTemplate} />
             </div>
+
+            {user && profile.avatar_id && (
+              <SubIcon
+                icon={User}
+                label="Pilot Profile"
+                onClick={() => { setProfileOpen(true); setManualOpen(false); setTemplateOpen(false); }}
+                isActive={profileOpen}
+                index={1.5}
+              />
+            )}
 
             <div className="w-6 h-px bg-primary/20 my-0.5" />
 
