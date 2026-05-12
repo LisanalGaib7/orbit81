@@ -8,7 +8,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Settings, BookOpen, Wrench, Power, RotateCcw, Undo2, X } from "lucide-react";
+import { Settings, BookOpen, Wrench, Power, RotateCcw, Undo2, X, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -17,6 +17,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TEMPLATES } from "@/constants/missionData";
+import { usePilotProfile } from "@/hooks/usePilotProfile";
+import { PilotAvatar } from "./PilotAvatar";
+import { PilotProfilePanel } from "./PilotProfilePanel";
 
 // ─── Sub-icon button ─────────────────────────────────────────────
 
@@ -206,10 +209,12 @@ interface HeaderBarProps {
 }
 
 export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: HeaderBarProps) {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
+  const profile = usePilotProfile();
   const [hubOpen, setHubOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -220,14 +225,14 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
   useEffect(() => {
     if (!hubOpen) return;
     const handler = (e: MouseEvent) => {
-      if (manualOpen || templateOpen) return;
+      if (manualOpen || templateOpen || profileOpen) return;
       if (hubRef.current && !hubRef.current.contains(e.target as Node)) {
         setHubOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [hubOpen, manualOpen, templateOpen]);
+  }, [hubOpen, manualOpen, templateOpen, profileOpen]);
 
   const handleReset = () => {
     if (confirmReset) {
@@ -256,10 +261,27 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
   if (!mounted) return null;
 
   return createPortal(
-    <div
-      ref={hubRef}
-      className="!fixed top-8 right-8 z-[9999] max-md:top-4 max-md:right-4"
-    >
+    <>
+      {/* Pilot identity chip — top-left */}
+      {user && profile.avatar_id && (
+        <div
+          className="!fixed top-8 left-8 z-[9999] flex items-center gap-2 rounded-md border border-primary/20 bg-background/40 px-2 py-1 backdrop-blur-md max-md:top-4 max-md:left-4"
+          style={{ boxShadow: "0 0 12px hsl(var(--primary) / 0.15)" }}
+        >
+          <PilotAvatar id={profile.avatar_id} size={28} />
+          <span
+            className="hidden sm:inline text-[10px] tracking-[0.25em] text-primary/90"
+            style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0 #000" }}
+          >
+            {profile.call_sign?.toUpperCase()}
+          </span>
+        </div>
+      )}
+
+      <div
+        ref={hubRef}
+        className="!fixed top-8 right-8 z-[9999] max-md:top-4 max-md:right-4"
+      >
       {/* Cog master toggle — hide when modal is open */}
       {!manualOpen && (
         <Tooltip>
@@ -326,6 +348,16 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
               <TemplatePanel isOpen={templateOpen} onClose={() => setTemplateOpen(false)} onSelect={onApplyTemplate} />
             </div>
 
+            {user && profile.avatar_id && (
+              <SubIcon
+                icon={User}
+                label="Pilot Profile"
+                onClick={() => { setProfileOpen(true); setManualOpen(false); setTemplateOpen(false); }}
+                isActive={profileOpen}
+                index={1.5}
+              />
+            )}
+
             <div className="w-6 h-px bg-primary/20 my-0.5" />
 
             <SubIcon
@@ -356,7 +388,20 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
           </motion.div>
         )}
       </AnimatePresence>
-    </div>,
+      </div>
+
+      <PilotProfilePanel
+        isOpen={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        currentAvatarId={profile.avatar_id}
+        currentCallSign={profile.call_sign}
+        onSave={async (next) => {
+          const result = await profile.saveProfile(next);
+          if (!result.error) setHubOpen(false);
+          return result;
+        }}
+      />
+    </>,
     document.body,
   );
 }
