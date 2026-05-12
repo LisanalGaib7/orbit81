@@ -1,25 +1,24 @@
 ## Goal
 
-Replace `src/assets/avatars/corgi.png` so SHIBA matches the chunky low-res pixel-art style of the other 8 pilots (NOVA, EMBER, etc.) — instead of the current high-detail cartoon illustration.
-
-## Reference
-
-- Style anchor: existing avatars (NOVA, PIXEL, COMET) — small chibi character centered on a large pure black canvas, blocky low-res pixels with visible square pixel grain, simple shading.
-- Subject anchor: the user-uploaded Shiba face pixel art (round head, squinty smiling eyes `^_^`, pink cheek dots, tiny smirk, perky ears).
+Refine COMET (less greasy, more soft pretty-boy / 미소년) and SHIBA (slimmer, cuter chibi).
 
 ## Changes
 
-1. Regenerate `src/assets/avatars/corgi.png`:
-   - True chunky pixel-art (visibly low resolution, square pixels, no anti-aliased illustration look)
-   - Small Shiba pilot occupying only the center ~40-50% of the frame (rest is pure black `#000000`)
-   - Standing upright on **2 human-like legs**, tiny chibi proportions, big round head / tiny body
-   - Face directly inspired by the reference: orange + white fur, squinty `^_^` smiling eyes, pink blush cheeks, small smirk, perky triangular ears
-   - Simple white-and-orange spacesuit (kept minimal so pixel style reads cleanly)
-   - No white sticker outline — only natural dark pixel outline
-   - Pure black background, no white halo
+1. **`src/assets/avatars/comet.png`** — regenerate:
+   - Soft pretty-boy (미소년) vibe: youthful, clean, slightly cool — NOT smug or greasy
+   - Slimmer face, softer jawline, gentle calm expression (faint smile, not a smirk)
+   - Larger clear eyes, lighter eyebrows
+   - New hairstyle: clean modern K-pop style red hair — soft fringe falling over the forehead, neat but slightly textured (no more spiky/messy windblown look)
+   - Keep red racing/pilot suit, chunky pixel-art style, pure black background, same canvas framing
 
-2. No code changes — `index.ts` already labels it SHIBA.
+2. **`src/assets/avatars/corgi.png`** — regenerate:
+   - Slimmer, smaller chibi proportions — currently the body looks too chunky/round
+   - Reduce overall body width, narrower torso, daintier limbs
+   - Keep the reference Shiba face (squinty smile, open mouth, blush, dark brow markings)
+   - Two human-like legs, simple white+orange spacesuit
+   - Even smaller character on the canvas — more black negative space around it
+   - Same chunky pixel-art style, pure black background
 
 ## Approach
 
-Use `imagegen--generate_image` (not edit) with strong style-matching prompt referencing the chunky pixel-art look of the other pilots, then visually QA against NOVA/PIXEL to confirm style match. Iterate if the output drifts back to high-detail illustration.
+Use `imagegen--edit_image` on each existing file in parallel with style-matching prompts. No code changes.
