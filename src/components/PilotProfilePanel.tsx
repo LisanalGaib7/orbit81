@@ -35,11 +35,11 @@ export function PilotProfilePanel({
   const { toast } = useToast();
 
   useEffect(() => {
-    if (isOpen || !saving) {
+    if (!isOpen) {
       setSelected(currentAvatarId);
       setCallSign(currentCallSign === "Pilot" ? "" : currentCallSign);
     }
-  }, [isOpen, saving, currentAvatarId, currentCallSign]);
+  }, [isOpen, currentAvatarId, currentCallSign]);
 
   const trimmed = callSign.trim();
   const canSave = !!selected && trimmed.length >= 2 && !saving;
