@@ -7,6 +7,8 @@ interface PilotAvatarProps {
   glow?: boolean;
   className?: string;
   pixelated?: boolean;
+  /** When "face", zoom into the head area of the avatar PNG. Default: full body. */
+  crop?: "face" | "full";
 }
 
 /**
