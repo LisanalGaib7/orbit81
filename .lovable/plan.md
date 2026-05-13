@@ -1,23 +1,45 @@
-## 문제
+## 진단
 
-상단 좌측 파일럿 칩의 아바타 썸네일에:
-1. 얼굴 뒤에 검은색 정사각형(컨테이너 `bg-background`)이 그대로 보임 — 칩의 어두운 배경과 분리되어 액자처럼 떠 보임
-2. `crop="face"` 모드에서 `translateY(18%)`로 머리가 박스 상단에 쏠려 있어 위·아래 여백이 비대칭
+`src/assets/avatars/*.png` 9개가 **각각 1024×1024, 700–934KB** PNG입니다(총 ~7.2MB). 프로필 패널을 열면 9개 그리드가 동시에 렌더되어 lazy-load가 즉시 트리거 → 모바일에서 큰 다운로드 + 디코드 → "변경 시 매우 느림" 체감.
+
+표시 크기는 매우 작음:
+- 헤더 칩: 44px
+- 프로필 그리드: 56px
+- 온보딩 그리드: 비슷한 작은 사이즈
+
+`image-rendering: pixelated` 픽셀아트라서 **원본을 작게 만들어도 화질 손실이 없음**(오히려 더 또렷한 픽셀룩). 1024px는 과잉.
+
+## 해결 방안 (가장 단순/효과 큰 순)
+
+### 1. 원본 PNG를 256×256으로 다운샘플 + 팔레트 양자화
+- `sharp`로 일회성 변환:
+  - resize 256×256 (nearest-neighbor → 픽셀룩 보존)
+  - PNG palette/8-bit + pngquant 수준 압축
+- 예상 결과: 파일당 ~10–25KB, 9개 합쳐 ~150KB (47× 감소)
+- 변환된 파일을 그대로 `src/assets/avatars/*.png`에 덮어씀 → 코드 변경 없음
+- 원본이 필요할 경우를 대비해 변환 전 `src/assets/avatars/_orig/`에 백업
+
+### 2. 프로필 그리드의 동시 디코드 부담 완화
+- `PilotAvatar`의 `<img>`에 `decoding="async"` 명시 추가 (이미 `loading="lazy"` 있음)
+- 프로필 그리드 썸네일은 항상 화면에 보이므로 lazy → eager로 바꿔도 무방하지만, 1번 변경 후 용량이 충분히 작아지면 추가 조치 불필요
+
+### 3. (선택) face crop 호버/선택 시 reflow 방지
+- 변경 없음. 1번만으로 체감 속도 충분히 회복.
 
 ## 변경 범위
 
-오직 **HeaderBar 좌상단 파일럿 칩**의 아바타 표시만 손봄. 온보딩/프로필 패널 등 다른 위치의 `PilotAvatar`는 영향 없음.
+- **에셋만 교체**: `src/assets/avatars/*.png` (9개) → 256×256, 양자화 PNG
+- (선택) `src/components/PilotAvatar.tsx`의 `<img>`에 `decoding="async"` 한 줄 추가
+- 백업: `src/assets/avatars/_orig/` 폴더에 원본 보존 (Vite import 영향 없음 — index.ts만 빌드에 포함됨)
+- 코드 로직/UI 변경 없음. 모든 사용처(헤더 칩, 온보딩, 프로필) 자동 적용.
 
-### 1. `src/components/PilotAvatar.tsx`
-- 컨테이너의 하드코딩된 `bg-background` 제거 → `bg-transparent`로 바꾸거나, `bordered` 옵션과 같은 패턴으로 `transparent?: boolean` (기본 false=현행 유지) 프롭 추가.
-  - 다른 사용처에서는 어두운 배경이 필요할 수 있으므로 **프롭 추가 방식**이 안전. (e.g. `transparent={true}` 시 `bg-transparent`)
-- `crop="face"` 변환값 조정: `translateY(18%)` → `translateY(8%)` 정도로 완화하여 머리가 박스 수직 중앙에 오도록 함. (대부분 PNG가 상단에 머리/하단에 몸통을 갖는 구조이므로 살짝만 끌어내림)
+## 위험
 
-### 2. `src/components/HeaderBar.tsx` 칩
-- `<PilotAvatar ... bordered={false} transparent />`로 호출하여 검은 배경 제거.
-- 칩 외곽은 그대로(테두리/blur/패딩 유지). 결과: 얼굴이 칩 배경 위에 자연스럽게 떠서 액자감 사라짐, 위·아래 균등.
+- 픽셀아트가 아닌 디테일한 일러스트라면 256px가 부족할 수 있음 → 그 경우 384×384로 fallback. 먼저 256으로 변환해 보고 시각 QA 후 결정.
 
-## 영향 없음
+## 실행
 
-- `PilotProfilePanel`, 온보딩 그리드, 기타 `PilotAvatar` 호출처는 기본값 그대로 → 시각 변화 없음.
-- 칩 외곽 보더, 콜사인 타이포, 패딩 변경 없음.
+1. `sharp` 스크립트로 9개 변환 + 백업
+2. `du -sh` 로 새 용량 확인
+3. 변환된 한 두 장을 시각 점검 (스크린샷)
+4. 필요 시 `decoding="async"` 추가

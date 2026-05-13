@@ -55,6 +55,7 @@ export function PilotAvatar({
           width={size}
           height={size}
           loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover"
           style={{
             ...(pixelated ? { imageRendering: "pixelated" as const } : {}),
