@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { AVATARS, type AvatarId } from "@/assets/avatars";
 import { PilotAvatar } from "./PilotAvatar";
@@ -26,6 +26,7 @@ export function PilotProfilePanel({
   onSave,
 }: PilotProfilePanelProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
   const [selected, setSelected] = useState<AvatarId | null>(currentAvatarId);
   const [callSign, setCallSign] = useState<string>(
     currentCallSign === "Pilot" ? "" : currentCallSign,
@@ -39,8 +40,6 @@ export function PilotProfilePanel({
       setCallSign(currentCallSign === "Pilot" ? "" : currentCallSign);
     }
   }, [isOpen, currentAvatarId, currentCallSign]);
-
-  if (!isOpen) return null;
 
   const trimmed = callSign.trim();
   const canSave = !!selected && trimmed.length >= 2 && !saving;
@@ -65,15 +64,20 @@ export function PilotProfilePanel({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[99999]">
+    <div
+      className={cn(
+        "fixed inset-0 z-[99999] transition-opacity duration-100",
+        isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
+      )}
+      aria-hidden={!isOpen}
+    >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.96 }}
-          transition={{ duration: 0.18 }}
+          initial={false}
+          animate={{ opacity: isOpen ? 1 : 0, scale: isOpen || shouldReduceMotion ? 1 : 0.98 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.08 }}
           className="pointer-events-auto flex max-h-[88vh] w-full max-w-md flex-col overflow-hidden rounded-xl bg-background/95 shadow-2xl backdrop-blur-md"
         >
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-primary/10 bg-background/90 px-4 py-3 backdrop-blur-sm">
