@@ -107,8 +107,12 @@ export function PilotOnboarding({ initialCallSign, initialAvatarId, onComplete }
             {selectedDef ? selectedDef.name : "— SELECT A PILOT —"}
           </div>
           <div
-            className="h-4 text-center text-[10px] text-muted-foreground"
-            style={{ fontFamily: "var(--font-body)" }}
+            className="h-5 text-center text-[11px] text-primary/80"
+            style={{
+              fontFamily: "var(--font-data)",
+              textShadow: "0 0 6px hsl(var(--primary) / 0.4), 1px 1px 0 #000",
+              letterSpacing: "0.15em",
+            }}
           >
             {selectedDef?.tagline ?? ""}
           </div>
