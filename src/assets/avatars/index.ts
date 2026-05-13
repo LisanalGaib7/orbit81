@@ -45,6 +45,16 @@ export const AVATAR_MAP: Record<AvatarId, AvatarDef> = AVATARS.reduce(
   {} as Record<AvatarId, AvatarDef>,
 );
 
+// Preload all avatar images at module import so opening the profile panel
+// is instant (no first-paint decode delay). Total payload is tiny (~60KB).
+if (typeof window !== "undefined") {
+  for (const a of AVATARS) {
+    const img = new Image();
+    img.decoding = "async";
+    img.src = a.src;
+  }
+}
+
 export function getAvatar(id: string | undefined | null): AvatarDef | null {
   if (!id) return null;
   return AVATAR_MAP[id as AvatarId] ?? null;
