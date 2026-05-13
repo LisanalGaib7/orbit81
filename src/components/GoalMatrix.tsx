@@ -59,7 +59,7 @@ export function GoalMatrix() {
       {/* HUD utility icons — rendered via portal to document.body */}
       <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} canRevert={canRevert} onRevert={revertReset} />
 
-      <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 max-w-3xl mx-auto">
+      <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 pt-24 sm:pt-6 max-w-3xl mx-auto">
         {/* SECTION 1: Brand */}
         <div className="text-center pt-2">
           <h1
