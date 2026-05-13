@@ -21,8 +21,10 @@ export function PilotAvatar({
   glow = false,
   className,
   pixelated = true,
+  crop = "full",
 }: PilotAvatarProps) {
   const avatar = getAvatar(id);
+  const faceCrop = crop === "face";
 
   return (
     <div
@@ -46,7 +48,15 @@ export function PilotAvatar({
           height={size}
           loading="lazy"
           className="h-full w-full object-cover"
-          style={pixelated ? { imageRendering: "pixelated" } : undefined}
+          style={{
+            ...(pixelated ? { imageRendering: "pixelated" as const } : {}),
+            ...(faceCrop
+              ? {
+                  transform: "scale(2.6) translateY(18%)",
+                  transformOrigin: "center center",
+                }
+              : {}),
+          }}
           draggable={false}
         />
       ) : (
