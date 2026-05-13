@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { TEMPLATES } from "@/constants/missionData";
 import { usePilotProfile } from "@/hooks/usePilotProfile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { PilotAvatar } from "./PilotAvatar";
 import { PilotProfilePanel } from "./PilotProfilePanel";
 
@@ -36,24 +37,32 @@ function SubIcon({
   isActive?: boolean;
   index: number;
 }) {
+  const isMobile = useIsMobile();
+
+  const button = (
+    <motion.button
+      onClick={onClick}
+      className="relative p-2.5 rounded-lg text-primary transition-colors hover:bg-primary/10"
+      style={{
+        filter: isActive ? "drop-shadow(0 0 6px hsl(var(--primary) / 0.7))" : undefined,
+      }}
+      initial={{ opacity: 0, y: -8, scale: 0.8 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -8, scale: 0.8 }}
+      transition={{ duration: 0.15, delay: index * 0.05 }}
+      aria-label={label}
+    >
+      <Icon className="w-4 h-4" strokeWidth={1.5} />
+    </motion.button>
+  );
+
+  // On mobile, skip Tooltip wrapper — Radix Tooltip swallows the first tap on
+  // touch devices, preventing onClick from firing.
+  if (isMobile) return button;
+
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <motion.button
-          onClick={onClick}
-          className="relative p-2.5 rounded-lg text-primary transition-colors hover:bg-primary/10"
-          style={{
-            filter: isActive ? "drop-shadow(0 0 6px hsl(var(--primary) / 0.7))" : undefined,
-          }}
-          initial={{ opacity: 0, y: -8, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -8, scale: 0.8 }}
-          transition={{ duration: 0.15, delay: index * 0.05 }}
-          aria-label={label}
-        >
-          <Icon className="w-4 h-4" strokeWidth={1.5} />
-        </motion.button>
-      </TooltipTrigger>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
       <TooltipContent
         side="left"
         className="text-[10px] font-bold border-primary/30 text-primary"
@@ -84,8 +93,8 @@ function ManualPanel({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
       if (justOpened.current) return;
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -166,8 +175,8 @@ function TemplatePanel({
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
   }, [isOpen, onClose]);
 
   return (
@@ -230,8 +239,8 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
         setHubOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
   }, [hubOpen, manualOpen, templateOpen, profileOpen]);
 
   const handleReset = () => {
