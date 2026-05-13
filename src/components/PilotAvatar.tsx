@@ -7,6 +7,7 @@ interface PilotAvatarProps {
   glow?: boolean;
   className?: string;
   pixelated?: boolean;
+  loading?: "eager" | "lazy";
   /** When "face", zoom into the head area of the avatar PNG. Default: full body. */
   crop?: "face" | "full";
   /** Show inner border ring. Default true. */
@@ -25,6 +26,7 @@ export function PilotAvatar({
   glow = false,
   className,
   pixelated = true,
+  loading = "eager",
   crop = "full",
   bordered = true,
   transparent = false,
@@ -54,7 +56,7 @@ export function PilotAvatar({
           alt={avatar.name}
           width={size}
           height={size}
-          loading="lazy"
+          loading={loading}
           decoding="async"
           className="h-full w-full object-cover"
           style={{
