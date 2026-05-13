@@ -1,22 +1,33 @@
-## Goal
+## Pilot Identity Chip — Refinement Plan
 
-Three avatar refinements.
+### 1. Split chip into two regions (avatar / call sign)
+In `src/components/HeaderBar.tsx` (lines ~266–279), restyle the existing chip so it reads as a single bordered box visually divided into two halves:
 
-## Changes
+- Left cell: avatar thumbnail (face only)
+- Vertical divider line (`border-l border-primary/20`)
+- Right cell: call sign label (orange, JetBrains Mono)
 
-1. **`src/assets/avatars/corgi.png`** — edit:
-   - Make the Shiba puppy's body and legs noticeably SHORTER and chubbier-cute (stubby chibi proportions, small round body, very short paws)
-   - Move the round bubble helmet to the RIGHT, fully separated from the body (currently overlapping the torso) — clear black gap between dog and helmet
-   - Keep face, sitting pose, four legs, white-orange spacesuit, chunky pixel-art style, pure black background
+Adjust padding and gap so both cells feel balanced. Keep call sign visible on mobile too (it's currently `hidden sm:inline` — change to always visible, just smaller).
 
-2. **`src/assets/avatars/pixel.png`** — edit:
-   - Subtly emphasize the chest/bust line on her outfit (light shading + slight curve so silhouette reads feminine) — tasteful, NOT exaggerated
-   - Keep face, blush, long hair, outfit color, pose, pixel style, black background pixel-for-pixel otherwise identical
+### 2. Show face only (head crop) instead of full body
+Add a `crop` prop to `src/components/PilotAvatar.tsx`:
 
-3. **`src/assets/avatars/ember.png`** — edit:
-   - Add a clearly visible mouth (small calm smile fitting her existing lofi-chill personality)
-   - Keep everything else (eyes, hair, headphones, outfit, pixel style, black background) identical
+```
+<PilotAvatar id={...} size={32} crop="face" />
+```
 
-## Approach
+Implementation: when `crop="face"`, the inner `<img>` gets a `transform: scale(2.4) translateY(22%)` inside the existing `overflow-hidden` container. Because every avatar PNG is composed identically (character centered, head in the upper third on a black background), one transform works for all 9 avatars.
 
-Three `imagegen--edit_image` calls in parallel. No code changes.
+Use the new `crop="face"` only in the HeaderBar chip. The onboarding/profile-panel grids keep the full-body view (no `crop` prop).
+
+### 3. Can the avatar be changed after first selection? — Yes
+No code change needed; just confirm in chat: the user can tap the **Settings cog** (top-right) → **Pilot Profile** sub-icon → reopens `PilotProfilePanel` where they can pick a new avatar and rename their call sign. This already works.
+
+### Out of scope
+- No change to the onboarding screen
+- No change to call-sign validation rules
+- No DB / RLS change
+
+### Files touched
+- `src/components/PilotAvatar.tsx` — add `crop` prop
+- `src/components/HeaderBar.tsx` — split chip layout, pass `crop="face"`
