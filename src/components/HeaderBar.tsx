@@ -37,24 +37,32 @@ function SubIcon({
   isActive?: boolean;
   index: number;
 }) {
+  const isMobile = useIsMobile();
+
+  const button = (
+    <motion.button
+      onClick={onClick}
+      className="relative p-2.5 rounded-lg text-primary transition-colors hover:bg-primary/10"
+      style={{
+        filter: isActive ? "drop-shadow(0 0 6px hsl(var(--primary) / 0.7))" : undefined,
+      }}
+      initial={{ opacity: 0, y: -8, scale: 0.8 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -8, scale: 0.8 }}
+      transition={{ duration: 0.15, delay: index * 0.05 }}
+      aria-label={label}
+    >
+      <Icon className="w-4 h-4" strokeWidth={1.5} />
+    </motion.button>
+  );
+
+  // On mobile, skip Tooltip wrapper — Radix Tooltip swallows the first tap on
+  // touch devices, preventing onClick from firing.
+  if (isMobile) return button;
+
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <motion.button
-          onClick={onClick}
-          className="relative p-2.5 rounded-lg text-primary transition-colors hover:bg-primary/10"
-          style={{
-            filter: isActive ? "drop-shadow(0 0 6px hsl(var(--primary) / 0.7))" : undefined,
-          }}
-          initial={{ opacity: 0, y: -8, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -8, scale: 0.8 }}
-          transition={{ duration: 0.15, delay: index * 0.05 }}
-          aria-label={label}
-        >
-          <Icon className="w-4 h-4" strokeWidth={1.5} />
-        </motion.button>
-      </TooltipTrigger>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
       <TooltipContent
         side="left"
         className="text-[10px] font-bold border-primary/30 text-primary"
