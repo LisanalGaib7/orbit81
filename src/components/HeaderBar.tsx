@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { TEMPLATES } from "@/constants/missionData";
 import { usePilotProfile } from "@/hooks/usePilotProfile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { PilotAvatar } from "./PilotAvatar";
 import { PilotProfilePanel } from "./PilotProfilePanel";
 

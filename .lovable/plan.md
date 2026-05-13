@@ -1,25 +1,34 @@
-## 목표
+# Settings 서브 메뉴 모바일 미작동 수정
 
-`HeaderBar`의 좌측 파일럿 칩과 우측 Settings 톱니바퀴가 현재 `position: fixed`로 뷰포트에 박혀 있어 스크롤해도 계속 따라옵니다. 이를 **페이지 상단(문서 최상단)에만 위치**하도록 바꿔 스크롤하면 자연스럽게 화면 밖으로 사라지게 합니다.
+## 문제
+모바일에서 우측 상단 설정(Cog)을 탭하면 메뉴(Manual / Templates / Pilot / Reset / Revert / Logout)는 펼쳐지지만, 각 항목을 탭해도 아무 동작이 일어나지 않음.
 
-## 변경 내역
+## 원인
+`HeaderBar.tsx`의 `SubIcon` 컴포넌트는 각 버튼을 Radix `Tooltip`으로 감싸고 있음. 터치 디바이스에서는 일반적으로:
+1. 첫 번째 탭 → 호버 에뮬레이션으로 Tooltip만 열림 (`click` 이벤트가 합성되지 않거나 무시됨)
+2. 두 번째 탭이 있어야 onClick 발화
 
-### `src/components/HeaderBar.tsx`
+서브 메뉴는 한 번 탭하면 닫히도록 설계되어 있어, 사용자는 사실상 버튼을 누를 수가 없음. (Cog 본체는 Tooltip이 `hubOpen`일 때 숨겨져 있어서 정상 동작함.)
 
-1. **createPortal 제거** — `document.body` 포털로 렌더링하면 항상 뷰포트 기준으로 떠 있게 되므로, 일반 자식 노드로 변경해 페이지 흐름 안에 배치합니다.
-2. **클래스 변경**:
-   - 좌측 파일럿 칩: `!fixed top-8 left-8` → `absolute top-8 left-8` (모바일도 `max-md:top-4 max-md:left-4` 동일하게 absolute로)
-   - 우측 톱니 컨테이너: `!fixed top-8 right-8` → `absolute top-8 right-8`
-3. **부모 컨테이너 확인** — `HeaderBar`를 호출하는 곳(`src/pages/Index.tsx` 등)에 `relative` 부모가 있는지 확인하고, 없으면 최상위 wrapper에 `relative` 추가하여 absolute 기준점이 문서 최상단이 되게 합니다.
-4. **Manual / Profile 모달, Sub-menu fly-out**은 그대로 유지 — 이들은 모달이라 뷰포트 fixed가 적절하므로 영향 없음. (Manual/Template/Profile 패널 자체 portal은 유지)
+## 수정 방향
 
-### 기술 메모
+### 1) SubIcon에서 모바일 시 Tooltip 비활성화
+- `useIsMobile()` 훅 사용 (`src/hooks/use-mobile.tsx` 이미 존재).
+- 모바일이면 Tooltip 래퍼 없이 `motion.button`만 렌더 → 첫 탭에서 바로 onClick 발화.
+- 데스크톱은 기존 Tooltip 동작 유지 (라벨 가독성).
+- 모바일에서는 라벨이 안 보이는 대신, 메뉴가 아이콘만 6개여서 방향성을 강화하기 위해 아이콘 옆에 작은 텍스트 라벨을 표시하거나 그대로 두는 두 가지 옵션이 있음 — 일단은 그대로 아이콘만 유지(현재 데스크톱과 동일한 시각).
 
-- 톱니 버튼의 sub-menu fly-out(`absolute right-0 top-full`)은 이미 부모 기준이라 변경 불필요.
-- z-index는 페이지 내 다른 요소를 덮을 수 있도록 `z-50` 정도로 낮춥니다(기존 z-[9999]는 portal용 과한 값).
-- 모바일/데스크탑 spacing(top-4 / top-8)은 그대로 유지.
+### 2) 보조: outside-click 핸들러를 `pointerdown`으로 변경 (선택)
+- 현재 `mousedown` 리스너 사용. 터치에서도 `mousedown`이 합성되긴 하지만, 일부 기기/브라우저에서 타이밍 차이로 클릭 직전에 패널이 닫힐 수 있음.
+- `mousedown` → `pointerdown`으로 통일하면 터치/마우스 모두 일관되게 동작.
+- ManualPanel, TemplatePanel, hub 외부 클릭 3곳 적용.
 
-## 영향 범위
+## 변경 파일
+- `src/components/HeaderBar.tsx`
+  - `SubIcon`에 `useIsMobile()` 분기 추가
+  - 외부 클릭 감지 3곳을 `pointerdown`으로 변경
 
-- `src/components/HeaderBar.tsx` — 위 수정
-- `src/pages/Index.tsx` (또는 HeaderBar 부모) — 필요 시 `relative` 추가만
+## 검증
+1. 모바일 뷰포트(390px)에서 Cog 탭 → 서브 메뉴 펼침
+2. Manual / Templates / Pilot Profile / Reset / Logout 각각 첫 탭에 동작
+3. 데스크톱에서는 기존 hover Tooltip 정상 표시
