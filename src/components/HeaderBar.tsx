@@ -407,7 +407,6 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
           return result;
         }}
       />
-    </>,
-    document.body,
+    </>
   );
 }
