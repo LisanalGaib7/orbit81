@@ -265,24 +265,21 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
       {/* Pilot identity chip — top-left */}
       {user && profile.avatar_id && (
         <div
-          className="!fixed top-8 left-8 z-[9999] flex items-stretch overflow-hidden rounded-md border border-primary/30 bg-background/50 backdrop-blur-md max-md:top-4 max-md:left-4"
+          className="!fixed top-8 left-8 z-[9999] flex items-center gap-2.5 rounded-md border border-primary/30 bg-background/50 pl-1 pr-3 py-1 backdrop-blur-md max-md:top-4 max-md:left-4"
           style={{ boxShadow: "0 0 12px hsl(var(--primary) / 0.18)" }}
         >
-          {/* Left cell — face */}
-          <div className="flex items-center justify-center p-1">
-            <PilotAvatar id={profile.avatar_id} size={32} crop="face" />
-          </div>
-          {/* Divider */}
-          <div className="w-px bg-primary/25" />
-          {/* Right cell — call sign */}
-          <div className="flex items-center px-3">
-            <span
-              className="text-[10px] sm:text-[11px] tracking-[0.25em] text-primary/90 whitespace-nowrap"
-              style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0 #000" }}
-            >
-              {profile.call_sign?.toUpperCase()}
-            </span>
-          </div>
+          <PilotAvatar
+            id={profile.avatar_id}
+            size={44}
+            crop="face"
+            className="border-transparent"
+          />
+          <span
+            className="text-[12px] tracking-[0.25em] text-primary/90 whitespace-nowrap"
+            style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0 #000" }}
+          >
+            {profile.call_sign?.toUpperCase()}
+          </span>
         </div>
       )}
 

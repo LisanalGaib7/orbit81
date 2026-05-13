@@ -1,33 +1,15 @@
-## Pilot Identity Chip — Refinement Plan
+## Pilot Chip — Single Box, Bigger Face
 
-### 1. Split chip into two regions (avatar / call sign)
-In `src/components/HeaderBar.tsx` (lines ~266–279), restyle the existing chip so it reads as a single bordered box visually divided into two halves:
+`src/components/HeaderBar.tsx` chip (lines ~266–287):
 
-- Left cell: avatar thumbnail (face only)
-- Vertical divider line (`border-l border-primary/20`)
-- Right cell: call sign label (orange, JetBrains Mono)
+- Remove inner divider and inner padded cell (`PilotAvatar` no longer wrapped in its own padded box).
+- Single outer box: rounded border, padded `pl-1 pr-3 py-1`, `gap-2.5`.
+- Avatar size: 32 → **44px** (`crop="face"`); pass `className="border-0"` so it shares the outer box border instead of double-bordering.
+- Call sign: 11px → **12px**, still tracking `0.25em`, primary/90.
+- Always visible on mobile.
 
-Adjust padding and gap so both cells feel balanced. Keep call sign visible on mobile too (it's currently `hidden sm:inline` — change to always visible, just smaller).
-
-### 2. Show face only (head crop) instead of full body
-Add a `crop` prop to `src/components/PilotAvatar.tsx`:
-
-```
-<PilotAvatar id={...} size={32} crop="face" />
-```
-
-Implementation: when `crop="face"`, the inner `<img>` gets a `transform: scale(2.4) translateY(22%)` inside the existing `overflow-hidden` container. Because every avatar PNG is composed identically (character centered, head in the upper third on a black background), one transform works for all 9 avatars.
-
-Use the new `crop="face"` only in the HeaderBar chip. The onboarding/profile-panel grids keep the full-body view (no `crop` prop).
-
-### 3. Can the avatar be changed after first selection? — Yes
-No code change needed; just confirm in chat: the user can tap the **Settings cog** (top-right) → **Pilot Profile** sub-icon → reopens `PilotProfilePanel` where they can pick a new avatar and rename their call sign. This already works.
+`src/components/PilotAvatar.tsx`: no API change needed — inner border is already `border border-primary/30`. To allow the chip to drop the inner border cleanly, make the border conditional via `className` override (already supported through `cn(..., className)`); pass `className="border-transparent"` from HeaderBar.
 
 ### Out of scope
-- No change to the onboarding screen
-- No change to call-sign validation rules
-- No DB / RLS change
-
-### Files touched
-- `src/components/PilotAvatar.tsx` — add `crop` prop
-- `src/components/HeaderBar.tsx` — split chip layout, pass `crop="face"`
+- Onboarding / profile-panel grids unchanged.
+- No DB / auth changes.
