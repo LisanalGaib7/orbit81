@@ -286,7 +286,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
 
       <div
         ref={hubRef}
-        className="!fixed top-8 right-8 z-[9999] max-md:top-4 max-md:right-4"
+        className="absolute top-8 right-8 z-50 max-md:top-4 max-md:right-4"
       >
       {/* Cog master toggle — hide when modal is open */}
       {!manualOpen && (
