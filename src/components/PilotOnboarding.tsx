@@ -107,10 +107,13 @@ export function PilotOnboarding({ initialCallSign, initialAvatarId, onComplete }
             {selectedDef ? selectedDef.name : "— SELECT A PILOT —"}
           </div>
           <div
-            className="h-5 text-center text-[11px] text-primary/80"
+            className="h-5 text-center text-[11px]"
             style={{
               fontFamily: "var(--font-data)",
-              textShadow: "0 0 6px hsl(var(--primary) / 0.4), 1px 1px 0 #000",
+              color: selectedDef?.accent ?? "hsl(var(--muted-foreground))",
+              textShadow: selectedDef
+                ? `0 0 6px ${selectedDef.accent}66, 1px 1px 0 #000`
+                : "1px 1px 0 #000",
               letterSpacing: "0.15em",
             }}
           >
