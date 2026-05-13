@@ -93,8 +93,8 @@ function ManualPanel({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
       if (justOpened.current) return;
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -175,8 +175,8 @@ function TemplatePanel({
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
   }, [isOpen, onClose]);
 
   return (
@@ -239,8 +239,8 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
         setHubOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
   }, [hubOpen, manualOpen, templateOpen, profileOpen]);
 
   const handleReset = () => {
