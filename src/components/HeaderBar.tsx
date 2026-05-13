@@ -273,6 +273,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
             size={44}
             crop="face"
             bordered={false}
+            transparent
           />
           <span
             className="text-[12px] tracking-[0.25em] text-primary/90 whitespace-nowrap"
