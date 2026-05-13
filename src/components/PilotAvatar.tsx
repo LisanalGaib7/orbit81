@@ -9,6 +9,8 @@ interface PilotAvatarProps {
   pixelated?: boolean;
   /** When "face", zoom into the head area of the avatar PNG. Default: full body. */
   crop?: "face" | "full";
+  /** Show inner border ring. Default true. */
+  bordered?: boolean;
 }
 
 /**
@@ -22,6 +24,7 @@ export function PilotAvatar({
   className,
   pixelated = true,
   crop = "full",
+  bordered = true,
 }: PilotAvatarProps) {
   const avatar = getAvatar(id);
   const faceCrop = crop === "face";
@@ -29,7 +32,8 @@ export function PilotAvatar({
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-md border border-primary/30 bg-background",
+        "relative shrink-0 overflow-hidden rounded-md bg-background",
+        bordered && "border border-primary/30",
         className,
       )}
       style={{
