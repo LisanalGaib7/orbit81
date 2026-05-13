@@ -11,6 +11,8 @@ interface PilotAvatarProps {
   crop?: "face" | "full";
   /** Show inner border ring. Default true. */
   bordered?: boolean;
+  /** Use transparent container background instead of solid bg-background. Default false. */
+  transparent?: boolean;
 }
 
 /**
@@ -25,6 +27,7 @@ export function PilotAvatar({
   pixelated = true,
   crop = "full",
   bordered = true,
+  transparent = false,
 }: PilotAvatarProps) {
   const avatar = getAvatar(id);
   const faceCrop = crop === "face";
@@ -32,7 +35,8 @@ export function PilotAvatar({
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-md bg-background",
+        "relative shrink-0 overflow-hidden rounded-md",
+        transparent ? "bg-transparent" : "bg-background",
         bordered && "border border-primary/30",
         className,
       )}
@@ -56,7 +60,7 @@ export function PilotAvatar({
             ...(pixelated ? { imageRendering: "pixelated" as const } : {}),
             ...(faceCrop
               ? {
-                  transform: "scale(2.6) translateY(18%)",
+                  transform: "scale(2.6) translateY(8%)",
                   transformOrigin: "center center",
                 }
               : {}),
