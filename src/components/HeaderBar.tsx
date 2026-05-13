@@ -260,12 +260,12 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
 
   if (!mounted) return null;
 
-  return createPortal(
+  return (
     <>
-      {/* Pilot identity chip — top-left */}
+      {/* Pilot identity chip — top-left, anchored to page top (scrolls away) */}
       {user && profile.avatar_id && (
         <div
-          className="!fixed top-8 left-8 z-[9999] inline-flex items-center gap-2 rounded-md border border-primary/30 bg-background/50 pl-1.5 pr-3 py-1 backdrop-blur-md max-md:top-4 max-md:left-4"
+          className="absolute top-8 left-8 z-50 inline-flex items-center gap-2 rounded-md border border-primary/30 bg-background/50 pl-1.5 pr-3 py-1 backdrop-blur-md max-md:top-4 max-md:left-4"
           style={{ boxShadow: "0 0 12px hsl(var(--primary) / 0.18)" }}
         >
           <PilotAvatar
