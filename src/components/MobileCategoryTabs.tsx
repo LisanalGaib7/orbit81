@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect, useRef, useState } from "react";
+import { useCallback, useMemo, useEffect, useState } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { getPrefix } from "@/lib/goalIds";
@@ -32,7 +32,6 @@ export function MobileCategoryTabs({
   onActionClick,
   globalProgress = 0,
 }: MobileCategoryTabsProps) {
-  const tabIntentRef = useRef<number | null>(null);
   const [selectedTab, setSelectedTab] = useState<number>(() => {
     if (typeof window === "undefined") return -1;
     const saved = sessionStorage.getItem("orbit81_mobile_tab");
@@ -75,7 +74,6 @@ export function MobileCategoryTabs({
       const nextTab = Number(tabElement.dataset.mobileTab);
       if (!Number.isFinite(nextTab) || nextTab < -1 || nextTab > 7) return;
 
-      tabIntentRef.current = nextTab;
       selectTab(nextTab);
     },
     [selectTab],
@@ -84,19 +82,16 @@ export function MobileCategoryTabs({
   const makeTabHandlers = useCallback(
     (idx: number) => ({
       onPointerDown: () => {
-        tabIntentRef.current = idx;
         selectTab(idx);
       },
       onMouseDown: () => {
-        tabIntentRef.current = idx;
         selectTab(idx);
       },
       onTouchStart: () => {
-        tabIntentRef.current = idx;
         selectTab(idx);
       },
-      onPointerUp: () => selectTab(tabIntentRef.current ?? idx),
-      onClick: () => selectTab(tabIntentRef.current ?? idx),
+      onPointerUp: () => selectTab(idx),
+      onClick: () => selectTab(idx),
     }),
     [selectTab],
   );
