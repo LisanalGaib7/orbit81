@@ -11,6 +11,7 @@ import { EditableLabel } from "./EditableLabel";
 import { PixelConfetti } from "./PixelConfetti";
 import { generateActionId } from "@/lib/goalIds";
 import { ACTION_POSITIONS } from "@/constants/missionData";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Tooltip,
   TooltipContent,
@@ -50,6 +51,7 @@ export function SubGoalBlock({
 }: SubGoalBlockProps) {
   const safeActions = actions ?? DEFAULT_ACTIONS;
   const safeActionLabels = actionLabels ?? DEFAULT_ACTION_LABELS;
+  const isMobile = useIsMobile();
 
   const handleBlockClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -59,6 +61,9 @@ export function SubGoalBlock({
 
   const handleActionSlotClick = (actionIdx: number, e: React.MouseEvent) => {
     e.stopPropagation();
+    const target = e.target as HTMLElement;
+    // Checkbox 자체 탭이면 sidebar 열지 않고 toggle만 실행
+    if (target.closest(".checkbox-goal")) return;
     onActionClick?.(blockIndex, actionIdx);
   };
 
@@ -69,6 +74,28 @@ export function SubGoalBlock({
       </div>
     );
   }
+
+  const renderSlot = (actionIdx: number) => (
+    <div
+      className="relative w-full h-full flex flex-col items-center justify-center gap-0.5 sm:gap-1.5 cursor-pointer hover:bg-primary/10 rounded transition-colors"
+      onClick={(e) => handleActionSlotClick(actionIdx, e)}
+    >
+      <span
+        className={`text-[9px] sm:text-[9px] font-bold tracking-tight leading-none ${
+          safeActions[actionIdx] ? "text-primary/50 line-through" : "text-primary"
+        }`}
+        style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0px #000000" }}
+      >
+        {generateActionId(label, actionIdx)}
+      </span>
+      <GoalCheckbox
+        checked={Boolean(safeActions[actionIdx])}
+        onChange={() => onToggle(blockIndex, actionIdx)}
+        label={safeActionLabels[actionIdx] || `Action ${actionIdx + 1} for ${label}`}
+        size="sm"
+      />
+    </div>
+  );
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -96,34 +123,11 @@ export function SubGoalBlock({
                     className="text-[10px] sm:text-xs font-medium leading-tight px-0.5 w-full"
                   />
                 </div>
+              ) : isMobile ? (
+                renderSlot(actionIdx)
               ) : (
                 <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div
-                      className="relative w-full h-full flex flex-col items-center justify-center gap-0.5 sm:gap-1.5 cursor-pointer hover:bg-primary/10 rounded transition-colors"
-                      onClick={(e) => handleActionSlotClick(actionIdx, e)}
-                    >
-                      {/* Action ID badge */}
-                      <span
-                        className={`text-[9px] sm:text-[9px] font-bold tracking-tight leading-none ${
-                          safeActions[actionIdx] ? "text-primary/50 line-through" : "text-primary"
-                        }`}
-                        style={{
-                          fontFamily: "var(--font-data)",
-                          textShadow: "1px 1px 0px #000000",
-                        }}
-                      >
-                        {generateActionId(label, actionIdx)}
-                      </span>
-
-                      <GoalCheckbox
-                        checked={Boolean(safeActions[actionIdx])}
-                        onChange={() => onToggle(blockIndex, actionIdx)}
-                        label={safeActionLabels[actionIdx] || `Action ${actionIdx + 1} for ${label}`}
-                        size="sm"
-                      />
-                    </div>
-                  </TooltipTrigger>
+                  <TooltipTrigger asChild>{renderSlot(actionIdx)}</TooltipTrigger>
                   <TooltipContent side="top" className="max-w-[200px] text-xs" sideOffset={5} style={{ fontFamily: "var(--font-body)" }}>
                     <span style={{ fontFamily: "var(--font-data)" }} className="font-bold text-primary">
                       [{generateActionId(label, actionIdx)}]

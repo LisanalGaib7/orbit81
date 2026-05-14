@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
@@ -33,8 +33,19 @@ export function MobileCategoryTabs({
   onActionClick,
   globalProgress = 0,
 }: MobileCategoryTabsProps) {
-  // -1 = core overview, 0-7 = sub-goal blocks
-  const [selectedTab, setSelectedTab] = useState<number>(-1);
+  // Persist selected tab in sessionStorage so re-renders/remounts don't reset it
+  const [selectedTab, setSelectedTab] = useState<number>(() => {
+    if (typeof window === "undefined") return -1;
+    const saved = sessionStorage.getItem("orbit81_mobile_tab");
+    const n = saved !== null ? parseInt(saved, 10) : -1;
+    return Number.isFinite(n) && n >= -1 && n <= 7 ? n : -1;
+  });
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("orbit81_mobile_tab", String(selectedTab));
+    } catch {}
+  }, [selectedTab]);
 
   const tabs = useMemo(() => {
     const items: { idx: number; label: string; prefix: string }[] = [
@@ -64,16 +75,18 @@ export function MobileCategoryTabs({
           return (
             <button
               key={tab.idx}
+              type="button"
               onClick={() => setSelectedTab(tab.idx)}
-              className={`flex-shrink-0 px-2.5 py-1.5 rounded text-[10px] font-bold tracking-wider transition-all border ${
-                isActive 
-                  ? "border-primary/60 bg-primary/15 shadow-[0_0_8px_rgba(234,179,8,0.2)]" 
+              className={`flex-shrink-0 px-2.5 py-1.5 rounded text-[10px] font-bold tracking-wider transition-all border min-h-[36px] ${
+                isActive
+                  ? "border-primary/60 bg-primary/15 shadow-[0_0_8px_rgba(234,179,8,0.2)]"
                   : "border-border bg-secondary/50 hover:border-muted-foreground/30"
               }`}
-              style={{ 
+              style={{
                 fontFamily: 'var(--font-data)',
                 textShadow: '1px 1px 0px #000000',
                 color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
+                touchAction: 'manipulation',
               }}
             >
               <span>{tab.prefix}</span>
@@ -86,13 +99,13 @@ export function MobileCategoryTabs({
       </div>
 
       {/* Content area */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false}>
         <motion.div
           key={selectedTab}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
         >
           {selectedTab === -1 ? (
             /* Core overview - show all 8 categories as a summary */
@@ -110,8 +123,10 @@ export function MobileCategoryTabs({
                   return (
                     <button
                       key={idx}
+                      type="button"
                       onClick={() => setSelectedTab(idx)}
-                      className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-secondary/30 hover:border-primary/30 transition-all"
+                      className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-secondary/30 hover:border-primary/30 transition-all min-h-[48px]"
+                      style={{ touchAction: 'manipulation' }}
                     >
                       <div className="flex items-center gap-2">
                         <span 
