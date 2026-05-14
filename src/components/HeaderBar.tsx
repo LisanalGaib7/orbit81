@@ -169,15 +169,67 @@ function TemplatePanel({
   onSelect: (labels: string[]) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+  const justOpened = useRef(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      justOpened.current = true;
+      requestAnimationFrame(() => { justOpened.current = false; });
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e: MouseEvent) => {
+    const handler = (e: PointerEvent) => {
+      if (justOpened.current) return;
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
     document.addEventListener("pointerdown", handler);
     return () => document.removeEventListener("pointerdown", handler);
   }, [isOpen, onClose]);
+
+  if (isMobile) {
+    if (!isOpen) return null;
+    return createPortal(
+      <div className="fixed inset-0 z-[99999]">
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+        <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+          <motion.div
+            ref={ref}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="pointer-events-auto w-full max-w-xs rounded-xl bg-background/95 backdrop-blur-md shadow-2xl overflow-hidden"
+            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-primary/10">
+              <h3 className="text-sm font-bold text-primary" style={{ fontFamily: "var(--font-header)", textShadow: "1px 1px 0px #000" }}>
+                Templates
+              </h3>
+              <button onClick={onClose} className="min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground" aria-label="Close">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-1 max-h-[60vh] overflow-y-auto">
+              {TEMPLATES.map((t) => (
+                <button
+                  key={t.name}
+                  onClick={() => { onSelect(t.labels); onClose(); }}
+                  className="w-full text-left px-3 py-3 text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors rounded min-h-[48px]"
+                  style={{ fontFamily: "var(--font-body)" }}
+                >
+                  {t.name}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>,
+      document.body
+    );
+  }
 
   return (
     <AnimatePresence>
@@ -265,9 +317,27 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
     }
   };
 
-  const closeSubPanels = () => { setManualOpen(false); setTemplateOpen(false); };
+  const closeSubPanels = () => { setManualOpen(false); setTemplateOpen(false); setProfileOpen(false); };
 
   if (!mounted) return null;
+
+  const isMobileView = typeof window !== "undefined" && window.innerWidth < 768;
+
+  const cogButton = (
+    <motion.button
+      onClick={() => { setHubOpen(!hubOpen); if (hubOpen) closeSubPanels(); }}
+      className="relative p-2.5 rounded-xl text-primary transition-colors"
+      style={{
+        background: hubOpen ? "hsl(var(--background) / 0.6)" : "transparent",
+        backdropFilter: hubOpen ? "blur(8px)" : undefined,
+      }}
+      animate={{ rotate: hubOpen ? 90 : 0 }}
+      transition={{ duration: 0.25, ease: "easeInOut" }}
+      aria-label="Command Settings"
+    >
+      <Settings className="w-5 h-5" strokeWidth={1.5} />
+    </motion.button>
+  );
 
   return (
     <>
@@ -297,33 +367,21 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
         ref={hubRef}
         className="absolute top-8 right-8 z-50 max-md:top-4 max-md:right-4"
       >
-      {/* Cog master toggle — always rendered so user is never trapped */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <motion.button
-            onClick={() => { setHubOpen(!hubOpen); if (hubOpen) closeSubPanels(); }}
-            className="relative p-2.5 rounded-xl text-primary transition-colors"
-            style={{
-              background: hubOpen ? "hsl(var(--background) / 0.6)" : "transparent",
-              backdropFilter: hubOpen ? "blur(8px)" : undefined,
-            }}
-            animate={{ rotate: hubOpen ? 90 : 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            aria-label="Command Settings"
-          >
-            <Settings className="w-5 h-5" strokeWidth={1.5} />
-          </motion.button>
-        </TooltipTrigger>
-        {!hubOpen && (
-          <TooltipContent
-            side="left"
-            className="text-[10px] font-bold border-primary/30 text-primary"
-            style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0px #000000" }}
-          >
-            Settings
-          </TooltipContent>
-        )}
-      </Tooltip>
+      {/* Cog master toggle — Tooltip skipped on mobile to avoid first-tap swallow */}
+      {isMobileView ? cogButton : (
+        <Tooltip>
+          <TooltipTrigger asChild>{cogButton}</TooltipTrigger>
+          {!hubOpen && (
+            <TooltipContent
+              side="left"
+              className="text-[10px] font-bold border-primary/30 text-primary"
+              style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0px #000000" }}
+            >
+              Settings
+            </TooltipContent>
+          )}
+        </Tooltip>
+      )}
 
       {/* Sub-menu fly-out */}
       <AnimatePresence>
