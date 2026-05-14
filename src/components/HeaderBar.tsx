@@ -317,9 +317,27 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
     }
   };
 
-  const closeSubPanels = () => { setManualOpen(false); setTemplateOpen(false); };
+  const closeSubPanels = () => { setManualOpen(false); setTemplateOpen(false); setProfileOpen(false); };
 
   if (!mounted) return null;
+
+  const isMobileView = typeof window !== "undefined" && window.innerWidth < 768;
+
+  const cogButton = (
+    <motion.button
+      onClick={() => { setHubOpen(!hubOpen); if (hubOpen) closeSubPanels(); }}
+      className="relative p-2.5 rounded-xl text-primary transition-colors"
+      style={{
+        background: hubOpen ? "hsl(var(--background) / 0.6)" : "transparent",
+        backdropFilter: hubOpen ? "blur(8px)" : undefined,
+      }}
+      animate={{ rotate: hubOpen ? 90 : 0 }}
+      transition={{ duration: 0.25, ease: "easeInOut" }}
+      aria-label="Command Settings"
+    >
+      <Settings className="w-5 h-5" strokeWidth={1.5} />
+    </motion.button>
+  );
 
   return (
     <>
@@ -349,33 +367,21 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
         ref={hubRef}
         className="absolute top-8 right-8 z-50 max-md:top-4 max-md:right-4"
       >
-      {/* Cog master toggle — always rendered so user is never trapped */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <motion.button
-            onClick={() => { setHubOpen(!hubOpen); if (hubOpen) closeSubPanels(); }}
-            className="relative p-2.5 rounded-xl text-primary transition-colors"
-            style={{
-              background: hubOpen ? "hsl(var(--background) / 0.6)" : "transparent",
-              backdropFilter: hubOpen ? "blur(8px)" : undefined,
-            }}
-            animate={{ rotate: hubOpen ? 90 : 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            aria-label="Command Settings"
-          >
-            <Settings className="w-5 h-5" strokeWidth={1.5} />
-          </motion.button>
-        </TooltipTrigger>
-        {!hubOpen && (
-          <TooltipContent
-            side="left"
-            className="text-[10px] font-bold border-primary/30 text-primary"
-            style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0px #000000" }}
-          >
-            Settings
-          </TooltipContent>
-        )}
-      </Tooltip>
+      {/* Cog master toggle — Tooltip skipped on mobile to avoid first-tap swallow */}
+      {isMobileView ? cogButton : (
+        <Tooltip>
+          <TooltipTrigger asChild>{cogButton}</TooltipTrigger>
+          {!hubOpen && (
+            <TooltipContent
+              side="left"
+              className="text-[10px] font-bold border-primary/30 text-primary"
+              style={{ fontFamily: "var(--font-data)", textShadow: "1px 1px 0px #000000" }}
+            >
+              Settings
+            </TooltipContent>
+          )}
+        </Tooltip>
+      )}
 
       {/* Sub-menu fly-out */}
       <AnimatePresence>
