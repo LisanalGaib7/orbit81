@@ -38,13 +38,34 @@ function SubIcon({
   index: number;
 }) {
   const isMobile = useIsMobile();
+  const skipNextClick = useRef(false);
+  const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (event.pointerType !== "mouse") {
+      skipNextClick.current = true;
+      event.preventDefault();
+      onClick();
+    }
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (skipNextClick.current) {
+      skipNextClick.current = false;
+      return;
+    }
+    onClick();
+  };
 
   const button = (
     <motion.button
-      onClick={onClick}
-      className="relative p-2.5 rounded-lg text-primary transition-colors hover:bg-primary/10"
+      type="button"
+      onPointerDown={handlePointerDown}
+      onClick={handleClick}
+      className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2.5 text-primary transition-colors hover:bg-primary/10"
       style={{
         filter: isActive ? "drop-shadow(0 0 6px hsl(var(--primary) / 0.7))" : undefined,
+        touchAction: "manipulation",
       }}
       initial={{ opacity: 0, y: -8, scale: 0.8 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -100,7 +121,7 @@ function ManualPanel({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[99999]">
+    <div className="fixed inset-0 z-[100001]">
       {/* Backdrop — closes on tap */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       {/* Centered modal */}
@@ -192,7 +213,7 @@ function TemplatePanel({
   if (isMobile) {
     if (!isOpen) return null;
     return createPortal(
-      <div className="fixed inset-0 z-[99999]">
+      <div className="fixed inset-0 z-[100001]">
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
         <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
           <motion.div
@@ -280,6 +301,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [mounted, setMounted] = useState(false);
   const hubRef = useRef<HTMLDivElement>(null);
+  const skipNextCogClick = useRef(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -323,13 +345,40 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
 
   const isMobileView = typeof window !== "undefined" && window.innerWidth < 768;
 
+  const handleCogPointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (event.pointerType !== "mouse") {
+      skipNextCogClick.current = true;
+      event.preventDefault();
+      setHubOpen((open) => {
+        if (open) closeSubPanels();
+        return !open;
+      });
+    }
+  };
+
+  const handleCogClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (skipNextCogClick.current) {
+      skipNextCogClick.current = false;
+      return;
+    }
+    setHubOpen((open) => {
+      if (open) closeSubPanels();
+      return !open;
+    });
+  };
+
   const cogButton = (
     <motion.button
-      onClick={() => { setHubOpen(!hubOpen); if (hubOpen) closeSubPanels(); }}
-      className="relative p-2.5 rounded-xl text-primary transition-colors"
+      type="button"
+      onPointerDown={handleCogPointerDown}
+      onClick={handleCogClick}
+      className="relative flex min-h-[48px] min-w-[48px] items-center justify-center rounded-xl p-2.5 text-primary transition-colors"
       style={{
         background: hubOpen ? "hsl(var(--background) / 0.6)" : "transparent",
         backdropFilter: hubOpen ? "blur(8px)" : undefined,
+        touchAction: "manipulation",
       }}
       animate={{ rotate: hubOpen ? 90 : 0 }}
       transition={{ duration: 0.25, ease: "easeInOut" }}
@@ -365,7 +414,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
 
       <div
         ref={hubRef}
-        className="absolute top-8 right-8 z-50 max-md:top-4 max-md:right-4"
+        className="fixed right-8 top-8 z-[100000] max-md:right-4 max-md:top-4"
       >
       {/* Cog master toggle — Tooltip skipped on mobile to avoid first-tap swallow */}
       {isMobileView ? cogButton : (
