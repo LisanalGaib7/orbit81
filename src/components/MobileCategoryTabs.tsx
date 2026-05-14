@@ -119,6 +119,7 @@ export function MobileCategoryTabs({
                   <button
                     key={idx}
                     type="button"
+                    onPointerDown={() => selectTab(idx)}
                     onClick={() => selectTab(idx)}
                     className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-secondary/30 hover:border-primary/30 transition-all min-h-[48px]"
                     style={{ touchAction: "manipulation" }}
