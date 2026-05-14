@@ -119,6 +119,7 @@ export function MobileCategoryTabs({
   }, [findTabButton, selectTab]);
 
   const handleTabPress = (idx: number, event: React.SyntheticEvent<HTMLButtonElement>) => {
+    if (event.cancelable) event.preventDefault();
     event.stopPropagation();
     const now = Date.now();
     const last = lastHandledRef.current;
@@ -147,6 +148,9 @@ export function MobileCategoryTabs({
             <button
               key={tab.idx}
               type="button"
+              onPointerDownCapture={(event) => handleTabPress(tab.idx, event)}
+              onTouchStartCapture={(event) => handleTabPress(tab.idx, event)}
+              onMouseDownCapture={(event) => handleTabPress(tab.idx, event)}
               onClick={(event) => handleTabClick(tab.idx, event)}
               aria-pressed={isActive}
               data-active={isActive ? "true" : "false"}
@@ -192,7 +196,10 @@ export function MobileCategoryTabs({
                     <button
                       key={idx}
                       type="button"
-              onClick={(event) => handleTabClick(idx, event)}
+                      onPointerDownCapture={(event) => handleTabPress(idx, event)}
+                      onTouchStartCapture={(event) => handleTabPress(idx, event)}
+                      onMouseDownCapture={(event) => handleTabPress(idx, event)}
+                      onClick={(event) => handleTabClick(idx, event)}
                       aria-pressed={selectedTab === idx}
                       data-active={selectedTab === idx ? "true" : "false"}
                       data-mobile-tab-idx={idx}
