@@ -38,9 +38,11 @@ function SubIcon({
   index: number;
 }) {
   const isMobile = useIsMobile();
+  const skipNextClick = useRef(false);
   const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     if (event.pointerType !== "mouse") {
+      skipNextClick.current = true;
       event.preventDefault();
       onClick();
     }
@@ -48,6 +50,10 @@ function SubIcon({
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
+    if (skipNextClick.current) {
+      skipNextClick.current = false;
+      return;
+    }
     onClick();
   };
 
