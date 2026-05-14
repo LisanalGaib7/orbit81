@@ -78,7 +78,7 @@ export function MobileCategoryTabs({
             <button
               key={tab.idx}
               type="button"
-              onClick={() => selectTab(tab.idx)}
+              onClick={(e) => { console.log("[tab onClick]", tab.idx, e.target); selectTab(tab.idx); }}
               aria-pressed={isActive}
               data-active={isActive ? "true" : "false"}
               className={`relative z-10 flex min-h-[48px] flex-shrink-0 items-center justify-center rounded border px-3 py-2 text-[10px] font-bold tracking-wider transition-all ${
