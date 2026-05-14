@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
@@ -61,12 +61,37 @@ export function MobileCategoryTabs({
     return actions[blockIdx]?.filter(Boolean).length ?? 0;
   };
 
+  const touchHandledRef = useRef(false);
+
+  const selectTab = (idx: number) => {
+    setSelectedTab(idx);
+    if (idx >= 0) onBlockClick(idx);
+  };
+
+  const handleTabPointerDown = (idx: number, event: React.PointerEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (event.pointerType !== "mouse") {
+      touchHandledRef.current = true;
+      event.preventDefault();
+      selectTab(idx);
+    }
+  };
+
+  const handleTabClick = (idx: number, event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (touchHandledRef.current) {
+      touchHandledRef.current = false;
+      return;
+    }
+    selectTab(idx);
+  };
+
   return (
-    <div className="w-full" style={{ zIndex: 50 }}>
+    <div className="relative w-full" style={{ zIndex: 200 }}>
       {/* Tab bar - horizontally scrollable */}
       <div 
-        className="flex gap-1 overflow-x-auto pb-2 mb-3 no-scrollbar"
-        style={{ WebkitOverflowScrolling: 'touch' }}
+        className="relative z-10 flex gap-1 overflow-x-auto pb-2 mb-3 no-scrollbar"
+        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}
       >
         {tabs.map((tab) => {
           const isActive = selectedTab === tab.idx;
@@ -76,8 +101,9 @@ export function MobileCategoryTabs({
             <button
               key={tab.idx}
               type="button"
-              onClick={() => setSelectedTab(tab.idx)}
-              className={`flex-shrink-0 px-2.5 py-1.5 rounded text-[10px] font-bold tracking-wider transition-all border min-h-[36px] ${
+              onPointerDown={(event) => handleTabPointerDown(tab.idx, event)}
+              onClick={(event) => handleTabClick(tab.idx, event)}
+              className={`relative z-10 flex min-h-[48px] flex-shrink-0 items-center justify-center rounded border px-3 py-2 text-[10px] font-bold tracking-wider transition-all ${
                 isActive
                   ? "border-primary/60 bg-primary/15 shadow-[0_0_8px_rgba(234,179,8,0.2)]"
                   : "border-border bg-secondary/50 hover:border-muted-foreground/30"
@@ -87,6 +113,7 @@ export function MobileCategoryTabs({
                 textShadow: '1px 1px 0px #000000',
                 color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
                 touchAction: 'manipulation',
+                pointerEvents: 'auto',
               }}
             >
               <span>{tab.prefix}</span>
