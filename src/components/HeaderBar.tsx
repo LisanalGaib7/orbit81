@@ -301,6 +301,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [mounted, setMounted] = useState(false);
   const hubRef = useRef<HTMLDivElement>(null);
+  const skipNextCogClick = useRef(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -347,6 +348,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
   const handleCogPointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     if (event.pointerType !== "mouse") {
+      skipNextCogClick.current = true;
       event.preventDefault();
       setHubOpen((open) => {
         if (open) closeSubPanels();
@@ -357,6 +359,10 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
 
   const handleCogClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
+    if (skipNextCogClick.current) {
+      skipNextCogClick.current = false;
+      return;
+    }
     setHubOpen((open) => {
       if (open) closeSubPanels();
       return !open;
