@@ -64,8 +64,7 @@ export function MobileCategoryTabs({
   const touchHandledRef = useRef(false);
 
   const selectTab = (idx: number) => {
-    setSelectedTab(idx);
-    if (idx >= 0) onBlockClick(idx);
+    setSelectedTab((current) => (current === idx ? current : idx));
   };
 
   const handleTabPointerDown = (idx: number, event: React.PointerEvent<HTMLButtonElement>) => {
@@ -103,6 +102,8 @@ export function MobileCategoryTabs({
               type="button"
               onPointerDown={(event) => handleTabPointerDown(tab.idx, event)}
               onClick={(event) => handleTabClick(tab.idx, event)}
+              aria-pressed={isActive}
+              data-active={isActive ? "true" : "false"}
               className={`relative z-10 flex min-h-[48px] flex-shrink-0 items-center justify-center rounded border px-3 py-2 text-[10px] font-bold tracking-wider transition-all ${
                 isActive
                   ? "border-primary/60 bg-primary/15 shadow-[0_0_8px_rgba(234,179,8,0.2)]"
@@ -153,6 +154,8 @@ export function MobileCategoryTabs({
                       type="button"
                       onPointerDown={(event) => handleTabPointerDown(idx, event)}
                       onClick={(event) => handleTabClick(idx, event)}
+                      aria-pressed={selectedTab === idx}
+                      data-active={selectedTab === idx ? "true" : "false"}
                       className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-secondary/30 hover:border-primary/30 transition-all min-h-[48px]"
                       style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
                     >
