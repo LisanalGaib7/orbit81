@@ -61,7 +61,7 @@ export function MobileCategoryTabs({
   };
 
   const rootRef = useRef<HTMLDivElement>(null);
-  const pressHandledRef = useRef(false);
+  const lastHandledRef = useRef<number>(0);
 
   const selectedIndex = selectedTab >= 0 ? selectedTab : activeBlockIndex;
 
@@ -70,65 +70,46 @@ export function MobileCategoryTabs({
     if (idx >= 0) onBlockClick(idx);
   }, [onBlockClick]);
 
+  // Native capture listeners on window — guarantees tab switching even if any
+  // parent layer (rocket animation, framer-motion, overlays) intercepts events.
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
     const handleNativePress = (event: Event) => {
       const target = event.target as Element | null;
-      const button = target?.closest<HTMLButtonElement>("[data-mobile-tab-idx]");
-      if (!button || !root.contains(button)) return;
-      if (event.type === "click" && pressHandledRef.current) {
-        pressHandledRef.current = false;
-        event.stopPropagation();
+      if (!target || typeof (target as Element).closest !== "function") return;
+      const button = (target as Element).closest<HTMLElement>("[data-mobile-tab-idx]");
+      if (!button) return;
+      const root = rootRef.current;
+      if (!root || !root.contains(button)) return;
+
+      // Debounce: a single tap fires pointerdown + touchstart + click. Only act once per ~400ms.
+      const now = Date.now();
+      if (now - lastHandledRef.current < 400) {
+        if (event.cancelable) event.preventDefault();
         return;
       }
-      if (event.type !== "click") pressHandledRef.current = true;
+      lastHandledRef.current = now;
+
       if (event.cancelable) event.preventDefault();
-      event.stopPropagation();
-      selectTab(Number(button.dataset.mobileTabIdx));
+      const idx = Number(button.dataset.mobileTabIdx);
+      if (Number.isFinite(idx)) selectTab(idx);
     };
 
-    root.addEventListener("pointerdown", handleNativePress, true);
-    root.addEventListener("mousedown", handleNativePress, true);
-    root.addEventListener("touchstart", handleNativePress, { capture: true, passive: false });
-    root.addEventListener("click", handleNativePress, true);
+    window.addEventListener("pointerdown", handleNativePress, true);
+    window.addEventListener("touchstart", handleNativePress, { capture: true, passive: false });
+    window.addEventListener("mousedown", handleNativePress, true);
     return () => {
-      root.removeEventListener("pointerdown", handleNativePress, true);
-      root.removeEventListener("mousedown", handleNativePress, true);
-      root.removeEventListener("touchstart", handleNativePress, true);
-      root.removeEventListener("click", handleNativePress, true);
+      window.removeEventListener("pointerdown", handleNativePress, true);
+      window.removeEventListener("touchstart", handleNativePress, true);
+      window.removeEventListener("mousedown", handleNativePress, true);
     };
   }, [selectTab]);
 
-  const handleTabPointerDown = (idx: number, event: React.PointerEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (event.pointerType !== "mouse") {
-      pressHandledRef.current = true;
-      event.preventDefault();
-      selectTab(idx);
-    }
-  };
-
-  const handleTabMouseDown = (idx: number, event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (event.button !== 0) return;
-    pressHandledRef.current = true;
-    selectTab(idx);
-  };
-
-  const handleTabTouchStart = (idx: number, event: React.TouchEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    pressHandledRef.current = true;
-    selectTab(idx);
-  };
-
+  // React fallback (covers environments where native window capture is blocked).
   const handleTabClick = (idx: number, event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    if (pressHandledRef.current) {
-      pressHandledRef.current = false;
-      return;
-    }
+    const now = Date.now();
+    if (now - lastHandledRef.current < 400) return;
+    lastHandledRef.current = now;
     selectTab(idx);
   };
 
@@ -147,9 +128,6 @@ export function MobileCategoryTabs({
             <button
               key={tab.idx}
               type="button"
-              onPointerDown={(event) => handleTabPointerDown(tab.idx, event)}
-              onMouseDown={(event) => handleTabMouseDown(tab.idx, event)}
-              onTouchStart={(event) => handleTabTouchStart(tab.idx, event)}
               onClick={(event) => handleTabClick(tab.idx, event)}
               aria-pressed={isActive}
               data-active={isActive ? "true" : "false"}
@@ -195,10 +173,7 @@ export function MobileCategoryTabs({
                     <button
                       key={idx}
                       type="button"
-                      onPointerDown={(event) => handleTabPointerDown(idx, event)}
-                      onMouseDown={(event) => handleTabMouseDown(idx, event)}
-                      onTouchStart={(event) => handleTabTouchStart(idx, event)}
-                      onClick={(event) => handleTabClick(idx, event)}
+              onClick={(event) => handleTabClick(idx, event)}
                       aria-pressed={selectedTab === idx}
                       data-active={selectedTab === idx ? "true" : "false"}
                       data-mobile-tab-idx={idx}
