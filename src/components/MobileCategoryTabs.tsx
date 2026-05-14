@@ -63,9 +63,12 @@ export function MobileCategoryTabs({
   const rootRef = useRef<HTMLDivElement>(null);
   const pressHandledRef = useRef(false);
 
+  const selectedIndex = selectedTab >= 0 ? selectedTab : activeBlockIndex;
+
   const selectTab = useCallback((idx: number) => {
-    setSelectedTab((current) => (current === idx ? current : idx));
-  }, []);
+    setSelectedTab(idx);
+    if (idx >= 0) onBlockClick(idx);
+  }, [onBlockClick]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -137,7 +140,7 @@ export function MobileCategoryTabs({
         style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}
       >
         {tabs.map((tab) => {
-          const isActive = selectedTab === tab.idx;
+          const isActive = tab.idx === -1 ? selectedTab === -1 : selectedIndex === tab.idx;
           const progress = tab.idx === -1 ? null : Math.round(subGoalProgress[tab.idx]);
           
           return (
@@ -175,7 +178,7 @@ export function MobileCategoryTabs({
 
       {/* Content area */}
       <div key={selectedTab}>
-          {selectedTab === -1 ? (
+          {selectedIndex === null || selectedTab === -1 ? (
             /* Core overview - show all 8 categories as a summary */
             <div className="space-y-3">
               <CoreGoalBlock 
@@ -239,16 +242,16 @@ export function MobileCategoryTabs({
             /* Single category 3x3 grid */
             <div className="max-w-[280px] mx-auto">
               <SubGoalBlock
-                blockIndex={selectedTab}
-                actions={actions[selectedTab]}
-                actionLabels={actionLabels[selectedTab]}
+                blockIndex={selectedIndex}
+                actions={actions[selectedIndex]}
+                actionLabels={actionLabels[selectedIndex]}
                 onToggle={onToggle}
-                label={subGoalLabels[selectedTab]}
-                onLabelChange={(newLabel) => onLabelChange(selectedTab, newLabel)}
-                showConfetti={completedSubGoals.has(selectedTab)}
-                onConfettiComplete={() => onConfettiComplete(selectedTab)}
-                isActive={activeBlockIndex === selectedTab}
-                onBlockClick={() => onBlockClick(selectedTab)}
+                label={subGoalLabels[selectedIndex]}
+                onLabelChange={(newLabel) => onLabelChange(selectedIndex, newLabel)}
+                showConfetti={completedSubGoals.has(selectedIndex)}
+                onConfettiComplete={() => onConfettiComplete(selectedIndex)}
+                isActive={activeBlockIndex === selectedIndex}
+                onBlockClick={() => onBlockClick(selectedIndex)}
                 onActionClick={onActionClick}
               />
             </div>
