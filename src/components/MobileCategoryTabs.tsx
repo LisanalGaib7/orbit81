@@ -61,7 +61,7 @@ export function MobileCategoryTabs({
     return actions[blockIdx]?.filter(Boolean).length ?? 0;
   };
 
-  const touchHandledRef = useRef(false);
+  const pressHandledRef = useRef(false);
 
   const selectTab = (idx: number) => {
     setSelectedTab((current) => (current === idx ? current : idx));
@@ -70,16 +70,29 @@ export function MobileCategoryTabs({
   const handleTabPointerDown = (idx: number, event: React.PointerEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     if (event.pointerType !== "mouse") {
-      touchHandledRef.current = true;
+      pressHandledRef.current = true;
       event.preventDefault();
       selectTab(idx);
     }
   };
 
+  const handleTabMouseDown = (idx: number, event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (event.button !== 0) return;
+    pressHandledRef.current = true;
+    selectTab(idx);
+  };
+
+  const handleTabTouchStart = (idx: number, event: React.TouchEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    pressHandledRef.current = true;
+    selectTab(idx);
+  };
+
   const handleTabClick = (idx: number, event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    if (touchHandledRef.current) {
-      touchHandledRef.current = false;
+    if (pressHandledRef.current) {
+      pressHandledRef.current = false;
       return;
     }
     selectTab(idx);
@@ -101,6 +114,8 @@ export function MobileCategoryTabs({
               key={tab.idx}
               type="button"
               onPointerDown={(event) => handleTabPointerDown(tab.idx, event)}
+              onMouseDown={(event) => handleTabMouseDown(tab.idx, event)}
+              onTouchStart={(event) => handleTabTouchStart(tab.idx, event)}
               onClick={(event) => handleTabClick(tab.idx, event)}
               aria-pressed={isActive}
               data-active={isActive ? "true" : "false"}
@@ -153,6 +168,8 @@ export function MobileCategoryTabs({
                       key={idx}
                       type="button"
                       onPointerDown={(event) => handleTabPointerDown(idx, event)}
+                      onMouseDown={(event) => handleTabMouseDown(idx, event)}
+                      onTouchStart={(event) => handleTabTouchStart(idx, event)}
                       onClick={(event) => handleTabClick(idx, event)}
                       aria-pressed={selectedTab === idx}
                       data-active={selectedTab === idx ? "true" : "false"}
