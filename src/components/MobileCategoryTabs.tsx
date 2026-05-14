@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef, useState } from "react";
+import { useCallback, useMemo, useEffect, useRef, useState } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { getPrefix } from "@/lib/goalIds";
@@ -60,11 +60,43 @@ export function MobileCategoryTabs({
     return actions[blockIdx]?.filter(Boolean).length ?? 0;
   };
 
+  const rootRef = useRef<HTMLDivElement>(null);
   const pressHandledRef = useRef(false);
 
-  const selectTab = (idx: number) => {
+  const selectTab = useCallback((idx: number) => {
     setSelectedTab((current) => (current === idx ? current : idx));
-  };
+  }, []);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const handleNativePress = (event: Event) => {
+      const target = event.target as Element | null;
+      const button = target?.closest<HTMLButtonElement>("[data-mobile-tab-idx]");
+      if (!button || !root.contains(button)) return;
+      if (event.type === "click" && pressHandledRef.current) {
+        pressHandledRef.current = false;
+        event.stopPropagation();
+        return;
+      }
+      if (event.type !== "click") pressHandledRef.current = true;
+      if (event.cancelable) event.preventDefault();
+      event.stopPropagation();
+      selectTab(Number(button.dataset.mobileTabIdx));
+    };
+
+    root.addEventListener("pointerdown", handleNativePress, true);
+    root.addEventListener("mousedown", handleNativePress, true);
+    root.addEventListener("touchstart", handleNativePress, { capture: true, passive: false });
+    root.addEventListener("click", handleNativePress, true);
+    return () => {
+      root.removeEventListener("pointerdown", handleNativePress, true);
+      root.removeEventListener("mousedown", handleNativePress, true);
+      root.removeEventListener("touchstart", handleNativePress, true);
+      root.removeEventListener("click", handleNativePress, true);
+    };
+  }, [selectTab]);
 
   const handleTabPointerDown = (idx: number, event: React.PointerEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -98,7 +130,7 @@ export function MobileCategoryTabs({
   };
 
   return (
-    <div className="relative w-full" style={{ zIndex: 200 }}>
+    <div ref={rootRef} className="relative w-full" style={{ zIndex: 200 }}>
       {/* Tab bar - horizontally scrollable */}
       <div 
         className="relative z-10 flex gap-1 overflow-x-auto pb-2 mb-3 no-scrollbar"
@@ -118,6 +150,7 @@ export function MobileCategoryTabs({
               onClick={(event) => handleTabClick(tab.idx, event)}
               aria-pressed={isActive}
               data-active={isActive ? "true" : "false"}
+              data-mobile-tab-idx={tab.idx}
               className={`relative z-10 flex min-h-[48px] flex-shrink-0 items-center justify-center rounded border px-3 py-2 text-[10px] font-bold tracking-wider transition-all ${
                 isActive
                   ? "border-primary/60 bg-primary/15 shadow-[0_0_8px_rgba(234,179,8,0.2)]"
@@ -165,6 +198,7 @@ export function MobileCategoryTabs({
                       onClick={(event) => handleTabClick(idx, event)}
                       aria-pressed={selectedTab === idx}
                       data-active={selectedTab === idx ? "true" : "false"}
+                      data-mobile-tab-idx={idx}
                       className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-secondary/30 hover:border-primary/30 transition-all min-h-[48px]"
                       style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
                     >
