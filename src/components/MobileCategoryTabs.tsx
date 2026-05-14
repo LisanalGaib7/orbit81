@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { getPrefix } from "@/lib/goalIds";
@@ -61,55 +62,76 @@ export function MobileCategoryTabs({
   };
 
   const rootRef = useRef<HTMLDivElement>(null);
-  const lastHandledRef = useRef<number>(0);
+  const lastHandledRef = useRef<{ idx: number; at: number } | null>(null);
 
   const selectedIndex = selectedTab >= 0 ? selectedTab : activeBlockIndex;
 
   const selectTab = useCallback((idx: number) => {
-    setSelectedTab(idx);
-    if (idx >= 0) onBlockClick(idx);
-  }, [onBlockClick]);
+    flushSync(() => setSelectedTab(idx));
+  }, []);
 
-  // Native capture listeners on window — guarantees tab switching even if any
-  // parent layer (rocket animation, framer-motion, overlays) intercepts events.
+  const findTabButton = useCallback((event: Event) => {
+    const path = typeof event.composedPath === "function" ? event.composedPath() : [];
+    for (const node of path) {
+      if (node instanceof HTMLElement && node.dataset.mobileTabIdx !== undefined) return node;
+    }
+
+    const target = event.target as Element | null;
+    return target && typeof target.closest === "function"
+      ? target.closest<HTMLElement>("[data-mobile-tab-idx]")
+      : null;
+  }, []);
+
+  // Native capture on the tab root guarantees state changes before React click
+  // bubbling, while avoiding the previous window-level handler swallowing taps.
   useEffect(() => {
     const handleNativePress = (event: Event) => {
-      const target = event.target as Element | null;
-      if (!target || typeof (target as Element).closest !== "function") return;
-      const button = (target as Element).closest<HTMLElement>("[data-mobile-tab-idx]");
+      const button = findTabButton(event);
       if (!button) return;
       const root = rootRef.current;
       if (!root || !root.contains(button)) return;
 
-      // Debounce: a single tap fires pointerdown + touchstart + click. Only act once per ~400ms.
+      const idx = Number(button.dataset.mobileTabIdx);
+      if (!Number.isFinite(idx)) return;
+
+      // A single tap can fire pointerdown + touchstart + mousedown + click.
+      // Suppress only duplicates for the same tab; allow rapid switching to another tab.
       const now = Date.now();
-      if (now - lastHandledRef.current < 400) {
+      const last = lastHandledRef.current;
+      if (last && last.idx === idx && now - last.at < 260) {
         if (event.cancelable) event.preventDefault();
         return;
       }
-      lastHandledRef.current = now;
+      lastHandledRef.current = { idx, at: now };
 
       if (event.cancelable) event.preventDefault();
-      const idx = Number(button.dataset.mobileTabIdx);
-      if (Number.isFinite(idx)) selectTab(idx);
+      event.stopPropagation();
+      selectTab(idx);
     };
 
-    window.addEventListener("pointerdown", handleNativePress, true);
-    window.addEventListener("touchstart", handleNativePress, { capture: true, passive: false });
-    window.addEventListener("mousedown", handleNativePress, true);
+    const root = rootRef.current;
+    if (!root) return;
+
+    root.addEventListener("pointerdown", handleNativePress, true);
+    root.addEventListener("touchstart", handleNativePress, { capture: true, passive: false });
+    root.addEventListener("mousedown", handleNativePress, true);
+    root.addEventListener("click", handleNativePress, true);
     return () => {
-      window.removeEventListener("pointerdown", handleNativePress, true);
-      window.removeEventListener("touchstart", handleNativePress, true);
-      window.removeEventListener("mousedown", handleNativePress, true);
+      root.removeEventListener("pointerdown", handleNativePress, true);
+      root.removeEventListener("touchstart", handleNativePress, true);
+      root.removeEventListener("mousedown", handleNativePress, true);
+      root.removeEventListener("click", handleNativePress, true);
     };
-  }, [selectTab]);
+  }, [findTabButton, selectTab]);
 
   // React fallback (covers environments where native window capture is blocked).
   const handleTabClick = (idx: number, event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     event.stopPropagation();
     const now = Date.now();
-    if (now - lastHandledRef.current < 400) return;
-    lastHandledRef.current = now;
+    const last = lastHandledRef.current;
+    if (last && last.idx === idx && now - last.at < 260) return;
+    lastHandledRef.current = { idx, at: now };
     selectTab(idx);
   };
 
