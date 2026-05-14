@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect, useState } from "react";
+import { useCallback, useMemo, useEffect, useRef, useState } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { getPrefix } from "@/lib/goalIds";
@@ -32,6 +32,7 @@ export function MobileCategoryTabs({
   onActionClick,
   globalProgress = 0,
 }: MobileCategoryTabsProps) {
+  const tabIntentRef = useRef<number | null>(null);
   const [selectedTab, setSelectedTab] = useState<number>(() => {
     if (typeof window === "undefined") return -1;
     const saved = sessionStorage.getItem("orbit81_mobile_tab");
@@ -66,7 +67,7 @@ export function MobileCategoryTabs({
   }, [selectedTab]);
 
   const selectFromEventTarget = useCallback(
-    (target: EventTarget | null, stopPropagation?: () => void) => {
+    (target: EventTarget | null) => {
       const element = target instanceof HTMLElement ? target : null;
       const tabElement = element?.closest<HTMLElement>("[data-mobile-tab]");
       if (!tabElement) return;
@@ -74,21 +75,38 @@ export function MobileCategoryTabs({
       const nextTab = Number(tabElement.dataset.mobileTab);
       if (!Number.isFinite(nextTab) || nextTab < -1 || nextTab > 7) return;
 
-      stopPropagation?.();
+      tabIntentRef.current = nextTab;
       selectTab(nextTab);
     },
+    [selectTab],
+  );
+
+  const makeTabHandlers = useCallback(
+    (idx: number) => ({
+      onPointerDown: () => {
+        tabIntentRef.current = idx;
+        selectTab(idx);
+      },
+      onMouseDown: () => {
+        tabIntentRef.current = idx;
+        selectTab(idx);
+      },
+      onTouchStart: () => {
+        tabIntentRef.current = idx;
+        selectTab(idx);
+      },
+      onPointerUp: () => selectTab(tabIntentRef.current ?? idx),
+      onClick: () => selectTab(tabIntentRef.current ?? idx),
+    }),
     [selectTab],
   );
 
   return (
     <div
       className="relative w-full"
-      onPointerDownCapture={(event) =>
-        selectFromEventTarget(event.target, () => event.stopPropagation())
-      }
-      onTouchStartCapture={(event) =>
-        selectFromEventTarget(event.target, () => event.stopPropagation())
-      }
+      onPointerDownCapture={(event) => selectFromEventTarget(event.target)}
+      onMouseDownCapture={(event) => selectFromEventTarget(event.target)}
+      onTouchStartCapture={(event) => selectFromEventTarget(event.target)}
       style={{ zIndex: 200 }}
     >
       {/* Tab bar - horizontally scrollable */}
@@ -105,8 +123,7 @@ export function MobileCategoryTabs({
               key={tab.idx}
               type="button"
               data-mobile-tab={tab.idx}
-              onPointerDown={() => selectTab(tab.idx)}
-              onClick={() => selectTab(tab.idx)}
+              {...makeTabHandlers(tab.idx)}
               aria-pressed={isActive}
               data-active={isActive ? "true" : "false"}
               className={`relative z-10 flex min-h-[48px] flex-shrink-0 items-center justify-center rounded border px-3 py-2 text-[10px] font-bold tracking-wider transition-all ${
@@ -148,9 +165,7 @@ export function MobileCategoryTabs({
                     key={idx}
                     type="button"
                     data-mobile-tab={idx}
-                    onPointerDown={() => selectTab(idx)}
-                    onPointerUp={() => selectTab(idx)}
-                    onClick={() => selectTab(idx)}
+                    {...makeTabHandlers(idx)}
                     className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-secondary/30 hover:border-primary/30 transition-all min-h-[48px]"
                     style={{ touchAction: "manipulation" }}
                   >
