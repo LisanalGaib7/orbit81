@@ -173,10 +173,7 @@ export function MobileCategoryTabs({
                     <button
                       key={idx}
                       type="button"
-                      onPointerDown={(event) => handleTabPointerDown(idx, event)}
-                      onMouseDown={(event) => handleTabMouseDown(idx, event)}
-                      onTouchStart={(event) => handleTabTouchStart(idx, event)}
-                      onClick={(event) => handleTabClick(idx, event)}
+              onClick={(event) => handleTabClick(idx, event)}
                       aria-pressed={selectedTab === idx}
                       data-active={selectedTab === idx ? "true" : "false"}
                       data-mobile-tab-idx={idx}
