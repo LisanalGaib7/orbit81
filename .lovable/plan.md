@@ -1,33 +1,46 @@
-## 목표
-모바일, 웹, iPad에서 subgoal 탭/체크박스/설정 메뉴 아이콘이 첫 탭부터 안정적으로 작동하도록 클릭 이벤트 구조를 정리합니다.
+## 확인한 실제 증상
 
-## 확인된 핵심 원인 후보
-- `SubGoalBlock`의 action slot `<div>`와 내부 `GoalCheckbox <button>`이 중첩 클릭 구조처럼 동작해, 체크 클릭이 사이드바 열기 이벤트와 충돌할 수 있습니다.
-- 모바일 `MobileCategoryTabs`는 `AnimatePresence mode="wait"`와 탭 전환 애니메이션이 결합되어 탭 클릭 후 화면 전환이 안정적으로 반영되지 않는 상태가 보입니다.
-- 설정 메뉴는 일부 패널 상태(`manualOpen`, `templateOpen`, `profileOpen`)와 hub 외부 클릭 처리, Tooltip/portal 조합이 여전히 상호 간섭할 수 있습니다.
-- `ActionSidebar`가 `modal={false}`인 Radix Dialog로 열리고, 닫힌/열린 상태 전환 중 body scroll lock 및 포커스 관리가 다른 클릭을 방해할 가능성이 있습니다.
+- 상단 모바일 탭에서 **HE/Career 같은 subgoal 탭을 누르면 콘텐츠가 단일 subgoal 3x3 그리드로 전환**되는 케이스는 재현상 정상 동작을 확인했습니다.
+- 하지만 **CORE 요약 영역 안의 subgoal 카드**를 누르면 화면이 여전히 CORE 요약에 머뭅니다.
+- 그래서 사용자가 체감한 “subgoal 탭전환 안 됨”의 핵심은 상단 탭만이 아니라, **CORE 요약 안의 subgoal 진입 버튼이 탭처럼 보여도 전환되지 않는 것**입니다.
 
-## 구현 계획
-1. **체크박스 클릭 경로 분리**
-   - `SubGoalBlock`에서 체크박스 자체 탭은 `toggleAction`만 실행되게 유지합니다.
-   - 체크박스 주변 action slot 탭은 사이드바 열기만 실행되게 하고, 두 이벤트가 동시에 실행되지 않도록 `pointerdown/click` 전파를 명확히 차단합니다.
-   - 웹/iPad에서 일부 체크만 안 눌리는 문제를 해결하기 위해 각 tile의 터치/클릭 영역 크기와 stacking을 고정합니다.
+## 원인
 
-2. **모바일 탭 전환 안정화**
-   - `MobileCategoryTabs`에서 탭 버튼을 `type="button"`으로 명시하고, 탭 클릭 시 active block/focus 상태를 함께 정리합니다.
-   - 모바일 content 전환 애니메이션은 클릭을 막지 않도록 단순화하거나 `pointer-events`를 제어합니다.
-   - CORE 요약 카드의 subgoal 버튼 클릭도 실제 selected tab 변경과 `activeBlockIndex` 정리가 함께 일어나도록 맞춥니다.
+- `MobileCategoryTabs.tsx` 안에 `data-mobile-tab-idx`를 가진 버튼이 두 종류 있습니다.
+  1. 상단 가로 탭 버튼
+  2. CORE 요약 아래의 subgoal 카드 버튼
+- 현재 네이티브 capture listener는 `rootRef.current.contains(button)`만 통과하면 처리합니다.
+- 그런데 CORE 요약 카드의 `pointerdown/touchstart/mousedown`은 React synthetic 이벤트의 `preventDefault()`/중복 방지 흐름과 섞이면서 실제 `selectedTab` 전환이 보장되지 않습니다.
+- 특히 현재 구조는 native root listener + React capture handler + click fallback이 같은 버튼에 중복으로 붙어 있어서, 모바일 브라우저 이벤트 순서에 따라 의도와 다른 중복 억제가 발생할 여지가 큽니다.
 
-3. **설정 메뉴 이벤트 구조 재정리**
-   - 모바일과 데스크톱 모두 설정 cog 및 하위 아이콘은 Tooltip이 클릭 이벤트를 감싸지 않는 순수 button 경로를 기본으로 정리합니다. 데스크톱 Tooltip은 hover-only 보조 UI로 유지하거나 안전한 wrapper만 사용합니다.
-   - Manual, Templates, Pilot Profile, Reset, Revert, Logout 각각의 handler에서 다른 패널 상태를 먼저 닫고 자기 동작만 실행하게 통일합니다.
-   - portal 모달의 backdrop/outside-click 로직은 “열린 직후 닫힘”과 “뒤쪽 메뉴가 클릭을 먹음”이 없도록 `pointerdown` 기준으로 정리합니다.
+## 수정 범위
 
-4. **사이드바가 전체 클릭을 막지 않게 조정**
-   - `ActionSidebar`의 focus 자동 이동/scrollIntoView가 모바일 첫 탭을 방해하지 않도록 조건을 완화합니다.
-   - 닫힌 뒤 body style이 반드시 복구되도록 유지하고, 필요 시 Sheet modal 설정을 클릭 가능한 구조로 바꿉니다.
+1. **`src/components/MobileCategoryTabs.tsx`만 수정**합니다.
+2. 탭 전환 함수를 단일화합니다.
+   - `selectTab(idx)` 하나가 `selectedTab` 변경과 `sessionStorage` 저장을 책임지게 정리합니다.
+   - pointer/touch/mouse/click 중복 방지는 이벤트 종류별 억제보다 “같은 idx의 짧은 중복만 무시”하는 단순 규칙으로 유지합니다.
+3. 상단 탭과 CORE 요약 카드의 전환 처리를 분리합니다.
+   - 상단 탭: native capture + React click fallback 유지.
+   - CORE 요약 카드: `onPointerUp/onTouchEnd/onClick` 중심으로 처리해 실제 사용자의 탭 완료 시점에 전환되도록 보장합니다.
+4. `event.preventDefault()`는 제거하거나 최소화합니다.
+   - 모바일 touch/pointer에서 `preventDefault()`가 후속 click/mouse 이벤트를 막는 패턴이 있어서, 탭 전환에는 기본 동작 차단을 쓰지 않겠습니다.
+5. 선택된 subgoal 콘텐츠 렌더링 조건을 명확하게 만듭니다.
+   - `selectedTab === -1`이면 CORE 요약.
+   - `selectedTab >= 0`이면 해당 subgoal 3x3 그리드.
+   - `selectedIndex === null` 같은 도달 불가능한 조건은 제거합니다.
 
-5. **검증 항목**
-   - 모바일 390px: CORE → 각 subgoal 탭 전환, CORE 요약 버튼 전환, subgoal 체크, action slot 사이드바 열기, settings 모든 아이콘 첫 탭 동작.
-   - 웹/iPad: 3x3 grid의 모든 subgoal 체크 64개 중 여러 위치(모서리/중앙 주변/하단)가 정상 토글되는지 확인.
-   - 설정 메뉴: Manual, Templates 선택, Pilot Profile, Reset 2-step, Revert, Logout 2-step이 클릭 이벤트를 잃지 않는지 확인.
+## 검증 기준
+
+모바일 390px 폭에서 직접 확인합니다.
+
+1. 초기 상태에서 CORE 요약이 보인다.
+2. 상단 `HE 0%` 탭을 누르면 Health 3x3 그리드가 보인다.
+3. 상단 `CA 0%` 탭을 누르면 Career 3x3 그리드가 보인다.
+4. 상단 `⊕` CORE 탭을 누르면 CORE 요약으로 돌아온다.
+5. CORE 요약 안의 `HE HEALTH 0/8` 카드를 누르면 Health 3x3 그리드로 전환된다.
+6. 전환 후 체크박스 탭은 기존처럼 action toggle만 수행하고, 탭 전환 로직과 충돌하지 않는다.
+
+## 비수정 범위
+
+- 디자인, 색상, 레이아웃, 저장 로직, action/sidebar 로직은 건드리지 않습니다.
+- `GoalMatrix`, `SubGoalBlock`, `useMissionProgress`는 현재 원인 범위 밖이므로 수정하지 않습니다.
