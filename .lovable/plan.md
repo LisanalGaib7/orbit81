@@ -1,34 +1,46 @@
-# Settings 서브 메뉴 모바일 미작동 수정
+# 모바일 설정 메뉴 검증 결과 및 수정 계획
 
-## 문제
-모바일에서 우측 상단 설정(Cog)을 탭하면 메뉴(Manual / Templates / Pilot / Reset / Revert / Logout)는 펼쳐지지만, 각 항목을 탭해도 아무 동작이 일어나지 않음.
+## 검증 결과 (390x844 뷰포트)
+
+1. **코그 첫 탭** → 정상. 서브 메뉴 열림 (Manual / Templates / Pilot / Reset / Logout 아이콘 노출).
+2. **Manual 첫 탭** → **버그**. 모달이 뜨지 않고, 동시에 코그 자체도 사라져 사용자가 갇힘.
 
 ## 원인
-`HeaderBar.tsx`의 `SubIcon` 컴포넌트는 각 버튼을 Radix `Tooltip`으로 감싸고 있음. 터치 디바이스에서는 일반적으로:
-1. 첫 번째 탭 → 호버 에뮬레이션으로 Tooltip만 열림 (`click` 이벤트가 합성되지 않거나 무시됨)
-2. 두 번째 탭이 있어야 onClick 발화
 
-서브 메뉴는 한 번 탭하면 닫히도록 설계되어 있어, 사용자는 사실상 버튼을 누를 수가 없음. (Cog 본체는 Tooltip이 `hubOpen`일 때 숨겨져 있어서 정상 동작함.)
+`HeaderBar.tsx` 구조상 `ManualPanel`과 `TemplatePanel`이 fly-out `motion.div` **내부**에 렌더링됩니다.
 
-## 수정 방향
+```
+fly-out (조건: hubOpen && !manualOpen)
+ ├─ SubIcon(Manual)  →  setManualOpen(true)
+ └─ ManualPanel (portal 호출)
+```
 
-### 1) SubIcon에서 모바일 시 Tooltip 비활성화
-- `useIsMobile()` 훅 사용 (`src/hooks/use-mobile.tsx` 이미 존재).
-- 모바일이면 Tooltip 래퍼 없이 `motion.button`만 렌더 → 첫 탭에서 바로 onClick 발화.
-- 데스크톱은 기존 Tooltip 동작 유지 (라벨 가독성).
-- 모바일에서는 라벨이 안 보이는 대신, 메뉴가 아이콘만 6개여서 방향성을 강화하기 위해 아이콘 옆에 작은 텍스트 라벨을 표시하거나 그대로 두는 두 가지 옵션이 있음 — 일단은 그대로 아이콘만 유지(현재 데스크톱과 동일한 시각).
+Manual을 탭하면 `manualOpen=true` → fly-out의 조건이 거짓이 되어 **fly-out 전체가 언마운트** → 그 안의 `ManualPanel`도 언마운트 → portal로 띄운 모달이 즉시 사라집니다. 동시에 코그도 `{!manualOpen && ...}` 가드로 숨겨져 화면에서 모든 진입점이 사라집니다.
 
-### 2) 보조: outside-click 핸들러를 `pointerdown`으로 변경 (선택)
-- 현재 `mousedown` 리스너 사용. 터치에서도 `mousedown`이 합성되긴 하지만, 일부 기기/브라우저에서 타이밍 차이로 클릭 직전에 패널이 닫힐 수 있음.
-- `mousedown` → `pointerdown`으로 통일하면 터치/마우스 모두 일관되게 동작.
-- ManualPanel, TemplatePanel, hub 외부 클릭 3곳 적용.
+Templates도 같은 구조이지만 fly-out 조건은 `manualOpen` 한 가지만 보므로 살아남고, 그래서 우연히 동작합니다. Manual만 깨져 있습니다.
 
-## 변경 파일
-- `src/components/HeaderBar.tsx`
-  - `SubIcon`에 `useIsMobile()` 분기 추가
-  - 외부 클릭 감지 3곳을 `pointerdown`으로 변경
+## 수정 계획
 
-## 검증
-1. 모바일 뷰포트(390px)에서 Cog 탭 → 서브 메뉴 펼침
-2. Manual / Templates / Pilot Profile / Reset / Logout 각각 첫 탭에 동작
-3. 데스크톱에서는 기존 hover Tooltip 정상 표시
+`src/components/HeaderBar.tsx` 한 파일만 수정합니다.
+
+1. **ManualPanel을 컴포넌트 최상위로 끌어올리기**  
+   현재 fly-out 안에 있는 `<ManualPanel ... />`을 제거하고, 파일 하단 `<PilotProfilePanel ... />` 옆 (root fragment 직속)에 한 번만 렌더링. 이러면 `hubOpen` / `manualOpen` 변화와 무관하게 모달이 살아 있음.
+
+2. **fly-out 가드 단순화**  
+   `hubOpen && !manualOpen` → `hubOpen`. Manual이 열렸을 때 fly-out을 굳이 언마운트할 이유가 없음 (모달이 위에 backdrop으로 덮음).
+
+3. **코그 숨김 가드 제거**  
+   `{!manualOpen && (<Tooltip>...코그...</Tooltip>)}` → 항상 렌더. 모달이 backdrop+blur로 가리므로 코그가 보여도 시각적 충돌 없음. 사용자가 갇히는 상황을 원천 차단.
+
+4. **TemplatePanel은 그대로 둠**  
+   Templates 패널은 코그 옆에 떠야 하는 위치-종속적인 작은 팝오버라 fly-out 내부 위치가 맞음. 모달 형태가 아닌 데다 동작도 정상.
+
+## 검증 단계
+
+브라우저 자동화로 390x844에서:
+- 코그 탭 → 서브 메뉴 노출
+- Manual 첫 탭 → Mission Manual 모달 노출 (스크린샷 확인)
+- 모달 X 버튼 첫 탭 → 모달 닫힘
+- Templates 첫 탭 → 템플릿 팝오버 노출
+- Pilot Profile / Reset / Logout 각각 첫 탭 onClick 동작 확인
+- 데스크톱(1280px)에서 Tooltip hover와 Manual 모달 모두 정상 동작 회귀 확인
