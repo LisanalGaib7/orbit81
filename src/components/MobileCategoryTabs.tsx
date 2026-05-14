@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { getPrefix } from "@/lib/goalIds";
@@ -64,10 +63,10 @@ export function MobileCategoryTabs({
   const rootRef = useRef<HTMLDivElement>(null);
   const lastHandledRef = useRef<{ idx: number; at: number } | null>(null);
 
-  const selectedIndex = selectedTab >= 0 ? selectedTab : activeBlockIndex;
+  const selectedIndex = selectedTab;
 
   const selectTab = useCallback((idx: number) => {
-    flushSync(() => setSelectedTab(idx));
+    setSelectedTab(idx);
   }, []);
 
   const findTabButton = useCallback((event: Event) => {
@@ -98,14 +97,9 @@ export function MobileCategoryTabs({
       // Suppress only duplicates for the same tab; allow rapid switching to another tab.
       const now = Date.now();
       const last = lastHandledRef.current;
-      if (last && last.idx === idx && now - last.at < 260) {
-        if (event.cancelable) event.preventDefault();
-        return;
-      }
+      if (last && last.idx === idx && now - last.at < 260) return;
       lastHandledRef.current = { idx, at: now };
 
-      if (event.cancelable) event.preventDefault();
-      event.stopPropagation();
       selectTab(idx);
     };
 
@@ -124,15 +118,18 @@ export function MobileCategoryTabs({
     };
   }, [findTabButton, selectTab]);
 
-  // React fallback (covers environments where native window capture is blocked).
-  const handleTabClick = (idx: number, event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
+  const handleTabPress = (idx: number, event: React.SyntheticEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     const now = Date.now();
     const last = lastHandledRef.current;
     if (last && last.idx === idx && now - last.at < 260) return;
     lastHandledRef.current = { idx, at: now };
     selectTab(idx);
+  };
+
+  // React fallback (covers environments where native capture is blocked).
+  const handleTabClick = (idx: number, event: React.MouseEvent<HTMLButtonElement>) => {
+    handleTabPress(idx, event);
   };
 
   return (
