@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
@@ -33,8 +33,19 @@ export function MobileCategoryTabs({
   onActionClick,
   globalProgress = 0,
 }: MobileCategoryTabsProps) {
-  // -1 = core overview, 0-7 = sub-goal blocks
-  const [selectedTab, setSelectedTab] = useState<number>(-1);
+  // Persist selected tab in sessionStorage so re-renders/remounts don't reset it
+  const [selectedTab, setSelectedTab] = useState<number>(() => {
+    if (typeof window === "undefined") return -1;
+    const saved = sessionStorage.getItem("orbit81_mobile_tab");
+    const n = saved !== null ? parseInt(saved, 10) : -1;
+    return Number.isFinite(n) && n >= -1 && n <= 7 ? n : -1;
+  });
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("orbit81_mobile_tab", String(selectedTab));
+    } catch {}
+  }, [selectedTab]);
 
   const tabs = useMemo(() => {
     const items: { idx: number; label: string; prefix: string }[] = [
