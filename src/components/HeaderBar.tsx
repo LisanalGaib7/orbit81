@@ -115,7 +115,7 @@ function ManualPanel({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[99999]">
+    <div className="fixed inset-0 z-[100001]">
       {/* Backdrop — closes on tap */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       {/* Centered modal */}
@@ -207,7 +207,7 @@ function TemplatePanel({
   if (isMobile) {
     if (!isOpen) return null;
     return createPortal(
-      <div className="fixed inset-0 z-[99999]">
+      <div className="fixed inset-0 z-[100001]">
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
         <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
           <motion.div
