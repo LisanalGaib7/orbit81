@@ -11,6 +11,7 @@ import { EditableLabel } from "./EditableLabel";
 import { PixelConfetti } from "./PixelConfetti";
 import { generateActionId } from "@/lib/goalIds";
 import { ACTION_POSITIONS } from "@/constants/missionData";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Tooltip,
   TooltipContent,
