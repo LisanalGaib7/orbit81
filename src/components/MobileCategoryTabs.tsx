@@ -123,8 +123,10 @@ export function MobileCategoryTabs({
                   return (
                     <button
                       key={idx}
+                      type="button"
                       onClick={() => setSelectedTab(idx)}
-                      className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-secondary/30 hover:border-primary/30 transition-all"
+                      className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-secondary/30 hover:border-primary/30 transition-all min-h-[48px]"
+                      style={{ touchAction: 'manipulation' }}
                     >
                       <div className="flex items-center gap-2">
                         <span 
