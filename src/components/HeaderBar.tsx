@@ -339,16 +339,13 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
             exit={{ opacity: 0, y: -4, scale: 0.9 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="relative">
-              <SubIcon
-                icon={BookOpen}
-                label="Manual"
-                onClick={() => { setManualOpen(!manualOpen); setTemplateOpen(false); }}
-                isActive={manualOpen}
-                index={0}
-              />
-              <ManualPanel isOpen={manualOpen} onClose={() => setManualOpen(false)} />
-            </div>
+            <SubIcon
+              icon={BookOpen}
+              label="Manual"
+              onClick={() => { setManualOpen(!manualOpen); setTemplateOpen(false); }}
+              isActive={manualOpen}
+              index={0}
+            />
 
             <div className="relative">
               <SubIcon
