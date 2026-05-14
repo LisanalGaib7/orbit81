@@ -1,5 +1,4 @@
 import { useMemo, useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { getPrefix } from "@/lib/goalIds";
@@ -142,14 +141,7 @@ export function MobileCategoryTabs({
       </div>
 
       {/* Content area */}
-      <AnimatePresence initial={false}>
-        <motion.div
-          key={selectedTab}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
-        >
+      <div key={selectedTab}>
           {selectedTab === -1 ? (
             /* Core overview - show all 8 categories as a summary */
             <div className="space-y-3">
@@ -227,8 +219,7 @@ export function MobileCategoryTabs({
               />
             </div>
           )}
-        </motion.div>
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
