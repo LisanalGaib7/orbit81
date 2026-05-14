@@ -39,12 +39,6 @@ export function MobileCategoryTabs({
     return Number.isFinite(n) && n >= -1 && n <= 7 ? n : -1;
   });
 
-  useEffect(() => {
-    try {
-      sessionStorage.setItem("orbit81_mobile_tab", String(selectedTab));
-    } catch {}
-  }, [selectedTab]);
-
   const tabs = useMemo(() => {
     const items: { idx: number; label: string; prefix: string }[] = [
       { idx: -1, label: "CORE", prefix: "⊕" },
@@ -59,11 +53,44 @@ export function MobileCategoryTabs({
     actions[blockIdx]?.filter(Boolean).length ?? 0;
 
   const selectTab = useCallback((idx: number) => {
+    try {
+      sessionStorage.setItem("orbit81_mobile_tab", String(idx));
+    } catch {}
     setSelectedTab((prev) => (prev === idx ? prev : idx));
   }, []);
 
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("orbit81_mobile_tab", String(selectedTab));
+    } catch {}
+  }, [selectedTab]);
+
+  const selectFromEventTarget = useCallback(
+    (target: EventTarget | null, stopPropagation?: () => void) => {
+      const element = target instanceof HTMLElement ? target : null;
+      const tabElement = element?.closest<HTMLElement>("[data-mobile-tab]");
+      if (!tabElement) return;
+
+      const nextTab = Number(tabElement.dataset.mobileTab);
+      if (!Number.isFinite(nextTab) || nextTab < -1 || nextTab > 7) return;
+
+      stopPropagation?.();
+      selectTab(nextTab);
+    },
+    [selectTab],
+  );
+
   return (
-    <div className="relative w-full" style={{ zIndex: 200 }}>
+    <div
+      className="relative w-full"
+      onPointerDownCapture={(event) =>
+        selectFromEventTarget(event.target, () => event.stopPropagation())
+      }
+      onTouchStartCapture={(event) =>
+        selectFromEventTarget(event.target, () => event.stopPropagation())
+      }
+      style={{ zIndex: 200 }}
+    >
       {/* Tab bar - horizontally scrollable */}
       <div
         className="relative z-10 flex gap-1 overflow-x-auto pb-2 mb-3 no-scrollbar"
@@ -77,6 +104,7 @@ export function MobileCategoryTabs({
             <button
               key={tab.idx}
               type="button"
+              data-mobile-tab={tab.idx}
               onPointerDown={() => selectTab(tab.idx)}
               onClick={() => selectTab(tab.idx)}
               aria-pressed={isActive}
@@ -119,7 +147,9 @@ export function MobileCategoryTabs({
                   <button
                     key={idx}
                     type="button"
+                    data-mobile-tab={idx}
                     onPointerDown={() => selectTab(idx)}
+                    onPointerUp={() => selectTab(idx)}
                     onClick={() => selectTab(idx)}
                     className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-secondary/30 hover:border-primary/30 transition-all min-h-[48px]"
                     style={{ touchAction: "manipulation" }}
