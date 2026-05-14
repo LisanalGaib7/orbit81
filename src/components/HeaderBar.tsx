@@ -411,6 +411,8 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
           return result;
         }}
       />
+
+      <ManualPanel isOpen={manualOpen} onClose={() => setManualOpen(false)} />
     </>
   );
 }
