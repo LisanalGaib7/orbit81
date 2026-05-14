@@ -338,13 +338,35 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
 
   const isMobileView = typeof window !== "undefined" && window.innerWidth < 768;
 
+  const handleCogPointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (event.pointerType !== "mouse") {
+      event.preventDefault();
+      setHubOpen((open) => {
+        if (open) closeSubPanels();
+        return !open;
+      });
+    }
+  };
+
+  const handleCogClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setHubOpen((open) => {
+      if (open) closeSubPanels();
+      return !open;
+    });
+  };
+
   const cogButton = (
     <motion.button
-      onClick={() => { setHubOpen(!hubOpen); if (hubOpen) closeSubPanels(); }}
-      className="relative p-2.5 rounded-xl text-primary transition-colors"
+      type="button"
+      onPointerDown={handleCogPointerDown}
+      onClick={handleCogClick}
+      className="relative flex min-h-[48px] min-w-[48px] items-center justify-center rounded-xl p-2.5 text-primary transition-colors"
       style={{
         background: hubOpen ? "hsl(var(--background) / 0.6)" : "transparent",
         backdropFilter: hubOpen ? "blur(8px)" : undefined,
+        touchAction: "manipulation",
       }}
       animate={{ rotate: hubOpen ? 90 : 0 }}
       transition={{ duration: 0.25, ease: "easeInOut" }}
@@ -380,7 +402,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
 
       <div
         ref={hubRef}
-        className="absolute top-8 right-8 z-50 max-md:top-4 max-md:right-4"
+        className="fixed right-8 top-8 z-[100000] max-md:right-4 max-md:top-4"
       >
       {/* Cog master toggle — Tooltip skipped on mobile to avoid first-tap swallow */}
       {isMobileView ? cogButton : (
