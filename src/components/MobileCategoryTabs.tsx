@@ -59,7 +59,6 @@ export function MobileCategoryTabs({
     actions[blockIdx]?.filter(Boolean).length ?? 0;
 
   const selectTab = useCallback((idx: number) => {
-    console.log("[MobileCategoryTabs] selectTab", idx);
     setSelectedTab((prev) => (prev === idx ? prev : idx));
   }, []);
 
