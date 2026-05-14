@@ -38,13 +38,28 @@ function SubIcon({
   index: number;
 }) {
   const isMobile = useIsMobile();
+  const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (event.pointerType !== "mouse") {
+      event.preventDefault();
+      onClick();
+    }
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onClick();
+  };
 
   const button = (
     <motion.button
-      onClick={onClick}
-      className="relative p-2.5 rounded-lg text-primary transition-colors hover:bg-primary/10"
+      type="button"
+      onPointerDown={handlePointerDown}
+      onClick={handleClick}
+      className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2.5 text-primary transition-colors hover:bg-primary/10"
       style={{
         filter: isActive ? "drop-shadow(0 0 6px hsl(var(--primary) / 0.7))" : undefined,
+        touchAction: "manipulation",
       }}
       initial={{ opacity: 0, y: -8, scale: 0.8 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
