@@ -75,16 +75,18 @@ export function MobileCategoryTabs({
           return (
             <button
               key={tab.idx}
+              type="button"
               onClick={() => setSelectedTab(tab.idx)}
-              className={`flex-shrink-0 px-2.5 py-1.5 rounded text-[10px] font-bold tracking-wider transition-all border ${
-                isActive 
-                  ? "border-primary/60 bg-primary/15 shadow-[0_0_8px_rgba(234,179,8,0.2)]" 
+              className={`flex-shrink-0 px-2.5 py-1.5 rounded text-[10px] font-bold tracking-wider transition-all border min-h-[36px] ${
+                isActive
+                  ? "border-primary/60 bg-primary/15 shadow-[0_0_8px_rgba(234,179,8,0.2)]"
                   : "border-border bg-secondary/50 hover:border-muted-foreground/30"
               }`}
-              style={{ 
+              style={{
                 fontFamily: 'var(--font-data)',
                 textShadow: '1px 1px 0px #000000',
                 color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
+                touchAction: 'manipulation',
               }}
             >
               <span>{tab.prefix}</span>
@@ -97,13 +99,13 @@ export function MobileCategoryTabs({
       </div>
 
       {/* Content area */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false}>
         <motion.div
           key={selectedTab}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
         >
           {selectedTab === -1 ? (
             /* Core overview - show all 8 categories as a summary */
