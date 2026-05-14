@@ -1,5 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useMemo, useEffect, useRef, useState } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { getPrefix } from "@/lib/goalIds";
@@ -61,23 +60,101 @@ export function MobileCategoryTabs({
     return actions[blockIdx]?.filter(Boolean).length ?? 0;
   };
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const pressHandledRef = useRef(false);
+
+  const selectedIndex = selectedTab >= 0 ? selectedTab : activeBlockIndex;
+
+  const selectTab = useCallback((idx: number) => {
+    setSelectedTab(idx);
+    if (idx >= 0) onBlockClick(idx);
+  }, [onBlockClick]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const handleNativePress = (event: Event) => {
+      const target = event.target as Element | null;
+      const button = target?.closest<HTMLButtonElement>("[data-mobile-tab-idx]");
+      if (!button || !root.contains(button)) return;
+      if (event.type === "click" && pressHandledRef.current) {
+        pressHandledRef.current = false;
+        event.stopPropagation();
+        return;
+      }
+      if (event.type !== "click") pressHandledRef.current = true;
+      if (event.cancelable) event.preventDefault();
+      event.stopPropagation();
+      selectTab(Number(button.dataset.mobileTabIdx));
+    };
+
+    root.addEventListener("pointerdown", handleNativePress, true);
+    root.addEventListener("mousedown", handleNativePress, true);
+    root.addEventListener("touchstart", handleNativePress, { capture: true, passive: false });
+    root.addEventListener("click", handleNativePress, true);
+    return () => {
+      root.removeEventListener("pointerdown", handleNativePress, true);
+      root.removeEventListener("mousedown", handleNativePress, true);
+      root.removeEventListener("touchstart", handleNativePress, true);
+      root.removeEventListener("click", handleNativePress, true);
+    };
+  }, [selectTab]);
+
+  const handleTabPointerDown = (idx: number, event: React.PointerEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (event.pointerType !== "mouse") {
+      pressHandledRef.current = true;
+      event.preventDefault();
+      selectTab(idx);
+    }
+  };
+
+  const handleTabMouseDown = (idx: number, event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (event.button !== 0) return;
+    pressHandledRef.current = true;
+    selectTab(idx);
+  };
+
+  const handleTabTouchStart = (idx: number, event: React.TouchEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    pressHandledRef.current = true;
+    selectTab(idx);
+  };
+
+  const handleTabClick = (idx: number, event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (pressHandledRef.current) {
+      pressHandledRef.current = false;
+      return;
+    }
+    selectTab(idx);
+  };
+
   return (
-    <div className="w-full" style={{ zIndex: 50 }}>
+    <div ref={rootRef} className="relative w-full" style={{ zIndex: 200 }}>
       {/* Tab bar - horizontally scrollable */}
       <div 
-        className="flex gap-1 overflow-x-auto pb-2 mb-3 no-scrollbar"
-        style={{ WebkitOverflowScrolling: 'touch' }}
+        className="relative z-10 flex gap-1 overflow-x-auto pb-2 mb-3 no-scrollbar"
+        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}
       >
         {tabs.map((tab) => {
-          const isActive = selectedTab === tab.idx;
+          const isActive = tab.idx === -1 ? selectedTab === -1 : selectedIndex === tab.idx;
           const progress = tab.idx === -1 ? null : Math.round(subGoalProgress[tab.idx]);
           
           return (
             <button
               key={tab.idx}
               type="button"
-              onClick={() => setSelectedTab(tab.idx)}
-              className={`flex-shrink-0 px-2.5 py-1.5 rounded text-[10px] font-bold tracking-wider transition-all border min-h-[36px] ${
+              onPointerDown={(event) => handleTabPointerDown(tab.idx, event)}
+              onMouseDown={(event) => handleTabMouseDown(tab.idx, event)}
+              onTouchStart={(event) => handleTabTouchStart(tab.idx, event)}
+              onClick={(event) => handleTabClick(tab.idx, event)}
+              aria-pressed={isActive}
+              data-active={isActive ? "true" : "false"}
+              data-mobile-tab-idx={tab.idx}
+              className={`relative z-10 flex min-h-[48px] flex-shrink-0 items-center justify-center rounded border px-3 py-2 text-[10px] font-bold tracking-wider transition-all ${
                 isActive
                   ? "border-primary/60 bg-primary/15 shadow-[0_0_8px_rgba(234,179,8,0.2)]"
                   : "border-border bg-secondary/50 hover:border-muted-foreground/30"
@@ -87,6 +164,7 @@ export function MobileCategoryTabs({
                 textShadow: '1px 1px 0px #000000',
                 color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
                 touchAction: 'manipulation',
+                pointerEvents: 'auto',
               }}
             >
               <span>{tab.prefix}</span>
@@ -99,15 +177,8 @@ export function MobileCategoryTabs({
       </div>
 
       {/* Content area */}
-      <AnimatePresence initial={false}>
-        <motion.div
-          key={selectedTab}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
-        >
-          {selectedTab === -1 ? (
+      <div key={selectedTab}>
+          {selectedIndex === null || selectedTab === -1 ? (
             /* Core overview - show all 8 categories as a summary */
             <div className="space-y-3">
               <CoreGoalBlock 
@@ -124,9 +195,15 @@ export function MobileCategoryTabs({
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => setSelectedTab(idx)}
+                      onPointerDown={(event) => handleTabPointerDown(idx, event)}
+                      onMouseDown={(event) => handleTabMouseDown(idx, event)}
+                      onTouchStart={(event) => handleTabTouchStart(idx, event)}
+                      onClick={(event) => handleTabClick(idx, event)}
+                      aria-pressed={selectedTab === idx}
+                      data-active={selectedTab === idx ? "true" : "false"}
+                      data-mobile-tab-idx={idx}
                       className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-secondary/30 hover:border-primary/30 transition-all min-h-[48px]"
-                      style={{ touchAction: 'manipulation' }}
+                      style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
                     >
                       <div className="flex items-center gap-2">
                         <span 
@@ -165,22 +242,21 @@ export function MobileCategoryTabs({
             /* Single category 3x3 grid */
             <div className="max-w-[280px] mx-auto">
               <SubGoalBlock
-                blockIndex={selectedTab}
-                actions={actions[selectedTab]}
-                actionLabels={actionLabels[selectedTab]}
+                blockIndex={selectedIndex}
+                actions={actions[selectedIndex]}
+                actionLabels={actionLabels[selectedIndex]}
                 onToggle={onToggle}
-                label={subGoalLabels[selectedTab]}
-                onLabelChange={(newLabel) => onLabelChange(selectedTab, newLabel)}
-                showConfetti={completedSubGoals.has(selectedTab)}
-                onConfettiComplete={() => onConfettiComplete(selectedTab)}
-                isActive={activeBlockIndex === selectedTab}
-                onBlockClick={() => onBlockClick(selectedTab)}
+                label={subGoalLabels[selectedIndex]}
+                onLabelChange={(newLabel) => onLabelChange(selectedIndex, newLabel)}
+                showConfetti={completedSubGoals.has(selectedIndex)}
+                onConfettiComplete={() => onConfettiComplete(selectedIndex)}
+                isActive={activeBlockIndex === selectedIndex}
+                onBlockClick={() => onBlockClick(selectedIndex)}
                 onActionClick={onActionClick}
               />
             </div>
           )}
-        </motion.div>
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
