@@ -38,30 +38,14 @@ function SubIcon({
   index: number;
 }) {
   const isMobile = useIsMobile();
-  const skipNextClick = useRef(false);
-  const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (event.pointerType !== "mouse") {
-      skipNextClick.current = true;
-      event.preventDefault();
-      onClick();
-    }
-  };
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (skipNextClick.current) {
-      skipNextClick.current = false;
-      return;
-    }
-    onClick();
-  };
 
   const button = (
     <motion.button
       type="button"
-      onPointerDown={handlePointerDown}
-      onClick={handleClick}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
       className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2.5 text-primary transition-colors hover:bg-primary/10"
       style={{
         filter: isActive ? "drop-shadow(0 0 6px hsl(var(--primary) / 0.7))" : undefined,
@@ -76,6 +60,7 @@ function SubIcon({
       <Icon className="w-4 h-4" strokeWidth={1.5} />
     </motion.button>
   );
+
 
   // On mobile, skip Tooltip wrapper — Radix Tooltip swallows the first tap on
   // touch devices, preventing onClick from firing.
