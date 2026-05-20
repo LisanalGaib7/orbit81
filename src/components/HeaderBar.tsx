@@ -38,30 +38,14 @@ function SubIcon({
   index: number;
 }) {
   const isMobile = useIsMobile();
-  const skipNextClick = useRef(false);
-  const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (event.pointerType !== "mouse") {
-      skipNextClick.current = true;
-      event.preventDefault();
-      onClick();
-    }
-  };
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (skipNextClick.current) {
-      skipNextClick.current = false;
-      return;
-    }
-    onClick();
-  };
 
   const button = (
     <motion.button
       type="button"
-      onPointerDown={handlePointerDown}
-      onClick={handleClick}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
       className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2.5 text-primary transition-colors hover:bg-primary/10"
       style={{
         filter: isActive ? "drop-shadow(0 0 6px hsl(var(--primary) / 0.7))" : undefined,
@@ -76,6 +60,7 @@ function SubIcon({
       <Icon className="w-4 h-4" strokeWidth={1.5} />
     </motion.button>
   );
+
 
   // On mobile, skip Tooltip wrapper — Radix Tooltip swallows the first tap on
   // touch devices, preventing onClick from firing.
@@ -293,6 +278,7 @@ interface HeaderBarProps {
 export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: HeaderBarProps) {
   const { signOut, user } = useAuth();
   const profile = usePilotProfile();
+  const isMobile = useIsMobile();
   const [hubOpen, setHubOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
@@ -301,13 +287,14 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [mounted, setMounted] = useState(false);
   const hubRef = useRef<HTMLDivElement>(null);
-  const skipNextCogClick = useRef(false);
+  const justOpenedHub = useRef(false);
 
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (!hubOpen) return;
     const handler = (e: MouseEvent) => {
+      if (justOpenedHub.current) return;
       if (manualOpen || templateOpen || profileOpen) return;
       if (hubRef.current && !hubRef.current.contains(e.target as Node)) {
         setHubOpen(false);
@@ -343,36 +330,22 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
 
   if (!mounted) return null;
 
-  const isMobileView = typeof window !== "undefined" && window.innerWidth < 768;
-
-  const handleCogPointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    if (event.pointerType !== "mouse") {
-      skipNextCogClick.current = true;
-      event.preventDefault();
-      setHubOpen((open) => {
-        if (open) closeSubPanels();
-        return !open;
-      });
-    }
-  };
-
   const handleCogClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    if (skipNextCogClick.current) {
-      skipNextCogClick.current = false;
-      return;
-    }
     setHubOpen((open) => {
+      const next = !open;
       if (open) closeSubPanels();
-      return !open;
+      if (next) {
+        justOpenedHub.current = true;
+        requestAnimationFrame(() => { justOpenedHub.current = false; });
+      }
+      return next;
     });
   };
 
   const cogButton = (
     <motion.button
       type="button"
-      onPointerDown={handleCogPointerDown}
       onClick={handleCogClick}
       className="relative flex min-h-[48px] min-w-[48px] items-center justify-center rounded-xl p-2.5 text-primary transition-colors"
       style={{
@@ -387,6 +360,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
       <Settings className="w-5 h-5" strokeWidth={1.5} />
     </motion.button>
   );
+
 
   return (
     <>
@@ -417,7 +391,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
         className="fixed right-8 top-8 z-[100000] max-md:right-4 max-md:top-4"
       >
       {/* Cog master toggle — Tooltip skipped on mobile to avoid first-tap swallow */}
-      {isMobileView ? cogButton : (
+      {isMobile ? cogButton : (
         <Tooltip>
           <TooltipTrigger asChild>{cogButton}</TooltipTrigger>
           {!hubOpen && (
