@@ -391,7 +391,7 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
         className="fixed right-8 top-8 z-[100000] max-md:right-4 max-md:top-4"
       >
       {/* Cog master toggle — Tooltip skipped on mobile to avoid first-tap swallow */}
-      {isMobileView ? cogButton : (
+      {isMobile ? cogButton : (
         <Tooltip>
           <TooltipTrigger asChild>{cogButton}</TooltipTrigger>
           {!hubOpen && (
