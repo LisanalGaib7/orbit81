@@ -16,7 +16,7 @@ import {
   ROCKET_BODY_HEIGHT,
   ROCKET_BODY_WIDTH,
   ROCKET_NOZZLE_ANCHOR_STYLE,
-} from "./rocketEngineGeometry";
+} from "@/lib/rocketEngineGeometry";
 import { getPreLaunchStage, type PreLaunchStage, type LaunchPhase } from "@/constants/missionData";
 
 interface RocketLaunchSequenceProps {

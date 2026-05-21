@@ -1,125 +1,40 @@
 /**
  * useMissionProgress — Core state machine for the Orbit 81 matrix.
  *
- * WHY: Keeps all matrix state (actions, labels, progress, mission-complete
- * triggers) in one hook so that the GoalMatrix component stays a thin
- * rendering shell. Any new feature that reads or writes matrix data
- * should go through this hook.
+ * WHY: Composes useMatrixStorage (persistence) + useMissionComplete (finale)
+ * so this hook stays focused on matrix business logic only.
+ * GoalMatrix remains a thin rendering shell calling this single hook.
  */
 
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   DEFAULT_SUBGOALS,
-  STORAGE_KEYS,
   SUB_GOAL_COUNT,
   ACTIONS_PER_BLOCK,
   TOTAL_ACTIONS,
 } from "@/constants/missionData";
 import { getEvolutionStage, type EvolutionStage } from "@/constants/evolutionData";
-import { useAuth } from "@/contexts/AuthContext";
-
-// ─── Array helpers ───────────────────────────────────────────────
-
-function ensureArraySize<T>(arr: T[] | undefined, size: number, defaultValue: T): T[] {
-  if (!Array.isArray(arr) || arr.length < size) {
-    return Array(size).fill(defaultValue);
-  }
-  return arr;
-}
-
-function ensure2DArraySize<T>(
-  arr: T[][] | undefined,
-  outerSize: number,
-  innerSize: number,
-  defaultValue: T,
-): T[][] {
-  if (!Array.isArray(arr) || arr.length < outerSize) {
-    return Array(outerSize)
-      .fill(null)
-      .map(() => Array(innerSize).fill(defaultValue));
-  }
-  return arr.map((inner) => ensureArraySize(inner, innerSize, defaultValue));
-}
-
-// ─── Safe localStorage reader ────────────────────────────────────
-
-function readStorage<T>(key: string, fallback: T, validate: (v: unknown) => T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw) return validate(JSON.parse(raw));
-  } catch {
-    console.warn(`Failed to parse ${key}, using defaults`);
-  }
-  return fallback;
-}
-
-// ─── Hook ────────────────────────────────────────────────────────
+import { useMatrixStorage, make2D } from "@/hooks/useMatrixStorage";
+import { useMissionComplete } from "@/hooks/useMissionComplete";
 
 export function useMissionProgress() {
-  const { user, isGuest } = useAuth();
-  const userId = user?.id ?? (isGuest ? "guest" : "anonymous");
+  // ── Persistence layer ────────────────────────────────────────────
+  const {
+    actions, setActions,
+    subGoalLabels, setSubGoalLabels,
+    actionLabels, setActionLabels,
+    keys,
+  } = useMatrixStorage();
 
-  // --- User-isolated localStorage keys ---
-  const keys = {
-    actions:            `goalMatrix_actions_${userId}`,
-    labels:             `goalMatrix_labels_${userId}`,
-    actionLabels:       `goalMatrix_actionLabels_${userId}`,
-    backupActions:      `orbit81_backup_actions_${userId}`,
-    backupLabels:       `orbit81_backup_labels_${userId}`,
-    backupActionLabels: `orbit81_backup_actionLabels_${userId}`,
-  };
-
-  // --- Core matrix state ---
-  const [actions, setActions] = useState<boolean[][]>(() =>
-    readStorage(keys.actions, make2D(false), (v) =>
-      ensure2DArraySize(v as boolean[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, false),
-    ),
-  );
-
-  const [subGoalLabels, setSubGoalLabels] = useState<string[]>(() =>
-    readStorage(keys.labels, [...DEFAULT_SUBGOALS], (v) =>
-      ensureArraySize(v as string[], SUB_GOAL_COUNT, "Goal"),
-    ),
-  );
-
-  const [actionLabels, setActionLabels] = useState<string[][]>(() =>
-    readStorage(keys.actionLabels, make2D(""), (v) =>
-      ensure2DArraySize(v as string[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, ""),
-    ),
-  );
-
-  // --- 기존 데이터 마이그레이션 (로그인 유저 최초 1회) ---
-  useEffect(() => {
-    if (!user?.id) return;
-    const migrate = (oldKey: string, newKey: string) => {
-      const oldData = localStorage.getItem(oldKey);
-      const newData = localStorage.getItem(newKey);
-      if (oldData && !newData) {
-        localStorage.setItem(newKey, oldData);
-        localStorage.removeItem(oldKey);
-      }
-    };
-    migrate(STORAGE_KEYS.actions,      keys.actions);
-    migrate(STORAGE_KEYS.labels,       keys.labels);
-    migrate(STORAGE_KEYS.actionLabels, keys.actionLabels);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
-
-  // --- Mission completion state ---
-  const [showMissionComplete, setShowMissionComplete] = useState(false);
-  const [showMissionModal, setShowMissionModal] = useState(false);
-  const [showFireworks, setShowFireworks] = useState(false);
+  // ── UI state ────────────────────────────────────────────────────
   const [completedSubGoals, setCompletedSubGoals] = useState<Set<number>>(new Set());
   const prevCompletedRef = useRef<Set<number>>(new Set());
-  const missionTriggeredRef = useRef(false);
   const [ignitionBurst, setIgnitionBurst] = useState(0);
   const [canRevert, setCanRevert] = useState(false);
-
-  // --- Sidebar / focus state ---
   const [activeBlockIndex, setActiveBlockIndex] = useState<number | null>(null);
   const [focusActionIndex, setFocusActionIndex] = useState<number | null>(null);
 
-  // --- Derived values ---
+  // ── Derived values ───────────────────────────────────────────────
   const subGoalProgress = useMemo(
     () => actions.map((block) => (block.filter(Boolean).length / ACTIONS_PER_BLOCK) * 100),
     [actions],
@@ -137,71 +52,16 @@ export function useMissionProgress() {
     [globalProgress],
   );
 
-  // --- Persist to localStorage ---
-  useEffect(() => localStorage.setItem(keys.actions, JSON.stringify(actions)), [actions, keys.actions]);
-  useEffect(() => localStorage.setItem(keys.labels, JSON.stringify(subGoalLabels)), [subGoalLabels, keys.labels]);
-  useEffect(() => localStorage.setItem(keys.actionLabels, JSON.stringify(actionLabels)), [actionLabels, keys.actionLabels]);
+  // ── Mission completion (extracted) ──────────────────────────────
+  const {
+    showMissionComplete,
+    showMissionModal,
+    showFireworks,
+    handleLaunchComplete,
+    dismissMission,
+  } = useMissionComplete(globalProgress);
 
-  // --- Callbacks ---
-  const toggleAction = useCallback((blockIndex: number, actionIndex: number) => {
-    setActions((prev) => {
-      const next = prev.map((block) => [...block]);
-      const wasChecked = next[blockIndex][actionIndex];
-      next[blockIndex][actionIndex] = !wasChecked;
-      if (!wasChecked) setIgnitionBurst((c) => c + 1);
-      return next;
-    });
-  }, []);
-
-  const updateLabel = useCallback((index: number, newLabel: string) => {
-    setSubGoalLabels((prev) => {
-      const next = [...prev];
-      next[index] = newLabel;
-      return next;
-    });
-  }, []);
-
-  const updateActionLabel = useCallback((blockIndex: number, actionIndex: number, label: string) => {
-    setActionLabels((prev) => {
-      const next = prev.map((block) => [...block]);
-      next[blockIndex][actionIndex] = label;
-      return next;
-    });
-  }, []);
-
-  const applyTemplate = useCallback((labels: string[]) => {
-    setSubGoalLabels(labels);
-  }, []);
-
-  const resetSession = useCallback(() => {
-    // Backup current state before resetting
-    localStorage.setItem(keys.backupActions, JSON.stringify(actions));
-    localStorage.setItem(keys.backupLabels, JSON.stringify(subGoalLabels));
-    localStorage.setItem(keys.backupActionLabels, JSON.stringify(actionLabels));
-    setActions(make2D(false));
-    setSubGoalLabels([...DEFAULT_SUBGOALS]);
-    setActionLabels(make2D(""));
-    setActiveBlockIndex(null);
-    setFocusActionIndex(null);
-    setCanRevert(true);
-  }, [actions, subGoalLabels, actionLabels]);
-
-  const revertReset = useCallback(() => {
-    const backupActions = localStorage.getItem(keys.backupActions);
-    const backupLabels = localStorage.getItem(keys.backupLabels);
-    const backupActionLabels = localStorage.getItem(keys.backupActionLabels);
-    if (backupActions) setActions(JSON.parse(backupActions));
-    if (backupLabels) setSubGoalLabels(JSON.parse(backupLabels));
-    if (backupActionLabels) setActionLabels(JSON.parse(backupActionLabels));
-    setCanRevert(false);
-  }, []);
-
-  const handleActionSlotClick = useCallback((blockIndex: number, actionIndex: number) => {
-    setActiveBlockIndex(blockIndex);
-    setFocusActionIndex(actionIndex);
-  }, []);
-
-  // --- Track newly completed sub-goals (confetti) ---
+  // ── Track newly completed sub-goals (confetti) ──────────────────
   useEffect(() => {
     const newCompleted = new Set<number>();
     subGoalProgress.forEach((p, idx) => {
@@ -215,33 +75,70 @@ export function useMissionProgress() {
     prevCompletedRef.current = newCompleted;
   }, [subGoalProgress]);
 
+  // ── Callbacks ────────────────────────────────────────────────────
+  const toggleAction = useCallback((blockIndex: number, actionIndex: number) => {
+    setActions((prev) => {
+      const next = prev.map((block) => [...block]);
+      const wasChecked = next[blockIndex][actionIndex];
+      next[blockIndex][actionIndex] = !wasChecked;
+      if (!wasChecked) setIgnitionBurst((c) => c + 1);
+      return next;
+    });
+  }, [setActions]);
+
+  const updateLabel = useCallback((index: number, newLabel: string) => {
+    setSubGoalLabels((prev) => {
+      const next = [...prev];
+      next[index] = newLabel;
+      return next;
+    });
+  }, [setSubGoalLabels]);
+
+  const updateActionLabel = useCallback((blockIndex: number, actionIndex: number, label: string) => {
+    setActionLabels((prev) => {
+      const next = prev.map((block) => [...block]);
+      next[blockIndex][actionIndex] = label;
+      return next;
+    });
+  }, [setActionLabels]);
+
+  const applyTemplate = useCallback((labels: string[]) => {
+    setSubGoalLabels(labels);
+  }, [setSubGoalLabels]);
+
+  const resetSession = useCallback(() => {
+    localStorage.setItem(keys.backupActions,      JSON.stringify(actions));
+    localStorage.setItem(keys.backupLabels,       JSON.stringify(subGoalLabels));
+    localStorage.setItem(keys.backupActionLabels, JSON.stringify(actionLabels));
+    setActions(make2D(false));
+    setSubGoalLabels([...DEFAULT_SUBGOALS]);
+    setActionLabels(make2D(""));
+    setActiveBlockIndex(null);
+    setFocusActionIndex(null);
+    setCanRevert(true);
+  }, [actions, subGoalLabels, actionLabels, keys, setActions, setSubGoalLabels, setActionLabels]);
+
+  const revertReset = useCallback(() => {
+    const backupActions      = localStorage.getItem(keys.backupActions);
+    const backupLabels       = localStorage.getItem(keys.backupLabels);
+    const backupActionLabels = localStorage.getItem(keys.backupActionLabels);
+    if (backupActions)      setActions(JSON.parse(backupActions));
+    if (backupLabels)       setSubGoalLabels(JSON.parse(backupLabels));
+    if (backupActionLabels) setActionLabels(JSON.parse(backupActionLabels));
+    setCanRevert(false);
+  }, [keys, setActions, setSubGoalLabels, setActionLabels]);
+
+  const handleActionSlotClick = useCallback((blockIndex: number, actionIndex: number) => {
+    setActiveBlockIndex(blockIndex);
+    setFocusActionIndex(actionIndex);
+  }, []);
+
   const clearConfetti = useCallback((idx: number) => {
     setCompletedSubGoals((prev) => {
       const next = new Set(prev);
       next.delete(idx);
       return next;
     });
-  }, []);
-
-  // --- Launch sequence callback ---
-  const handleLaunchComplete = useCallback(() => {
-    setShowFireworks(true);
-    setTimeout(() => setShowMissionModal(true), 1000);
-  }, []);
-
-  // --- Grand finale trigger ---
-  useEffect(() => {
-    if (globalProgress === 100 && !missionTriggeredRef.current) {
-      missionTriggeredRef.current = true;
-      setShowMissionComplete(true);
-    }
-  }, [globalProgress]);
-
-  const dismissMission = useCallback(() => {
-    setShowMissionComplete(false);
-    setShowMissionModal(false);
-    setShowFireworks(false);
-    missionTriggeredRef.current = false;
   }, []);
 
   return {
@@ -280,12 +177,4 @@ export function useMissionProgress() {
     setActiveBlockIndex,
     setFocusActionIndex,
   };
-}
-
-// ─── Utility ─────────────────────────────────────────────────────
-
-function make2D<T>(value: T): T[][] {
-  return Array(SUB_GOAL_COUNT)
-    .fill(null)
-    .map(() => Array(ACTIONS_PER_BLOCK).fill(value));
 }
