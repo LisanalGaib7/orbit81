@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, useCallback } from "react";
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -364,6 +364,7 @@ function BootSequence({ onComplete }: { onComplete: () => void }) {
 
 const Login = () => {
   const { user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, enterGuestMode } = useAuth();
+  const navigate = useNavigate();
   const [googlePressed, setGooglePressed] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -701,7 +702,7 @@ const Login = () => {
             <button
               onClick={() => {
                 enterGuestMode();
-                window.location.href = '/';
+                navigate('/');
               }}
               className="group self-center"
               style={{

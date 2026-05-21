@@ -10,6 +10,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import type { Json } from "@/integrations/supabase/types";
 import type { AvatarId } from "@/assets/avatars";
 
 interface AvatarConfig {
@@ -78,8 +79,7 @@ export function usePilotProfile(): PilotProfile {
       };
       const { error } = await supabase
         .from("profiles")
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .update({ call_sign, avatar_config: nextConfig as any })
+        .update({ call_sign, avatar_config: nextConfig as unknown as Json })
         .eq("user_id", user!.id);
       if (error) throw error;
       return { call_sign, avatar_config: nextConfig };

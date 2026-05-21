@@ -150,10 +150,11 @@ export function ActionSidebar({
     if (isOpen) {
       const targetIdx = focusActionIndex ?? actionLabels.findIndex((l) => !l);
       const idx = targetIdx >= 0 ? targetIdx : 0;
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         inputRefs.current[idx]?.focus();
         inputRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 150);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, blockIndex, focusActionIndex]);
 

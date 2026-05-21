@@ -294,8 +294,18 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
   const [mounted, setMounted] = useState(false);
   const hubRef = useRef<HTMLDivElement>(null);
   const justOpenedHub = useRef(false);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const logoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
+
+  // 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+      if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!hubOpen) return;
@@ -317,7 +327,8 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
       setHubOpen(false);
     } else {
       setConfirmReset(true);
-      setTimeout(() => setConfirmReset(false), 3000);
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = setTimeout(() => setConfirmReset(false), 3000);
     }
   };
 
@@ -328,7 +339,8 @@ export function HeaderBar({ onApplyTemplate, onReset, canRevert, onRevert }: Hea
       setHubOpen(false);
     } else {
       setConfirmLogout(true);
-      setTimeout(() => setConfirmLogout(false), 3000);
+      if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = setTimeout(() => setConfirmLogout(false), 3000);
     }
   };
 
