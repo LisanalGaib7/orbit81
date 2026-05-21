@@ -78,10 +78,14 @@ export function useMissionProgress() {
   // ── Callbacks ────────────────────────────────────────────────────
   const toggleAction = useCallback((blockIndex: number, actionIndex: number) => {
     setActions((prev) => {
-      const next = prev.map((block) => [...block]);
-      const wasChecked = next[blockIndex][actionIndex];
-      next[blockIndex][actionIndex] = !wasChecked;
+      // 변경된 블록만 새 배열로 교체 → 나머지 블록은 참조 유지
+      // → React.memo SubGoalBlock이 변경된 블록만 리렌더
+      const changedBlock = [...prev[blockIndex]];
+      const wasChecked = changedBlock[actionIndex];
+      changedBlock[actionIndex] = !wasChecked;
       if (!wasChecked) setIgnitionBurst((c) => c + 1);
+      const next = [...prev];
+      next[blockIndex] = changedBlock;
       return next;
     });
   }, [setActions]);
@@ -96,8 +100,11 @@ export function useMissionProgress() {
 
   const updateActionLabel = useCallback((blockIndex: number, actionIndex: number, label: string) => {
     setActionLabels((prev) => {
-      const next = prev.map((block) => [...block]);
-      next[blockIndex][actionIndex] = label;
+      // 변경된 블록만 새 배열로 교체
+      const changedBlock = [...prev[blockIndex]];
+      changedBlock[actionIndex] = label;
+      const next = [...prev];
+      next[blockIndex] = changedBlock;
       return next;
     });
   }, [setActionLabels]);

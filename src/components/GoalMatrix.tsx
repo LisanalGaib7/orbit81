@@ -2,6 +2,7 @@
  * GoalMatrix — Root orchestrator for the Orbit 81 mission dashboard.
  */
 
+import { lazy, Suspense } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { ProgressBar } from "./ProgressBar";
@@ -9,8 +10,6 @@ import { ProgressMilestones } from "./ProgressMilestones";
 import { RocketLaunchSequence } from "./RocketLaunchSequence";
 import { LaunchStructure } from "./LaunchStructure";
 import { Starfield } from "./Starfield";
-import { MissionAccomplished } from "./MissionAccomplished";
-import { DeepSpaceFireworks } from "./DeepSpaceFireworks";
 import { ActionSidebar } from "./ActionSidebar";
 import { TypewriterText } from "./TypewriterText";
 import { MobileCategoryTabs } from "./MobileCategoryTabs";
@@ -18,6 +17,10 @@ import { HeaderBar } from "./HeaderBar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useMissionProgress } from "@/hooks/useMissionProgress";
 import { GRID_POSITIONS, TOTAL_ACTIONS } from "@/constants/missionData";
+
+// 100% 달성 시에만 표시되는 무거운 컴포넌트 — 초기 번들에서 분리
+const DeepSpaceFireworks = lazy(() => import("./DeepSpaceFireworks").then(m => ({ default: m.DeepSpaceFireworks })));
+const MissionAccomplished = lazy(() => import("./MissionAccomplished").then(m => ({ default: m.MissionAccomplished })));
 
 export function GoalMatrix() {
   const {
@@ -192,13 +195,17 @@ export function GoalMatrix() {
         />
       )}
 
-      <DeepSpaceFireworks active={showFireworks} />
+      <Suspense fallback={null}>
+        <DeepSpaceFireworks active={showFireworks} />
+      </Suspense>
 
-      <MissionAccomplished
-        isOpen={showMissionComplete}
-        onClose={dismissMission}
-        showModal={showMissionModal}
-      />
+      <Suspense fallback={null}>
+        <MissionAccomplished
+          isOpen={showMissionComplete}
+          onClose={dismissMission}
+          showModal={showMissionModal}
+        />
+      </Suspense>
     </>
   );
 }

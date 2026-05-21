@@ -6,6 +6,7 @@
  * central constants file so the grid layout is defined once.
  */
 
+import { memo } from "react";
 import { GoalCheckbox } from "./GoalCheckbox";
 import { EditableLabel } from "./EditableLabel";
 import { PixelConfetti } from "./PixelConfetti";
@@ -36,7 +37,7 @@ interface SubGoalBlockProps {
 const DEFAULT_ACTIONS = Array(8).fill(false);
 const DEFAULT_ACTION_LABELS = Array(8).fill("");
 
-export function SubGoalBlock({
+export const SubGoalBlock = memo(function SubGoalBlock({
   blockIndex,
   actions = DEFAULT_ACTIONS,
   actionLabels = DEFAULT_ACTION_LABELS,
@@ -142,4 +143,5 @@ export function SubGoalBlock({
       </div>
     </TooltipProvider>
   );
+});
 }

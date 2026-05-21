@@ -89,13 +89,16 @@ function ManualPanel({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
   useEffect(() => {
     if (isOpen) {
       justOpened.current = true;
-      requestAnimationFrame(() => { justOpened.current = false; });
+      // double-rAF: 모바일에서 단일 rAF가 너무 빨리 클리어되는 문제 방지
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { justOpened.current = false; });
+      });
     }
   }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e: MouseEvent) => {
+    const handler = (e: PointerEvent) => {
       if (justOpened.current) return;
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
@@ -181,7 +184,10 @@ function TemplatePanel({
   useEffect(() => {
     if (isOpen) {
       justOpened.current = true;
-      requestAnimationFrame(() => { justOpened.current = false; });
+      // double-rAF: 모바일에서 단일 rAF가 너무 빨리 클리어되는 문제 방지
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { justOpened.current = false; });
+      });
     }
   }, [isOpen]);
 
