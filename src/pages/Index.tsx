@@ -5,8 +5,7 @@ import { PilotOnboarding } from "@/components/PilotOnboarding";
 import { usePilotProfile } from "@/hooks/usePilotProfile";
 
 const Index = () => {
-  const { user, loading } = useAuth();
-  const isGuest = localStorage.getItem('orbit81_guest_mode') === 'true';
+  const { user, loading, isGuest } = useAuth();
   const profile = usePilotProfile();
 
   if (loading) {

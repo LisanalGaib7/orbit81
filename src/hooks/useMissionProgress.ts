@@ -16,6 +16,7 @@ import {
   TOTAL_ACTIONS,
 } from "@/constants/missionData";
 import { getEvolutionStage, type EvolutionStage } from "@/constants/evolutionData";
+import { useAuth } from "@/contexts/AuthContext";
 
 // ─── Array helpers ───────────────────────────────────────────────
 
@@ -55,24 +56,54 @@ function readStorage<T>(key: string, fallback: T, validate: (v: unknown) => T): 
 // ─── Hook ────────────────────────────────────────────────────────
 
 export function useMissionProgress() {
+  const { user, isGuest } = useAuth();
+  const userId = user?.id ?? (isGuest ? "guest" : "anonymous");
+
+  // --- User-isolated localStorage keys ---
+  const keys = {
+    actions:            `goalMatrix_actions_${userId}`,
+    labels:             `goalMatrix_labels_${userId}`,
+    actionLabels:       `goalMatrix_actionLabels_${userId}`,
+    backupActions:      `orbit81_backup_actions_${userId}`,
+    backupLabels:       `orbit81_backup_labels_${userId}`,
+    backupActionLabels: `orbit81_backup_actionLabels_${userId}`,
+  };
+
   // --- Core matrix state ---
   const [actions, setActions] = useState<boolean[][]>(() =>
-    readStorage(STORAGE_KEYS.actions, make2D(false), (v) =>
+    readStorage(keys.actions, make2D(false), (v) =>
       ensure2DArraySize(v as boolean[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, false),
     ),
   );
 
   const [subGoalLabels, setSubGoalLabels] = useState<string[]>(() =>
-    readStorage(STORAGE_KEYS.labels, [...DEFAULT_SUBGOALS], (v) =>
+    readStorage(keys.labels, [...DEFAULT_SUBGOALS], (v) =>
       ensureArraySize(v as string[], SUB_GOAL_COUNT, "Goal"),
     ),
   );
 
   const [actionLabels, setActionLabels] = useState<string[][]>(() =>
-    readStorage(STORAGE_KEYS.actionLabels, make2D(""), (v) =>
+    readStorage(keys.actionLabels, make2D(""), (v) =>
       ensure2DArraySize(v as string[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, ""),
     ),
   );
+
+  // --- 기존 데이터 마이그레이션 (로그인 유저 최초 1회) ---
+  useEffect(() => {
+    if (!user?.id) return;
+    const migrate = (oldKey: string, newKey: string) => {
+      const oldData = localStorage.getItem(oldKey);
+      const newData = localStorage.getItem(newKey);
+      if (oldData && !newData) {
+        localStorage.setItem(newKey, oldData);
+        localStorage.removeItem(oldKey);
+      }
+    };
+    migrate(STORAGE_KEYS.actions,      keys.actions);
+    migrate(STORAGE_KEYS.labels,       keys.labels);
+    migrate(STORAGE_KEYS.actionLabels, keys.actionLabels);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // --- Mission completion state ---
   const [showMissionComplete, setShowMissionComplete] = useState(false);
@@ -107,9 +138,9 @@ export function useMissionProgress() {
   );
 
   // --- Persist to localStorage ---
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.actions, JSON.stringify(actions)), [actions]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.labels, JSON.stringify(subGoalLabels)), [subGoalLabels]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.actionLabels, JSON.stringify(actionLabels)), [actionLabels]);
+  useEffect(() => localStorage.setItem(keys.actions, JSON.stringify(actions)), [actions, keys.actions]);
+  useEffect(() => localStorage.setItem(keys.labels, JSON.stringify(subGoalLabels)), [subGoalLabels, keys.labels]);
+  useEffect(() => localStorage.setItem(keys.actionLabels, JSON.stringify(actionLabels)), [actionLabels, keys.actionLabels]);
 
   // --- Callbacks ---
   const toggleAction = useCallback((blockIndex: number, actionIndex: number) => {
@@ -144,9 +175,9 @@ export function useMissionProgress() {
 
   const resetSession = useCallback(() => {
     // Backup current state before resetting
-    localStorage.setItem('orbit81_backup_actions', JSON.stringify(actions));
-    localStorage.setItem('orbit81_backup_labels', JSON.stringify(subGoalLabels));
-    localStorage.setItem('orbit81_backup_actionLabels', JSON.stringify(actionLabels));
+    localStorage.setItem(keys.backupActions, JSON.stringify(actions));
+    localStorage.setItem(keys.backupLabels, JSON.stringify(subGoalLabels));
+    localStorage.setItem(keys.backupActionLabels, JSON.stringify(actionLabels));
     setActions(make2D(false));
     setSubGoalLabels([...DEFAULT_SUBGOALS]);
     setActionLabels(make2D(""));
@@ -156,9 +187,9 @@ export function useMissionProgress() {
   }, [actions, subGoalLabels, actionLabels]);
 
   const revertReset = useCallback(() => {
-    const backupActions = localStorage.getItem('orbit81_backup_actions');
-    const backupLabels = localStorage.getItem('orbit81_backup_labels');
-    const backupActionLabels = localStorage.getItem('orbit81_backup_actionLabels');
+    const backupActions = localStorage.getItem(keys.backupActions);
+    const backupLabels = localStorage.getItem(keys.backupLabels);
+    const backupActionLabels = localStorage.getItem(keys.backupActionLabels);
     if (backupActions) setActions(JSON.parse(backupActions));
     if (backupLabels) setSubGoalLabels(JSON.parse(backupLabels));
     if (backupActionLabels) setActionLabels(JSON.parse(backupActionLabels));

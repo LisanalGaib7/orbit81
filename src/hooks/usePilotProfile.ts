@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import type { AvatarId } from "@/assets/avatars";
 
 interface AvatarConfig {
@@ -26,6 +27,7 @@ const DEFAULT_CONFIG: AvatarConfig = { suit_color: "default", unlocked_parts: []
 
 export function usePilotProfile(): PilotProfile {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [callSign, setCallSign] = useState<string>("Pilot");
   const [config, setConfig] = useState<AvatarConfig>(DEFAULT_CONFIG);
   const [loading, setLoading] = useState<boolean>(true);
@@ -42,12 +44,19 @@ export function usePilotProfile(): PilotProfile {
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (!error && data) {
+    if (error) {
+      console.error("Failed to load pilot profile:", error);
+      toast({
+        title: "프로필 로드 실패",
+        description: "네트워크를 확인하고 잠시 후 다시 시도해주세요.",
+        variant: "destructive",
+      });
+    } else if (data) {
       setCallSign(data.call_sign ?? "Pilot");
       setConfig((data.avatar_config as AvatarConfig) ?? DEFAULT_CONFIG);
     }
     setLoading(false);
-  }, [user]);
+  }, [user, toast]);
 
   useEffect(() => {
     load();

@@ -363,7 +363,7 @@ function BootSequence({ onComplete }: { onComplete: () => void }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 const Login = () => {
-  const { user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
+  const { user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, enterGuestMode } = useAuth();
   const [googlePressed, setGooglePressed] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -700,7 +700,7 @@ const Login = () => {
           <div className="flex flex-col items-center gap-1 mt-2">
             <button
               onClick={() => {
-                localStorage.setItem('orbit81_guest_mode', 'true');
+                enterGuestMode();
                 window.location.href = '/';
               }}
               className="group self-center"
