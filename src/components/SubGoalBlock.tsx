@@ -144,4 +144,3 @@ export const SubGoalBlock = memo(function SubGoalBlock({
     </TooltipProvider>
   );
 });
-}
