@@ -63,13 +63,14 @@ export function PilotProfilePanel({
     onClose();
   };
 
+  // When closed, remove from DOM entirely so child pointer-events-auto
+  // elements cannot intercept clicks on the grid underneath.
+  if (!isOpen) return null;
+
   return createPortal(
     <div
-      className={cn(
-        "fixed inset-0 z-[100001] transition-opacity duration-100",
-        isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
-      )}
-      aria-hidden={!isOpen}
+      className="fixed inset-0 z-[100001] pointer-events-auto opacity-100"
+      aria-hidden={false}
     >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
