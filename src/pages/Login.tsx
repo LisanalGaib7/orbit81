@@ -371,12 +371,6 @@ function VerificationModal({ email, onClose }: { email: string; onClose: () => v
           boxShadow: '0 0 40px rgba(255,157,0,0.15), 0 0 80px rgba(255,157,0,0.05)',
         }}
       >
-        {/* Corner brackets */}
-        <CornerBracket position="tl" />
-        <CornerBracket position="tr" />
-        <CornerBracket position="bl" />
-        <CornerBracket position="br" />
-
         {/* Header bar */}
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#FF9D00]/20">
           <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#34A853', boxShadow: '0 0 6px #34A853' }} />
@@ -401,11 +395,11 @@ function VerificationModal({ email, onClose }: { email: string; onClose: () => v
 
           <div className="flex flex-col gap-2">
             <p style={{ fontFamily: 'var(--font-data)', fontSize: 10, color: '#FF9D00', opacity: 0.7, letterSpacing: '0.1em', lineHeight: 1.7 }}>
-              인증 링크를 이메일로 전송했습니다.<br />
-              링크를 클릭하면 로그인이 완료됩니다.
+              A verification link has been sent to your email.<br />
+              Click the link to complete sign-in.
             </p>
             <p style={{ fontFamily: 'var(--font-data)', fontSize: 9, color: '#FF9D00', opacity: 0.4, letterSpacing: '0.1em' }}>
-              ⚠ 스팸함도 확인해주세요
+              ⚠ Check your spam folder if you don't see it
             </p>
           </div>
 
