@@ -81,7 +81,7 @@ export function GoalMatrix() {
         </div>
 
         {/* SECTION 2: Rocket + Launch Structure + Progress */}
-        <div className="w-full flex flex-col items-center gap-6 pointer-events-none" style={{ zIndex: 100 }}>
+        <div className="w-full flex flex-col items-center gap-6 pointer-events-none">
           <div className="relative" style={{ minHeight: "160px", width: "120px" }}>
             {/* Mechazilla launch structure behind rocket */}
             <LaunchStructure stage={currentStage} />
