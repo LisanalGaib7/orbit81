@@ -6,7 +6,7 @@
  * from legacy generic keys.
  */
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   DEFAULT_SUBGOALS,
   STORAGE_KEYS,
@@ -90,6 +90,22 @@ export function useMatrixStorage() {
       ensure2DArraySize(v as string[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, ""),
     ),
   );
+
+  // Re-read storage when userId changes (e.g. anonymous → real user after auth resolves)
+  const prevUserIdRef = useRef<string>(userId);
+  useEffect(() => {
+    if (prevUserIdRef.current === userId) return;
+    prevUserIdRef.current = userId;
+    setActions(readStorage(keys.actions, make2D(false), (v) =>
+      ensure2DArraySize(v as boolean[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, false),
+    ));
+    setSubGoalLabels(readStorage(keys.labels, [...DEFAULT_SUBGOALS], (v) =>
+      ensureArraySize(v as string[], SUB_GOAL_COUNT, "Goal"),
+    ));
+    setActionLabels(readStorage(keys.actionLabels, make2D(""), (v) =>
+      ensure2DArraySize(v as string[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, ""),
+    ));
+  }, [userId, keys]);
 
   // One-time migration: move data from legacy generic keys → user-specific keys
   useEffect(() => {
