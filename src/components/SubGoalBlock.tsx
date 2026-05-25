@@ -63,8 +63,8 @@ export const SubGoalBlock = memo(function SubGoalBlock({
   const handleActionSlotClick = (actionIdx: number, e: React.MouseEvent) => {
     e.stopPropagation();
     const target = e.target as HTMLElement;
-    // Checkbox 자체 탭이면 sidebar 열지 않고 toggle만 실행
-    if (target.closest(".checkbox-goal")) return;
+    // checkbox 버튼이나 wrapper 영역 클릭이면 sidebar 열지 않음
+    if (target.closest(".checkbox-goal") || target.closest("[data-checkbox-area]")) return;
     onActionClick?.(blockIndex, actionIdx);
   };
 

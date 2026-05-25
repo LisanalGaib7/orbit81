@@ -24,6 +24,7 @@ export const GoalCheckbox = memo(function GoalCheckbox({ checked, onChange, labe
   return (
     // wrapper div 전체가 터치 타겟 — 버튼 밖 클릭도 올바르게 toggle
     <div
+      data-checkbox-area="true"
       className="relative flex items-center justify-center min-w-[48px] min-h-[48px] sm:min-w-0 sm:min-h-0"
       onClick={handleClick}
     >

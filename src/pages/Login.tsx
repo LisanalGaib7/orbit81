@@ -394,11 +394,12 @@ function VerificationModal({ email, onClose }: { email: string; onClose: () => v
           </div>
 
           <div className="flex flex-col gap-2">
-            <p style={{ fontFamily: 'var(--font-data)', fontSize: 10, color: '#FF9D00', opacity: 0.7, letterSpacing: '0.1em', lineHeight: 1.7 }}>
-              A verification link has been sent to your email.<br />
-              Click the link to complete sign-in.
+            <p style={{ fontFamily: 'var(--font-data)', fontSize: 10, color: '#FF9D00', opacity: 0.7, letterSpacing: '0.08em', lineHeight: 2 }}>
+              A verification link has been sent<br />
+              to your inbox.<br />
+              Click it to complete sign-in.
             </p>
-            <p style={{ fontFamily: 'var(--font-data)', fontSize: 9, color: '#FF9D00', opacity: 0.4, letterSpacing: '0.1em' }}>
+            <p style={{ fontFamily: 'var(--font-data)', fontSize: 9, color: '#FF9D00', opacity: 0.4, letterSpacing: '0.08em' }}>
               ⚠ Check your spam folder if you don't see it
             </p>
           </div>
