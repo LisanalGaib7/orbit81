@@ -4,6 +4,11 @@
  * WHY: Separates localStorage read/write logic from business logic in
  * useMissionProgress. Handles user-isolated keys and one-time migration
  * from legacy generic keys.
+ *
+ * KEY DESIGN: persist effects depend ONLY on data (not on keys).
+ * Keys are accessed via ref so they're always current without being
+ * listed as deps — this prevents persist effects from firing when
+ * userId changes and overwriting good data with stale state.
  */
 
 import { useState, useEffect, useMemo, useRef } from "react";
@@ -59,10 +64,16 @@ export function readStorage<T>(key: string, fallback: T, validate: (v: unknown) 
 // ─── Hook ─────────────────────────────────────────────────────────
 
 export function useMatrixStorage() {
-  const { user, isGuest } = useAuth();
+  const { user, isGuest, loading } = useAuth();
   const userId = user?.id ?? (isGuest ? "guest" : "anonymous");
 
-  // User-isolated localStorage keys (memoized to prevent key churn on re-render)
+  // Always-current refs — updated every render, no effect needed
+  const userIdRef = useRef(userId);
+  userIdRef.current = userId;
+  const loadingRef = useRef(loading);
+  loadingRef.current = loading;
+
+  // User-isolated localStorage keys (memoized)
   const keys = useMemo(() => ({
     actions:            `goalMatrix_actions_${userId}`,
     labels:             `goalMatrix_labels_${userId}`,
@@ -72,42 +83,52 @@ export function useMatrixStorage() {
     backupActionLabels: `orbit81_backup_actionLabels_${userId}`,
   }), [userId]);
 
-  // State initialised from storage
-  const [actions, setActions] = useState<boolean[][]>(() =>
-    readStorage(keys.actions, make2D(false), (v) =>
-      ensure2DArraySize(v as boolean[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, false),
-    ),
-  );
+  // Keep a ref to keys so persist effects can always access current key
+  // without listing keys as a dependency (which would cause overwrite race)
+  const keysRef = useRef(keys);
+  keysRef.current = keys;
 
-  const [subGoalLabels, setSubGoalLabels] = useState<string[]>(() =>
-    readStorage(keys.labels, [...DEFAULT_SUBGOALS], (v) =>
-      ensureArraySize(v as string[], SUB_GOAL_COUNT, "Goal"),
-    ),
-  );
+  // Start with defaults — real data loaded by effect below
+  const [actions, setActions] = useState<boolean[][]>(make2D(false));
+  const [subGoalLabels, setSubGoalLabels] = useState<string[]>([...DEFAULT_SUBGOALS]);
+  const [actionLabels, setActionLabels] = useState<string[][]>(make2D(""));
 
-  const [actionLabels, setActionLabels] = useState<string[][]>(() =>
-    readStorage(keys.actionLabels, make2D(""), (v) =>
-      ensure2DArraySize(v as string[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, ""),
-    ),
-  );
-
-  // Re-read storage when userId changes (e.g. anonymous → real user after auth resolves)
-  const prevUserIdRef = useRef<string>(userId);
+  // ── Load from storage once auth resolves (or userId changes) ──────
+  // Deps: [userId, loading] — fires when auth resolves OR user switches.
+  // Does NOT include keys to avoid circular dependency.
   useEffect(() => {
-    if (prevUserIdRef.current === userId) return;
-    prevUserIdRef.current = userId;
-    setActions(readStorage(keys.actions, make2D(false), (v) =>
+    if (loading) return; // wait for auth to settle
+    const k = keysRef.current;
+    setActions(readStorage(k.actions, make2D(false), (v) =>
       ensure2DArraySize(v as boolean[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, false),
     ));
-    setSubGoalLabels(readStorage(keys.labels, [...DEFAULT_SUBGOALS], (v) =>
+    setSubGoalLabels(readStorage(k.labels, [...DEFAULT_SUBGOALS], (v) =>
       ensureArraySize(v as string[], SUB_GOAL_COUNT, "Goal"),
     ));
-    setActionLabels(readStorage(keys.actionLabels, make2D(""), (v) =>
+    setActionLabels(readStorage(k.actionLabels, make2D(""), (v) =>
       ensure2DArraySize(v as string[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, ""),
     ));
-  }, [userId, keys]);
+  }, [userId, loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // One-time migration: move data from legacy generic keys → user-specific keys
+  // ── Persist on data change — key via ref, NOT dep ─────────────────
+  // This ensures persist effects only fire when data changes,
+  // never when only the key changes (prevents stale-state overwrite).
+  useEffect(() => {
+    if (loadingRef.current) return;
+    localStorage.setItem(keysRef.current.actions, JSON.stringify(actions));
+  }, [actions]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (loadingRef.current) return;
+    localStorage.setItem(keysRef.current.labels, JSON.stringify(subGoalLabels));
+  }, [subGoalLabels]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (loadingRef.current) return;
+    localStorage.setItem(keysRef.current.actionLabels, JSON.stringify(actionLabels));
+  }, [actionLabels]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── One-time migration: legacy generic keys → user-specific keys ──
   useEffect(() => {
     if (!user?.id) return;
     const migrate = (oldKey: string, newKey: string) => {
@@ -123,11 +144,6 @@ export function useMatrixStorage() {
     migrate(STORAGE_KEYS.actionLabels, keys.actionLabels);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
-
-  // Auto-persist on every change
-  useEffect(() => localStorage.setItem(keys.actions,      JSON.stringify(actions)),      [actions,      keys.actions]);
-  useEffect(() => localStorage.setItem(keys.labels,       JSON.stringify(subGoalLabels)), [subGoalLabels, keys.labels]);
-  useEffect(() => localStorage.setItem(keys.actionLabels, JSON.stringify(actionLabels)), [actionLabels,  keys.actionLabels]);
 
   return {
     actions, setActions,
