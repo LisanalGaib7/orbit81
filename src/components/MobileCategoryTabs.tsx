@@ -146,11 +146,13 @@ export function MobileCategoryTabs({
       <div key={selectedTab}>
         {selectedTab === -1 ? (
           <div className="space-y-3">
-            <CoreGoalBlock
-              subGoalProgress={subGoalProgress}
-              subGoalLabels={subGoalLabels}
-              coreProgress={globalProgress}
-            />
+            <div className="aspect-square w-full mx-auto [&>*]:h-full">
+              <CoreGoalBlock
+                subGoalProgress={subGoalProgress}
+                subGoalLabels={subGoalLabels}
+                coreProgress={globalProgress}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-2">
               {subGoalLabels.map((label, idx) => {
                 const completed = completedCount(idx);
