@@ -98,15 +98,15 @@ export function MobileCategoryTabs({
 
   return (
     <div
-      className="relative w-full"
+      className="relative w-full h-full flex flex-col"
       onPointerDownCapture={(event) => selectFromEventTarget(event.target)}
       onMouseDownCapture={(event) => selectFromEventTarget(event.target)}
       onTouchStartCapture={(event) => selectFromEventTarget(event.target)}
       style={{ zIndex: 200 }}
     >
-      {/* Tab bar - horizontally scrollable */}
+      {/* Tab bar - horizontally scrollable, fixed height */}
       <div
-        className="relative z-10 flex gap-1 overflow-x-auto pb-1 mb-2 no-scrollbar"
+        className="relative z-10 flex gap-1 overflow-x-auto pb-1 mb-2 no-scrollbar shrink-0"
         style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
       >
         {tabs.map((tab) => {
@@ -142,18 +142,18 @@ export function MobileCategoryTabs({
         })}
       </div>
 
-      {/* Content area */}
-      <div key={selectedTab}>
+      {/* Content area — fills remaining height */}
+      <div key={selectedTab} className="flex-1 min-h-0">
         {selectedTab === -1 ? (
-          <div className="space-y-3">
-            <div className="aspect-square w-full mx-auto [&>*]:h-full">
+          <div className="h-full overflow-y-auto">
+            <div className="aspect-square w-full [&>*]:h-full [&>*]:w-full">
               <CoreGoalBlock
                 subGoalProgress={subGoalProgress}
                 subGoalLabels={subGoalLabels}
                 coreProgress={globalProgress}
               />
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 mt-3">
               {subGoalLabels.map((label, idx) => {
                 const completed = completedCount(idx);
                 const progress = Math.round(subGoalProgress[idx]);
@@ -200,7 +200,7 @@ export function MobileCategoryTabs({
             </div>
           </div>
         ) : (
-          <div className="aspect-square w-full mx-auto [&>*]:h-full">
+          <div className="h-full aspect-square mx-auto [&>*]:h-full [&>*]:w-full">
             <SubGoalBlock
               blockIndex={selectedTab}
               actions={actions[selectedTab]}
