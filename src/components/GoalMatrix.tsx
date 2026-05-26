@@ -164,19 +164,21 @@ export function GoalMatrix() {
         )}
 
         {/* SECTION 4: Legend */}
-        <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-goal-core border border-border" />
-            <span>Core Goal (Center)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-goal-sub border border-border" />
-            <span>Sub Goals (8 blocks)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="checkbox-goal checked w-3 h-3 !border" />
-            <span>Completed Action</span>
-          </div>
+        <div className="flex items-center justify-center gap-4 sm:gap-6">
+          {[
+            { bg: "bg-goal-core", label: "CORE" },
+            { bg: "bg-goal-sub", label: "SUB" },
+            { bg: "bg-primary/70", label: "DONE" },
+          ].map(({ bg, label }) => (
+            <span
+              key={label}
+              className="flex items-center gap-1.5 text-[9px] tracking-[0.2em] text-muted-foreground/50"
+              style={{ fontFamily: "var(--font-data)" }}
+            >
+              <span className={`w-2 h-2 rounded-sm ${bg} shrink-0`} />
+              {label}
+            </span>
+          ))}
         </div>
       </div>
 
