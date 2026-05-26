@@ -146,13 +146,7 @@ export function MobileCategoryTabs({
       <div key={selectedTab}>
         {selectedTab === -1 ? (
           <div className="space-y-3">
-            <div
-              className="mx-auto [&>*]:h-full"
-              style={{
-                aspectRatio: "1 / 1",
-                width: "min(100%, calc(100svh - 490px))",
-              }}
-            >
+            <div className="aspect-square w-full mx-auto [&>*]:h-full">
               <CoreGoalBlock
                 subGoalProgress={subGoalProgress}
                 subGoalLabels={subGoalLabels}
@@ -206,13 +200,7 @@ export function MobileCategoryTabs({
             </div>
           </div>
         ) : (
-          <div
-            className="mx-auto [&>*]:h-full"
-            style={{
-              aspectRatio: "1 / 1",
-              width: "min(100%, calc(100svh - 490px))",
-            }}
-          >
+          <div className="aspect-square w-full mx-auto [&>*]:h-full">
             <SubGoalBlock
               blockIndex={selectedTab}
               actions={actions[selectedTab]}

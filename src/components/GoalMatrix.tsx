@@ -62,9 +62,9 @@ export function GoalMatrix() {
       {/* HUD utility icons — rendered via portal to document.body */}
       <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} canRevert={canRevert} onRevert={revertReset} sidebarOpen={activeBlockIndex !== null} />
 
-      <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-6 pt-24 sm:pt-6 max-w-3xl mx-auto">
+      <div className="relative z-10 flex flex-col items-center gap-3 sm:gap-6 p-4 sm:p-6 pt-20 sm:pt-6 pb-2 sm:pb-6 max-w-3xl mx-auto">
         {/* SECTION 1: Brand */}
-        <div className="text-center pt-2">
+        <div className="text-center sm:pt-2">
           <h1
             className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide pixel-title-3d whitespace-nowrap"
             style={{ imageRendering: "pixelated" }}
@@ -81,8 +81,8 @@ export function GoalMatrix() {
         </div>
 
         {/* SECTION 2: Rocket + Launch Structure + Progress */}
-        <div className="w-full flex flex-col items-center gap-6 pointer-events-none">
-          <div className="relative" style={{ minHeight: "160px", width: "120px" }}>
+        <div className="w-full flex flex-col items-center gap-3 sm:gap-6 pointer-events-none">
+          <div className="relative" style={{ minHeight: isMobile ? "110px" : "160px", width: "120px" }}>
             {/* Mechazilla launch structure behind rocket */}
             <LaunchStructure stage={currentStage} />
             <RocketLaunchSequence
@@ -163,8 +163,8 @@ export function GoalMatrix() {
           </div>
         )}
 
-        {/* SECTION 4: Legend */}
-        <div className="flex items-center justify-center gap-4 sm:gap-6">
+        {/* SECTION 4: Legend — desktop only (mobile has no room) */}
+        {!isMobile && <div className="flex items-center justify-center gap-4 sm:gap-6">
           {[
             { bg: "bg-goal-core", label: "CORE" },
             { bg: "bg-goal-sub", label: "SUB" },
@@ -179,7 +179,7 @@ export function GoalMatrix() {
               {label}
             </span>
           ))}
-        </div>
+        </div>}
       </div>
 
       {/* Action Sidebar (Task Drawer) */}
