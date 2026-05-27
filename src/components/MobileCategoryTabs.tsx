@@ -146,7 +146,7 @@ export function MobileCategoryTabs({
       <div key={selectedTab} className="flex-1 min-h-0">
         {selectedTab === -1 ? (
           <div className="h-full overflow-y-auto">
-            <div className="aspect-square w-full [&>*]:h-full [&>*]:w-full">
+            <div className="h-full max-w-full mx-auto [&>*]:h-full [&>*]:w-full" style={{ aspectRatio: "1 / 1" }}>
               <CoreGoalBlock
                 subGoalProgress={subGoalProgress}
                 subGoalLabels={subGoalLabels}
@@ -200,7 +200,7 @@ export function MobileCategoryTabs({
             </div>
           </div>
         ) : (
-          <div className="h-full aspect-square mx-auto [&>*]:h-full [&>*]:w-full">
+          <div className="h-full max-w-full mx-auto [&>*]:h-full [&>*]:w-full" style={{ aspectRatio: "1 / 1" }}>
             <SubGoalBlock
               blockIndex={selectedTab}
               actions={actions[selectedTab]}
