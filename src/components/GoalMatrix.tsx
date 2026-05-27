@@ -63,10 +63,10 @@ export function GoalMatrix() {
       <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} canRevert={canRevert} onRevert={revertReset} sidebarOpen={activeBlockIndex !== null} />
 
       <div
-        className="relative z-10 flex flex-col items-center gap-2 sm:gap-6 p-4 sm:p-6 pt-20 sm:pt-6 pb-2 sm:pb-6 max-w-3xl mx-auto"
+        className="relative z-10 flex flex-col items-center gap-2 sm:gap-6 p-4 sm:p-6 pt-16 sm:pt-6 pb-0 sm:pb-6 max-w-3xl mx-auto"
       >
-        {/* SECTION 1: Brand */}
-        <div className="text-center sm:pt-2">
+        {/* SECTION 1: Brand — hidden on mobile to reclaim vertical space */}
+        <div className="text-center sm:pt-2 hidden sm:block">
           <h1
             className="text-lg sm:text-2xl md:text-3xl font-bold tracking-wide pixel-title-3d whitespace-nowrap"
             style={{ imageRendering: "pixelated" }}
@@ -83,7 +83,7 @@ export function GoalMatrix() {
         </div>
 
         {/* SECTION 2: Rocket + Launch Structure + Progress */}
-        <div className="w-full flex flex-col items-center gap-3 sm:gap-6 pointer-events-none">
+        <div className="w-full flex flex-col items-center gap-2 sm:gap-6 pointer-events-none">
           <div className="relative" style={{ minHeight: isMobile ? "90px" : "160px", width: "120px" }}>
             {/* Mechazilla launch structure behind rocket */}
             <LaunchStructure stage={currentStage} />
