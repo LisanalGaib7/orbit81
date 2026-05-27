@@ -64,7 +64,6 @@ export function GoalMatrix() {
 
       <div
         className="relative z-10 flex flex-col items-center gap-2 sm:gap-6 p-4 sm:p-6 pt-20 sm:pt-6 pb-2 sm:pb-6 max-w-3xl mx-auto"
-        style={isMobile ? { height: "100dvh", overflow: "hidden" } : undefined}
       >
         {/* SECTION 1: Brand */}
         <div className="text-center sm:pt-2">
@@ -126,22 +125,20 @@ export function GoalMatrix() {
 
         {/* SECTION 3: Matrix Grid */}
         {isMobile ? (
-          <div className="flex-1 min-h-0 w-full">
-            <MobileCategoryTabs
-              actions={actions}
-              actionLabels={actionLabels}
-              subGoalLabels={subGoalLabels}
-              subGoalProgress={subGoalProgress}
-              onToggle={toggleAction}
-              onLabelChange={updateLabel}
-              completedSubGoals={completedSubGoals}
-              onConfettiComplete={clearConfetti}
-              activeBlockIndex={activeBlockIndex}
-              onBlockClick={(idx) => { setActiveBlockIndex(idx); setFocusActionIndex(null); }}
-              onActionClick={handleActionSlotClick}
-              globalProgress={globalProgress}
-            />
-          </div>
+          <MobileCategoryTabs
+            actions={actions}
+            actionLabels={actionLabels}
+            subGoalLabels={subGoalLabels}
+            subGoalProgress={subGoalProgress}
+            onToggle={toggleAction}
+            onLabelChange={updateLabel}
+            completedSubGoals={completedSubGoals}
+            onConfettiComplete={clearConfetti}
+            activeBlockIndex={activeBlockIndex}
+            onBlockClick={(idx) => { setActiveBlockIndex(idx); setFocusActionIndex(null); }}
+            onActionClick={handleActionSlotClick}
+            globalProgress={globalProgress}
+          />
         ) : (
           <div className="goal-grid w-full aspect-square max-w-2xl" style={{ zIndex: 50 }}>
             {GRID_POSITIONS.map((subIdx, gridIdx) => (

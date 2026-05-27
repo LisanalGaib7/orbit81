@@ -98,15 +98,15 @@ export function MobileCategoryTabs({
 
   return (
     <div
-      className="relative w-full h-full flex flex-col"
+      className="relative w-full"
       onPointerDownCapture={(event) => selectFromEventTarget(event.target)}
       onMouseDownCapture={(event) => selectFromEventTarget(event.target)}
       onTouchStartCapture={(event) => selectFromEventTarget(event.target)}
       style={{ zIndex: 200 }}
     >
-      {/* Tab bar - horizontally scrollable, fixed height */}
+      {/* Tab bar - horizontally scrollable */}
       <div
-        className="relative z-10 flex gap-1 overflow-x-auto pb-1 mb-2 no-scrollbar shrink-0"
+        className="relative z-10 flex gap-1 overflow-x-auto pb-1 mb-2 no-scrollbar"
         style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
       >
         {tabs.map((tab) => {
@@ -142,18 +142,18 @@ export function MobileCategoryTabs({
         })}
       </div>
 
-      {/* Content area — fills remaining height */}
-      <div key={selectedTab} className="flex-1 min-h-0">
+      {/* Content area */}
+      <div key={selectedTab}>
         {selectedTab === -1 ? (
-          <div className="h-full overflow-y-auto">
-            <div className="h-full max-w-full mx-auto [&>*]:h-full [&>*]:w-full" style={{ aspectRatio: "1 / 1" }}>
+          <div className="space-y-3">
+            <div className="aspect-square w-full mx-auto [&>*]:h-full [&>*]:w-full">
               <CoreGoalBlock
                 subGoalProgress={subGoalProgress}
                 subGoalLabels={subGoalLabels}
                 coreProgress={globalProgress}
               />
             </div>
-            <div className="grid grid-cols-2 gap-2 mt-3">
+            <div className="grid grid-cols-2 gap-2">
               {subGoalLabels.map((label, idx) => {
                 const completed = completedCount(idx);
                 const progress = Math.round(subGoalProgress[idx]);
@@ -200,7 +200,7 @@ export function MobileCategoryTabs({
             </div>
           </div>
         ) : (
-          <div className="h-full max-w-full mx-auto [&>*]:h-full [&>*]:w-full" style={{ aspectRatio: "1 / 1" }}>
+          <div className="aspect-square w-full mx-auto [&>*]:h-full [&>*]:w-full">
             <SubGoalBlock
               blockIndex={selectedTab}
               actions={actions[selectedTab]}
