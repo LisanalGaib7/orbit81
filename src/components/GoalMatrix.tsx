@@ -165,8 +165,8 @@ export function GoalMatrix() {
           </div>
         )}
 
-        {/* SECTION 4: Legend — desktop only (mobile has no room) */}
-        {!isMobile && <div className="flex items-center justify-center gap-4 sm:gap-6">
+        {/* SECTION 4: Legend — hidden on mobile via CSS (not JS) to avoid layout flash */}
+        <div className="hidden sm:flex items-center justify-center gap-4 sm:gap-6">
           {[
             { bg: "bg-goal-core", label: "CORE" },
             { bg: "bg-goal-sub", label: "SUB" },
@@ -181,7 +181,7 @@ export function GoalMatrix() {
               {label}
             </span>
           ))}
-        </div>}
+        </div>
       </div>
 
       {/* Action Sidebar (Task Drawer) */}
