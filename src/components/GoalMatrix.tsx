@@ -63,7 +63,7 @@ export function GoalMatrix() {
       <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} canRevert={canRevert} onRevert={revertReset} sidebarOpen={activeBlockIndex !== null} />
 
       <div
-        className="relative z-10 flex flex-col items-center gap-2 sm:gap-6 p-4 sm:p-6 pt-4 sm:pt-6 pb-2 sm:pb-6 max-w-3xl mx-auto h-[100svh] sm:h-auto overflow-hidden sm:overflow-visible"
+        className="relative z-10 flex flex-col items-center gap-2 sm:gap-6 p-4 sm:p-6 pt-4 sm:pt-6 pb-2 sm:pb-6 max-w-3xl mx-auto h-[100svh] sm:h-auto overflow-y-auto sm:overflow-visible no-scrollbar"
       >
         {/* SECTION 1: Brand — hidden on mobile to reclaim vertical space */}
         <div className="text-center sm:pt-2 hidden sm:block">

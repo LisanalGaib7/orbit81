@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect, useState } from "react";
+import { useCallback, useMemo, useEffect, useState, useRef, useLayoutEffect } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { getPrefix } from "@/lib/goalIds";
@@ -64,6 +64,33 @@ export function MobileCategoryTabs({
       sessionStorage.setItem("orbit81_mobile_tab", String(selectedTab));
     } catch {}
   }, [selectedTab]);
+
+  // The 3×3 grid must be a square that fits within the space actually left
+  // over below the rocket/progress hero. CSS aspect-ratio inside a flex column
+  // is unreliable on iOS Safari (it fails to shrink, so the bottom row gets
+  // clipped), so we measure the real available box and size the square in JS.
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [squareSize, setSquareSize] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    const measure = () => {
+      const rect = el.getBoundingClientRect();
+      const size = Math.floor(Math.min(rect.width, rect.height));
+      setSquareSize(size > 0 ? size : null);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
+    };
+  }, []);
 
   const selectFromEventTarget = useCallback(
     (target: EventTarget | null) => {
@@ -142,7 +169,8 @@ export function MobileCategoryTabs({
         })}
       </div>
 
-      {/* Content area */}
+      {/* Content area — stable wrapper measured for square sizing (see useLayoutEffect) */}
+      <div ref={contentRef} className="flex-1 min-h-0 flex flex-col">
       <div key={selectedTab} className="flex-1 min-h-0 flex flex-col">
         {selectedTab === -1 ? (
           <div className="space-y-3 h-full overflow-y-auto no-scrollbar">
@@ -200,7 +228,10 @@ export function MobileCategoryTabs({
             </div>
           </div>
         ) : (
-          <div className="h-full aspect-square max-w-full mx-auto [&>*]:h-full [&>*]:w-full">
+          <div
+            className={`mx-auto [&>*]:h-full [&>*]:w-full ${squareSize ? "" : "w-full aspect-square"}`}
+            style={squareSize ? { width: squareSize, height: squareSize } : undefined}
+          >
             <SubGoalBlock
               blockIndex={selectedTab}
               actions={actions[selectedTab]}
@@ -216,6 +247,7 @@ export function MobileCategoryTabs({
             />
           </div>
         )}
+      </div>
       </div>
     </div>
   );
