@@ -98,7 +98,7 @@ export function MobileCategoryTabs({
 
   return (
     <div
-      className="relative w-full"
+      className="relative w-full flex-1 min-h-0 flex flex-col"
       onPointerDownCapture={(event) => selectFromEventTarget(event.target)}
       onMouseDownCapture={(event) => selectFromEventTarget(event.target)}
       onTouchStartCapture={(event) => selectFromEventTarget(event.target)}
@@ -106,7 +106,7 @@ export function MobileCategoryTabs({
     >
       {/* Tab bar - horizontally scrollable */}
       <div
-        className="relative z-10 flex gap-1 overflow-x-auto pb-1 mb-2 no-scrollbar"
+        className="relative z-10 flex gap-1 overflow-x-auto pb-1 mb-2 no-scrollbar shrink-0"
         style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
       >
         {tabs.map((tab) => {
@@ -143,9 +143,9 @@ export function MobileCategoryTabs({
       </div>
 
       {/* Content area */}
-      <div key={selectedTab}>
+      <div key={selectedTab} className="flex-1 min-h-0 flex flex-col">
         {selectedTab === -1 ? (
-          <div className="space-y-3">
+          <div className="space-y-3 h-full overflow-y-auto no-scrollbar">
             <div className="aspect-square w-full mx-auto [&>*]:h-full [&>*]:w-full">
               <CoreGoalBlock
                 subGoalProgress={subGoalProgress}
@@ -200,7 +200,7 @@ export function MobileCategoryTabs({
             </div>
           </div>
         ) : (
-          <div className="aspect-square w-full mx-auto [&>*]:h-full [&>*]:w-full">
+          <div className="h-full aspect-square max-w-full mx-auto [&>*]:h-full [&>*]:w-full">
             <SubGoalBlock
               blockIndex={selectedTab}
               actions={actions[selectedTab]}

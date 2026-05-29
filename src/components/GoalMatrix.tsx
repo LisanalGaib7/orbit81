@@ -63,7 +63,7 @@ export function GoalMatrix() {
       <HeaderBar onApplyTemplate={applyTemplate} onReset={resetSession} canRevert={canRevert} onRevert={revertReset} sidebarOpen={activeBlockIndex !== null} />
 
       <div
-        className="relative z-10 flex flex-col items-center gap-2 sm:gap-6 p-4 sm:p-6 pt-16 sm:pt-6 pb-0 sm:pb-6 max-w-3xl mx-auto"
+        className="relative z-10 flex flex-col items-center gap-2 sm:gap-6 p-4 sm:p-6 pt-4 sm:pt-6 pb-2 sm:pb-6 max-w-3xl mx-auto h-[100svh] sm:h-auto overflow-hidden sm:overflow-visible"
       >
         {/* SECTION 1: Brand — hidden on mobile to reclaim vertical space */}
         <div className="text-center sm:pt-2 hidden sm:block">
@@ -83,7 +83,7 @@ export function GoalMatrix() {
         </div>
 
         {/* SECTION 2: Rocket + Launch Structure + Progress */}
-        <div className="w-full flex flex-col items-center gap-2 sm:gap-6 pointer-events-none">
+        <div className="w-full flex flex-col items-center gap-2 sm:gap-6 pointer-events-none shrink-0">
           <div className="relative" style={{ minHeight: isMobile ? "90px" : "160px", width: "120px" }}>
             {/* Mechazilla launch structure behind rocket */}
             <LaunchStructure stage={currentStage} />
@@ -96,7 +96,7 @@ export function GoalMatrix() {
 
           <div className="w-full max-w-md space-y-1">
             {/* Mission Readout */}
-            <div className="text-center mb-2">
+            <div className="text-center mb-1 sm:mb-2">
               <span
                 className="font-mono text-[9px] sm:text-[11px] tracking-[0.2em] uppercase"
                 style={{
