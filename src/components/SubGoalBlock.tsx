@@ -101,7 +101,7 @@ export const SubGoalBlock = memo(function SubGoalBlock({
   return (
     <TooltipProvider delayDuration={200}>
       <div
-        className={`goal-block goal-block-sub p-2 relative cursor-pointer transition-all duration-300 ${
+        className={`goal-block goal-block-sub p-2 relative cursor-pointer transition-all duration-300 h-full w-full ${
           isActive
             ? "ring-2 ring-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] scale-[1.02]"
             : "hover:ring-1 hover:ring-primary/30"
@@ -110,11 +110,11 @@ export const SubGoalBlock = memo(function SubGoalBlock({
       >
         <PixelConfetti trigger={showConfetti} onComplete={onConfettiComplete} />
 
-        <div className="grid grid-cols-3 gap-2 sm:gap-1">
+        <div className="grid grid-cols-3 grid-rows-3 gap-2 sm:gap-1 w-full h-full">
           {ACTION_POSITIONS.map((actionIdx, gridIdx) => (
             <div
               key={gridIdx}
-              className="tile-cell aspect-square flex items-center justify-center overflow-visible"
+              className="tile-cell flex items-center justify-center overflow-visible min-h-0 min-w-0"
             >
               {actionIdx === -1 ? (
                 <div style={{ fontFamily: "var(--font-header)" }}>
