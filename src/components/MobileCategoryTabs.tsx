@@ -148,7 +148,7 @@ export function MobileCategoryTabs({
               {...makeTabHandlers(tab.idx)}
               aria-pressed={isActive}
               data-active={isActive ? "true" : "false"}
-              className={`relative z-10 flex min-h-[36px] flex-shrink-0 items-center justify-center rounded border px-2 py-1 text-[10px] font-bold tracking-wider transition-all ${
+              className={`relative z-10 flex min-h-[36px] min-w-[60px] flex-shrink-0 items-center justify-center rounded border px-2 py-1 text-[10px] font-bold tracking-wider transition-all ${
                 isActive
                   ? "border-primary/60 bg-primary/15 shadow-[0_0_8px_rgba(234,179,8,0.2)]"
                   : "border-border/50 bg-secondary/30 hover:border-muted-foreground/30"
