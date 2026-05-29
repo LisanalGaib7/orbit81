@@ -33,7 +33,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8 sm:py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-background py-0 sm:py-12 relative overflow-hidden">
       <GoalMatrix />
     </div>
   );
