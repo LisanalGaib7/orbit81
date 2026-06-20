@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { AVATARS, type AvatarId } from "@/assets/avatars";
 import { PilotAvatar } from "./PilotAvatar";
 import { useToast } from "@/hooks/use-toast";
+import { useAvatarSelection, MAX_CALLSIGN, normalizeCallSign } from "@/hooks/useAvatarSelection";
 import { cn } from "@/lib/utils";
 
 interface PilotProfilePanelProps {
@@ -15,9 +16,6 @@ interface PilotProfilePanelProps {
   onSave: (next: { avatar_id: AvatarId; call_sign: string }) => Promise<{ error: string | null }>;
 }
 
-const MAX_CALLSIGN = 16;
-const CALLSIGN_RE = /^[A-Za-z0-9 _-]*$/;
-
 export function PilotProfilePanel({
   isOpen,
   onClose,
@@ -27,33 +25,24 @@ export function PilotProfilePanel({
 }: PilotProfilePanelProps) {
   const ref = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
-  const [selected, setSelected] = useState<AvatarId | null>(currentAvatarId);
-  const [callSign, setCallSign] = useState<string>(
-    currentCallSign === "Pilot" ? "" : currentCallSign,
-  );
+  const { selected, setSelected, callSign, setCallSign, handleNameChange, trimmedName, isValid } =
+    useAvatarSelection(currentAvatarId, currentCallSign);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (!isOpen) {
       setSelected(currentAvatarId);
-      setCallSign(currentCallSign === "Pilot" ? "" : currentCallSign);
+      setCallSign(normalizeCallSign(currentCallSign));
     }
-  }, [isOpen, currentAvatarId, currentCallSign]);
+  }, [isOpen, currentAvatarId, currentCallSign, setSelected, setCallSign]);
 
-  const trimmed = callSign.trim();
-  const canSave = !!selected && trimmed.length >= 2 && !saving;
-
-  const handleNameChange = (v: string) => {
-    if (v.length > MAX_CALLSIGN) return;
-    if (!CALLSIGN_RE.test(v)) return;
-    setCallSign(v);
-  };
+  const canSave = isValid && !saving;
 
   const handleSave = async () => {
-    if (!selected || trimmed.length < 2) return;
+    if (!selected || trimmedName.length < 2) return;
     setSaving(true);
-    const { error } = await onSave({ avatar_id: selected, call_sign: trimmed });
+    const { error } = await onSave({ avatar_id: selected, call_sign: trimmedName });
     setSaving(false);
     if (error) {
       toast({ title: "SAVE FAILED", description: error, variant: "destructive" });

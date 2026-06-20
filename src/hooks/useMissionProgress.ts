@@ -9,7 +9,6 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   DEFAULT_SUBGOALS,
-  SUB_GOAL_COUNT,
   ACTIONS_PER_BLOCK,
   TOTAL_ACTIONS,
 } from "@/constants/missionData";

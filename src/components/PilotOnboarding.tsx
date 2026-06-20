@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AVATARS, type AvatarId } from "@/assets/avatars";
 import { PilotAvatar } from "./PilotAvatar";
 import { Starfield } from "./Starfield";
+import { useAvatarSelection, MAX_CALLSIGN } from "@/hooks/useAvatarSelection";
 import { cn } from "@/lib/utils";
 
 interface PilotOnboardingProps {
@@ -11,25 +12,14 @@ interface PilotOnboardingProps {
   onComplete: (next: { avatar_id: AvatarId; call_sign: string }) => Promise<{ error: string | null }>;
 }
 
-const MAX_CALLSIGN = 16;
-const CALLSIGN_RE = /^[A-Za-z0-9 _-]*$/;
-
 export function PilotOnboarding({ initialCallSign, initialAvatarId, onComplete }: PilotOnboardingProps) {
-  const [selected, setSelected] = useState<AvatarId | null>(initialAvatarId ?? null);
-  const initialName = (initialCallSign ?? "").replace(/^Pilot$/i, "");
-  const [callSign, setCallSign] = useState<string>(initialName);
+  const { selected, setSelected, callSign, handleNameChange, trimmedName, isValid } =
+    useAvatarSelection(initialAvatarId ?? null, initialCallSign);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const selectedDef = AVATARS.find((a) => a.id === selected) ?? null;
-  const trimmedName = callSign.trim();
-  const canDeploy = !!selected && trimmedName.length >= 2 && !submitting;
-
-  const handleNameChange = (v: string) => {
-    if (v.length > MAX_CALLSIGN) return;
-    if (!CALLSIGN_RE.test(v)) return;
-    setCallSign(v);
-  };
+  const canDeploy = isValid && !submitting;
 
   const handleDeploy = async () => {
     if (!selected || trimmedName.length < 2) return;

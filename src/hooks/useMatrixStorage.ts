@@ -108,7 +108,7 @@ export function useMatrixStorage() {
     setActionLabels(readStorage(k.actionLabels, make2D(""), (v) =>
       ensure2DArraySize(v as string[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, ""),
     ));
-  }, [userId, loading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [userId, loading]);
 
   // ── Persist on data change — key via ref, NOT dep ─────────────────
   // This ensures persist effects only fire when data changes,
@@ -116,17 +116,17 @@ export function useMatrixStorage() {
   useEffect(() => {
     if (loadingRef.current) return;
     localStorage.setItem(keysRef.current.actions, JSON.stringify(actions));
-  }, [actions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [actions]);
 
   useEffect(() => {
     if (loadingRef.current) return;
     localStorage.setItem(keysRef.current.labels, JSON.stringify(subGoalLabels));
-  }, [subGoalLabels]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [subGoalLabels]);
 
   useEffect(() => {
     if (loadingRef.current) return;
     localStorage.setItem(keysRef.current.actionLabels, JSON.stringify(actionLabels));
-  }, [actionLabels]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [actionLabels]);
 
   // ── One-time migration: legacy generic keys → user-specific keys ──
   useEffect(() => {
