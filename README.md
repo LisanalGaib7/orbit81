@@ -28,16 +28,16 @@ _Demo assets coming soon._
 - Hit 100% and watch the launch sequence play
 - Guest mode: use it fully offline, no login required, data stays local
 
+## How it works
+
+Goal data (the grid, checkmarks, labels) lives in **localStorage**, isolated per user by key. Supabase is only used for **auth and profiles** (callsign, avatar) — none of your goal content touches the backend. Guest mode skips Supabase entirely and stores everything locally.
+
 ## Tech Stack
 
 - React 18, TypeScript, Vite 5
 - Tailwind CSS, shadcn/ui, framer-motion
 - Supabase (Auth: Email + Google OAuth, `profiles` table with RLS)
 - Deployed on Vercel
-
-## How it works
-
-Goal data (the grid, checkmarks, labels) lives in **localStorage**, isolated per user by key. Supabase is only used for **auth and profiles** (callsign, avatar) — none of your goal content touches the backend. Guest mode skips Supabase entirely and stores everything locally.
 
 ## Getting Started
 
@@ -88,16 +88,16 @@ _데모 이미지 준비 중입니다._
 - 100% 달성 시 발사 시퀀스 재생
 - 게스트 모드: 로그인 없이 완전 오프라인 사용, 데이터는 기기에만 저장
 
+## 동작 방식
+
+목표 데이터(그리드, 체크, 라벨)는 **localStorage**에 유저별 격리 키로 저장됩니다. Supabase는 **인증과 프로필**(콜사인, 아바타)에만 쓰이며, 목표 내용은 백엔드로 전송되지 않습니다. 게스트 모드는 Supabase를 아예 거치지 않고 전부 로컬에 저장합니다.
+
 ## 기술 스택
 
 - React 18, TypeScript, Vite 5
 - Tailwind CSS, shadcn/ui, framer-motion
 - Supabase (인증: 이메일 + Google OAuth, `profiles` 테이블 + RLS)
 - Vercel 배포
-
-## 동작 방식
-
-목표 데이터(그리드, 체크, 라벨)는 **localStorage**에 유저별 격리 키로 저장됩니다. Supabase는 **인증과 프로필**(콜사인, 아바타)에만 쓰이며, 목표 내용은 백엔드로 전송되지 않습니다. 게스트 모드는 Supabase를 아예 거치지 않고 전부 로컬에 저장합니다.
 
 ## 시작하기
 
