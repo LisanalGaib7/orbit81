@@ -62,8 +62,3 @@ vercel --prod
 ```
 
 Deploys are done via the Vercel CLI. **A `git push` alone does not trigger a deploy** — run `vercel --prod` explicitly.
-
-## Security
-
-- Row Level Security (RLS) enforces per-user data access in Supabase
-- `vercel.json` sets security headers: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`
