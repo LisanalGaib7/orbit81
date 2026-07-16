@@ -27,3 +27,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.vercel
+.env*
+
+# Package manager lockfiles
+bun.lock
+bun.lockb
+yarn.lock
+pnpm-lock.yaml
