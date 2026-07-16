@@ -1,73 +1,69 @@
-# Welcome to your Lovable project
+# Orbit 81
 
-## Project info
+A space-themed mandalart (81-square) goal tracker: 1 core goal, 8 sub-goals, 64 actions.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**Live**: https://orbit81.vercel.app
 
-## How can I edit this code?
+![React](https://img.shields.io/badge/React-18-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-blue) ![Vite](https://img.shields.io/badge/Vite-5-purple)
 
-There are several ways of editing your application.
+## Demo
 
-**Use Lovable**
+_Demo assets coming soon._
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+<!-- TODO(demo): hero — desktop 9x9 grid overview
+     ![Orbit 81 grid](docs/demo-desktop.png) -->
 
-Changes made via Lovable will be committed automatically to this repo.
+<!-- TODO(demo): core loop GIF — checking an action, watching progress/rocket evolve
+     ![Orbit 81 core loop](docs/demo-loop.gif) -->
 
-**Use your preferred IDE**
+<!-- TODO(demo): mobile screen
+     ![Orbit 81 mobile](docs/demo-mobile.png) -->
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Features
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- 9x9 mandalart grid: 1 core goal, 8 sub-goals, 64 actions
+- Checking off actions fuels a rocket that evolves as your progress grows
+- Hit 100% and watch the launch sequence play
+- Guest mode: use it fully offline, no login required, data stays local
 
-Follow these steps:
+## Tech Stack
+
+- React 18, TypeScript, Vite 5
+- Tailwind CSS, shadcn/ui, framer-motion
+- Supabase (Auth: Email + Google OAuth, `profiles` table with RLS)
+- Deployed on Vercel
+
+## How it works
+
+Goal data (the grid, checkmarks, labels) lives in **localStorage**, isolated per user by key. Supabase is only used for **auth and profiles** (callsign, avatar) — none of your goal content touches the backend. Guest mode skips Supabase entirely and stores everything locally.
+
+## Getting Started
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The dev server runs at **http://localhost:8080** (overridden in `vite.config`, not Vite's default 5173).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Environment variables
 
-**Use GitHub Codespaces**
+Create a `.env.local` (do not commit it):
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+| Variable | Description |
+| --- | --- |
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable/anon key (safe to expose client-side; authorization is enforced by RLS, not by this key) |
 
-## What technologies are used for this project?
+## Deployment
 
-This project is built with:
+```sh
+vercel --prod
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Deploys are done via the Vercel CLI. **A `git push` alone does not trigger a deploy** — run `vercel --prod` explicitly.
 
-## How can I deploy this project?
+## Security
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Row Level Security (RLS) enforces per-user data access in Supabase
+- `vercel.json` sets security headers: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`
