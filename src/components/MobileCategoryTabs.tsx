@@ -14,6 +14,7 @@ interface MobileCategoryTabsProps {
   onConfettiComplete: (idx: number) => void;
   activeBlockIndex: number | null;
   onBlockClick: (idx: number) => void;
+  onCloseSidebar: () => void;
   onActionClick: (blockIndex: number, actionIndex: number) => void;
   globalProgress?: number;
 }
@@ -29,6 +30,7 @@ export function MobileCategoryTabs({
   onConfettiComplete,
   activeBlockIndex,
   onBlockClick,
+  onCloseSidebar,
   onActionClick,
   globalProgress = 0,
 }: MobileCategoryTabsProps) {
@@ -52,12 +54,16 @@ export function MobileCategoryTabs({
   const completedCount = (blockIdx: number) =>
     actions[blockIdx]?.filter(Boolean).length ?? 0;
 
-  const selectTab = useCallback((idx: number) => {
-    try {
-      sessionStorage.setItem("orbit81_mobile_tab", String(idx));
-    } catch {}
-    setSelectedTab((prev) => (prev === idx ? prev : idx));
-  }, []);
+  const selectTab = useCallback(
+    (idx: number) => {
+      try {
+        sessionStorage.setItem("orbit81_mobile_tab", String(idx));
+      } catch {}
+      setSelectedTab((prev) => (prev === idx ? prev : idx));
+      onCloseSidebar();
+    },
+    [onCloseSidebar],
+  );
 
   useEffect(() => {
     try {
@@ -238,11 +244,11 @@ export function MobileCategoryTabs({
               actionLabels={actionLabels[selectedTab]}
               onToggle={onToggle}
               label={subGoalLabels[selectedTab]}
-              onLabelChange={(newLabel) => onLabelChange(selectedTab, newLabel)}
+              onLabelChange={onLabelChange}
               showConfetti={completedSubGoals.has(selectedTab)}
-              onConfettiComplete={() => onConfettiComplete(selectedTab)}
+              onConfettiComplete={onConfettiComplete}
               isActive={activeBlockIndex === selectedTab}
-              onBlockClick={() => onBlockClick(selectedTab)}
+              onBlockClick={onBlockClick}
               onActionClick={onActionClick}
             />
           </div>

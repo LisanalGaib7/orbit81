@@ -93,6 +93,7 @@ export function usePilotProfile(): PilotProfile {
   const saveProfile = useCallback<PilotProfile["saveProfile"]>(
     async ({ avatar_id, call_sign }) => {
       if (!user) return { error: "Not authenticated" };
+      if (isLoading) return { error: "Profile still loading, try again" };
       try {
         await mutateAsync({ avatar_id, call_sign });
         return { error: null };
@@ -100,7 +101,7 @@ export function usePilotProfile(): PilotProfile {
         return { error: err instanceof Error ? err.message : "Unknown error" };
       }
     },
-    [user, mutateAsync],
+    [user, isLoading, mutateAsync],
   );
 
   const refresh = useCallback(async () => {

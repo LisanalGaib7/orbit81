@@ -2,7 +2,7 @@
  * GoalMatrix — Root orchestrator for the Orbit 81 mission dashboard.
  */
 
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useCallback } from "react";
 import { SubGoalBlock } from "./SubGoalBlock";
 import { CoreGoalBlock } from "./CoreGoalBlock";
 import { ProgressBar } from "./ProgressBar";
@@ -54,6 +54,18 @@ export function GoalMatrix() {
   } = useMissionProgress();
 
   const isMobile = useIsMobile();
+
+  const handleBlockOpen = useCallback(
+    (idx: number) => {
+      setActiveBlockIndex(idx);
+      setFocusActionIndex(null);
+    },
+    [setActiveBlockIndex, setFocusActionIndex],
+  );
+
+  const handleCloseSidebar = useCallback(() => {
+    setActiveBlockIndex(null);
+  }, [setActiveBlockIndex]);
 
   return (
     <>
@@ -135,7 +147,8 @@ export function GoalMatrix() {
             completedSubGoals={completedSubGoals}
             onConfettiComplete={clearConfetti}
             activeBlockIndex={activeBlockIndex}
-            onBlockClick={(idx) => { setActiveBlockIndex(idx); setFocusActionIndex(null); }}
+            onBlockClick={handleBlockOpen}
+            onCloseSidebar={handleCloseSidebar}
             onActionClick={handleActionSlotClick}
             globalProgress={globalProgress}
           />
@@ -152,11 +165,11 @@ export function GoalMatrix() {
                     actionLabels={actionLabels[subIdx]}
                     onToggle={toggleAction}
                     label={subGoalLabels[subIdx]}
-                    onLabelChange={(newLabel) => updateLabel(subIdx, newLabel)}
+                    onLabelChange={updateLabel}
                     showConfetti={completedSubGoals.has(subIdx)}
-                    onConfettiComplete={() => clearConfetti(subIdx)}
+                    onConfettiComplete={clearConfetti}
                     isActive={activeBlockIndex === subIdx}
-                    onBlockClick={() => { setActiveBlockIndex(subIdx); setFocusActionIndex(null); }}
+                    onBlockClick={handleBlockOpen}
                     onActionClick={handleActionSlotClick}
                   />
                 )}

@@ -26,11 +26,11 @@ interface SubGoalBlockProps {
   actionLabels?: string[];
   onToggle: (blockIndex: number, actionIndex: number) => void;
   label: string;
-  onLabelChange: (newLabel: string) => void;
+  onLabelChange: (index: number, newLabel: string) => void;
   showConfetti?: boolean;
-  onConfettiComplete?: () => void;
+  onConfettiComplete?: (index: number) => void;
   isActive?: boolean;
-  onBlockClick?: () => void;
+  onBlockClick?: (index: number) => void;
   onActionClick?: (blockIndex: number, actionIndex: number) => void;
 }
 
@@ -57,7 +57,7 @@ export const SubGoalBlock = memo(function SubGoalBlock({
   const handleBlockClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.closest(".checkbox-goal") || target.closest("input") || target.closest("button")) return;
-    onBlockClick?.();
+    onBlockClick?.(blockIndex);
   };
 
   const handleActionSlotClick = (actionIdx: number, e: React.MouseEvent) => {
@@ -108,7 +108,7 @@ export const SubGoalBlock = memo(function SubGoalBlock({
         }`}
         onClick={handleBlockClick}
       >
-        <PixelConfetti trigger={showConfetti} onComplete={onConfettiComplete} />
+        <PixelConfetti trigger={showConfetti} onComplete={() => onConfettiComplete?.(blockIndex)} />
 
         <div className="grid grid-cols-3 grid-rows-3 gap-2 sm:gap-1 w-full h-full">
           {ACTION_POSITIONS.map((actionIdx, gridIdx) => (
@@ -120,7 +120,7 @@ export const SubGoalBlock = memo(function SubGoalBlock({
                 <div style={{ fontFamily: "var(--font-header)" }}>
                   <EditableLabel
                     value={label || "Goal"}
-                    onChange={onLabelChange}
+                    onChange={(newLabel) => onLabelChange(blockIndex, newLabel)}
                     className="text-[10px] sm:text-xs font-medium leading-tight px-0.5 w-full"
                   />
                 </div>
