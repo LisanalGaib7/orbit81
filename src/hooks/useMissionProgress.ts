@@ -9,11 +9,18 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   DEFAULT_SUBGOALS,
+  SUB_GOAL_COUNT,
   ACTIONS_PER_BLOCK,
   TOTAL_ACTIONS,
 } from "@/constants/missionData";
 import { getEvolutionStage, type EvolutionStage } from "@/constants/evolutionData";
-import { useMatrixStorage, make2D } from "@/hooks/useMatrixStorage";
+import {
+  useMatrixStorage,
+  make2D,
+  readStorage,
+  ensureArraySize,
+  ensure2DArraySize,
+} from "@/hooks/useMatrixStorage";
 import { useMissionComplete } from "@/hooks/useMissionComplete";
 
 export function useMissionProgress() {
@@ -125,12 +132,18 @@ export function useMissionProgress() {
   }, [actions, subGoalLabels, actionLabels, keys, setActions, setSubGoalLabels, setActionLabels]);
 
   const revertReset = useCallback(() => {
-    const backupActions      = localStorage.getItem(keys.backupActions);
-    const backupLabels       = localStorage.getItem(keys.backupLabels);
-    const backupActionLabels = localStorage.getItem(keys.backupActionLabels);
-    if (backupActions)      setActions(JSON.parse(backupActions));
-    if (backupLabels)       setSubGoalLabels(JSON.parse(backupLabels));
-    if (backupActionLabels) setActionLabels(JSON.parse(backupActionLabels));
+    // Route through readStorage so a corrupted/legacy-shape backup can't
+    // crash (raw JSON.parse) or inject an under-sized array that later
+    // breaks toggleAction — same validation the normal load path uses.
+    setActions(readStorage(keys.backupActions, make2D(false), (v) =>
+      ensure2DArraySize(v as boolean[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, false),
+    ));
+    setSubGoalLabels(readStorage(keys.backupLabels, [...DEFAULT_SUBGOALS], (v) =>
+      ensureArraySize(v as string[], SUB_GOAL_COUNT, "Goal"),
+    ));
+    setActionLabels(readStorage(keys.backupActionLabels, make2D(""), (v) =>
+      ensure2DArraySize(v as string[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, ""),
+    ));
     setCanRevert(false);
   }, [keys, setActions, setSubGoalLabels, setActionLabels]);
 

@@ -99,6 +99,30 @@ export function useMatrixStorage() {
   useEffect(() => {
     if (loading) return; // wait for auth to settle
     const k = keysRef.current;
+
+    // One-time carry-over INTO a freshly signed-in user's namespace, done
+    // BEFORE the reads below so promoted data shows immediately (the load
+    // used to read the empty user keys before migration ran, which made
+    // guest-mode progress vanish on sign-in). Copies only when the
+    // destination is empty, then consumes the source — idempotent.
+    if (user?.id) {
+      const promote = (from: string, to: string) => {
+        const src = localStorage.getItem(from);
+        if (src && !localStorage.getItem(to)) {
+          localStorage.setItem(to, src);
+          localStorage.removeItem(from);
+        }
+      };
+      // Data entered in guest mode before signing up …
+      promote("goalMatrix_actions_guest",      k.actions);
+      promote("goalMatrix_labels_guest",       k.labels);
+      promote("goalMatrix_actionLabels_guest", k.actionLabels);
+      // … and legacy pre-namespacing global keys.
+      promote(STORAGE_KEYS.actions,      k.actions);
+      promote(STORAGE_KEYS.labels,       k.labels);
+      promote(STORAGE_KEYS.actionLabels, k.actionLabels);
+    }
+
     setActions(readStorage(k.actions, make2D(false), (v) =>
       ensure2DArraySize(v as boolean[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, false),
     ));
@@ -108,6 +132,7 @@ export function useMatrixStorage() {
     setActionLabels(readStorage(k.actionLabels, make2D(""), (v) =>
       ensure2DArraySize(v as string[][], SUB_GOAL_COUNT, ACTIONS_PER_BLOCK, ""),
     ));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, loading]);
 
   // ── Persist on data change — key via ref, NOT dep ─────────────────
@@ -127,23 +152,6 @@ export function useMatrixStorage() {
     if (loadingRef.current) return;
     localStorage.setItem(keysRef.current.actionLabels, JSON.stringify(actionLabels));
   }, [actionLabels]);
-
-  // ── One-time migration: legacy generic keys → user-specific keys ──
-  useEffect(() => {
-    if (!user?.id) return;
-    const migrate = (oldKey: string, newKey: string) => {
-      const oldData = localStorage.getItem(oldKey);
-      const newData = localStorage.getItem(newKey);
-      if (oldData && !newData) {
-        localStorage.setItem(newKey, oldData);
-        localStorage.removeItem(oldKey);
-      }
-    };
-    migrate(STORAGE_KEYS.actions,      keys.actions);
-    migrate(STORAGE_KEYS.labels,       keys.labels);
-    migrate(STORAGE_KEYS.actionLabels, keys.actionLabels);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
 
   return {
     actions, setActions,

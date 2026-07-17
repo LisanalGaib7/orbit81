@@ -13,11 +13,16 @@ export function useMissionComplete(globalProgress: number) {
   const [showFireworks, setShowFireworks] = useState(false);
   const missionTriggeredRef = useRef(false);
 
-  // Grand finale trigger — fires once when progress hits 100
+  // Grand finale trigger — fires once when progress hits 100.
+  // The "already triggered" latch self-resets as soon as progress leaves 100
+  // (reset, revert, or un-checking an action), so re-completing re-arms the
+  // finale without depending on the modal being dismissed first.
   useEffect(() => {
     if (globalProgress === 100 && !missionTriggeredRef.current) {
       missionTriggeredRef.current = true;
       setShowMissionComplete(true);
+    } else if (globalProgress < 100) {
+      missionTriggeredRef.current = false;
     }
   }, [globalProgress]);
 
