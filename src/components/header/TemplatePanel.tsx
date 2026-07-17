@@ -7,12 +7,13 @@
  * and onSelect(labels) to apply a template.
  */
 
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TEMPLATES } from "@/constants/missionData";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useClickOutside } from "@/hooks/useClickOutside";
 
 export function TemplatePanel({
   isOpen,
@@ -25,27 +26,8 @@ export function TemplatePanel({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-  const justOpened = useRef(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      justOpened.current = true;
-      // double-rAF: 모바일에서 단일 rAF가 너무 빨리 클리어되는 문제 방지
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => { justOpened.current = false; });
-      });
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: PointerEvent) => {
-      if (justOpened.current) return;
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
-    };
-    document.addEventListener("pointerdown", handler);
-    return () => document.removeEventListener("pointerdown", handler);
-  }, [isOpen, onClose]);
+  useClickOutside(ref, onClose, isOpen);
 
   if (isMobile) {
     if (!isOpen) return null;
